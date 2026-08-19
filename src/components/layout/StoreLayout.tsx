@@ -221,53 +221,68 @@ export function StoreLayout() {
         <Outlet />
       </main>
 
-      <footer className="hidden md:block bg-charcoal-900 text-charcoal-300 mt-auto">
-        <div className="max-w-7xl mx-auto container-padding py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
+      {/* Footer — visible on all screens; extra bottom padding on mobile for bottom nav */}
+      <footer className="bg-charcoal-900 text-charcoal-300 mt-auto pb-20 md:pb-0">
+        <div className="max-w-7xl mx-auto container-padding py-8 sm:py-12">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+            <div className="col-span-2 sm:col-span-2 md:col-span-1">
+              <div className="flex items-center gap-2 mb-3 sm:mb-4">
                 <img src={KULU_LOGO_SRC} alt="KULU" className="w-9 h-9 object-contain brightness-0 invert" />
                 <span className="font-bold text-xl text-white">KULU</span>
               </div>
-              <p className="text-sm">{t('tagline')}</p>
+              <p className="text-sm leading-relaxed">{t('tagline')}</p>
             </div>
             <div>
-              <h4 className="font-semibold text-white mb-3">{t('shop')}</h4>
+              <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('shop')}</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/shop" className="hover:text-white">{t('allProducts')}</Link>
+                  <Link to="/shop" className="hover:text-white active:text-white">
+                    {t('allProducts')}
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/shop?sort=newest" className="hover:text-white">{t('newArrivals')}</Link>
+                  <Link to="/shop?sort=newest" className="hover:text-white active:text-white">
+                    {t('newArrivals')}
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/shop?sort=popular" className="hover:text-white">{t('bestSellers')}</Link>
+                  <Link to="/shop?sort=popular" className="hover:text-white active:text-white">
+                    {t('bestSellers')}
+                  </Link>
                 </li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-white mb-3">{t('customer')}</h4>
+              <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('customer')}</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/account" className="hover:text-white">{t('myAccount')}</Link>
+                  <Link to="/account" className="hover:text-white active:text-white">
+                    {t('myAccount')}
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/orders" className="hover:text-white">{t('trackOrder')}</Link>
+                  <Link to="/orders" className="hover:text-white active:text-white">
+                    {t('trackOrder')}
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/notifications" className="hover:text-white">{t('notifications')}</Link>
+                  <Link to="/notifications" className="hover:text-white active:text-white">
+                    {t('notifications')}
+                  </Link>
                 </li>
                 <li>
-                  <Link to="/wishlist" className="hover:text-white">{t('wishlist')}</Link>
+                  <Link to="/wishlist" className="hover:text-white active:text-white">
+                    {t('wishlist')}
+                  </Link>
                 </li>
               </ul>
             </div>
-            <div>
-              <h4 className="font-semibold text-white mb-3">{t('delivery')}</h4>
-              <p className="text-sm">{t('deliveryDesc')}</p>
+            <div className="col-span-2 sm:col-span-2 md:col-span-1">
+              <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('delivery')}</h4>
+              <p className="text-sm leading-relaxed">{t('deliveryDesc')}</p>
             </div>
           </div>
-          <div className="border-t border-charcoal-700 mt-8 pt-8 text-center text-sm">
+          <div className="border-t border-charcoal-700 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-sm">
             <p>
               &copy; {new Date().getFullYear()} KULU. {t('allRights')}
             </p>
@@ -311,7 +326,8 @@ export function StoreLayout() {
         </div>
       </nav>
 
-      <div className="md:hidden h-16 safe-bottom-spacer" />
+      {/* Spacer so last content clears fixed bottom nav (footer has its own pb-20) */}
+      <div className="md:hidden h-0" />
     </div>
   )
 }
