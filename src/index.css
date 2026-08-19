@@ -41,7 +41,7 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: var(--color-charcoal-200);
   }
 
   body {
