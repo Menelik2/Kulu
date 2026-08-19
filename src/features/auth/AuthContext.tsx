@@ -11,6 +11,7 @@ interface AuthContextType {
   isAdmin: boolean
   signUp: (email: string, password: string, fullName: string, phone?: string) => Promise<{ error: Error | null }>
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
+  signInWithGoogle: () => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
   updateProfile: (data: { full_name?: string; phone?: string | null }) => Promise<{ error: Error | null }>
@@ -89,6 +90,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const signInWithGoogle = async () => {
+    try {
+      const redirectTo = `${window.location.origin}/`
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
+        },
+      })
+      return { error: error as Error | null }
+    } catch (err) {
+      return { error: err as Error }
+    }
+  }
+
   const signOut = async () => {
     await supabase.auth.signOut()
     setProfile(null)
@@ -111,7 +131,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (error) return { error: error as Error }
 
-      // Keep auth user metadata in sync when name changes
       if (data.full_name !== undefined) {
         await supabase.auth.updateUser({
           data: { full_name: data.full_name, phone: data.phone ?? undefined },
@@ -146,6 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAdmin,
         signUp,
         signIn,
+        signInWithGoogle,
         signOut,
         refreshProfile,
         updateProfile,
