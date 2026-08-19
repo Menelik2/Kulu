@@ -95,6 +95,25 @@ export async function adminGetOrder(id: string) {
 export async function adminUpdateOrderStatus(id: string, status: string) {
   const { data, error } = await supabase.from('orders').update({ status }).eq('id', id).select().single()
   if (error) throw error
+
+  const statusLabels: Record<string, string> = {
+    confirmed: 'confirmed',
+    processing: 'being prepared',
+    shipped: 'shipped',
+    delivered: 'delivered',
+    cancelled: 'cancelled',
+  }
+  const label = statusLabels[status]
+  if (label && data) {
+    await supabase.from('notifications').insert({
+      user_id: data.user_id,
+      title: `Order ${label}`,
+      message: `Your order ${data.order_number} has been ${label}.`,
+      type: 'order',
+      link: `/orders/${data.id}`,
+    })
+  }
+
   return data as Order
 }
 
