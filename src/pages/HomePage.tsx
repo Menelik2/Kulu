@@ -88,26 +88,26 @@ export default function HomePage() {
       </section>
 
       {categories && categories.length > 0 && (
-        <section className="max-w-7xl mx-auto container-padding py-8 sm:py-12">
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
+        <section className="max-w-7xl mx-auto container-padding py-6 sm:py-12">
+          <div className="flex items-center justify-between mb-3 sm:mb-6">
+            <h2 className="text-lg sm:text-2xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
             <Link to="/shop" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
               {t('viewAll')} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 sm:gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4">
             {categories.slice(0, 10).map((cat) => {
               const Icon = getCategoryIcon(cat.slug || cat.name)
               return (
                 <Link
                   key={cat.id}
                   to={`/shop?category=${cat.id}`}
-                  className="group bg-white rounded-2xl border border-charcoal-100 p-3 sm:p-4 text-center hover:border-primary-300 hover:shadow-md active:scale-[0.98] transition-all"
+                  className="group bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2 sm:p-4 text-center hover:border-primary-300 hover:shadow-md active:scale-[0.98] transition-all"
                 >
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-2xl bg-primary-50 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary-100 group-hover:scale-105 transition-all">
-                    <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary-600" strokeWidth={1.75} />
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 mx-auto rounded-xl sm:rounded-2xl bg-primary-50 flex items-center justify-center mb-1.5 sm:mb-3 group-hover:bg-primary-100 group-hover:scale-105 transition-all">
+                    <Icon className="h-4 w-4 sm:h-6 sm:w-6 md:h-7 md:w-7 text-primary-600" strokeWidth={1.75} />
                   </div>
-                  <h3 className="font-medium text-xs sm:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2">
+                  <h3 className="font-medium text-[10px] sm:text-xs md:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2 leading-tight">
                     {cat.name}
                   </h3>
                 </Link>
