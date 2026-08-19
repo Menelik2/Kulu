@@ -13,6 +13,8 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
   refreshProfile: () => Promise<void>
+  updateProfile: (data: { full_name?: string; phone?: string | null }) => Promise<{ error: Error | null }>
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -47,7 +49,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     })
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
       if (session?.user) {
@@ -94,6 +98,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (user) await fetchProfile(user.id)
   }
 
+  const updateProfile = async (data: { full_name?: string; phone?: string | null }) => {
+    if (!user) return { error: new Error('Not signed in') }
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          ...data,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', user.id)
+
+      if (error) return { error: error as Error }
+
+      // Keep auth user metadata in sync when name changes
+      if (data.full_name !== undefined) {
+        await supabase.auth.updateUser({
+          data: { full_name: data.full_name, phone: data.phone ?? undefined },
+        })
+      }
+
+      await fetchProfile(user.id)
+      return { error: null }
+    } catch (err) {
+      return { error: err as Error }
+    }
+  }
+
+  const updatePassword = async (newPassword: string) => {
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword })
+      return { error: error as Error | null }
+    } catch (err) {
+      return { error: err as Error }
+    }
+  }
+
   const isAdmin = profile?.role === 'admin'
 
   return (
@@ -108,6 +148,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signOut,
         refreshProfile,
+        updateProfile,
+        updatePassword,
       }}
     >
       {children}
