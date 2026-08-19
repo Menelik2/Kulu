@@ -6,6 +6,7 @@ import App from './App'
 import './index.css'
 import { AuthProvider } from './features/auth/AuthContext'
 import { CartProvider } from './features/cart/CartContext'
+import { LanguageProvider } from './features/language/LanguageContext'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,12 +21,14 @@ const queryClient = new QueryClient({
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <CartProvider>
-          <App />
-          <Toaster position="top-center" richColors closeButton />
-        </CartProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <CartProvider>
+            <App />
+            <Toaster position="top-center" richColors closeButton />
+          </CartProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </QueryClientProvider>
   </StrictMode>
 )

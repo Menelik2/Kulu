@@ -3,6 +3,7 @@ import { ShoppingCart, Star } from 'lucide-react'
 import type { Product } from '@/types/database'
 import { formatETB, calculateDiscountPercent, getEffectivePrice } from '@/lib/utils'
 import { useCart } from '@/features/cart/CartContext'
+import { useLanguage } from '@/features/language/LanguageContext'
 import { Button } from '@/components/ui/button'
 
 interface ProductCardProps {
@@ -11,13 +12,14 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const { addItem } = useCart()
+  const { t } = useLanguage()
   const primaryImage = product.images?.find((i) => i.is_primary) || product.images?.[0]
   const discount = calculateDiscountPercent(product.price, product.discount_price)
   const effectivePrice = getEffectivePrice(product.price, product.discount_price)
   const outOfStock = product.stock_quantity < 1
 
   return (
-    <div className="group bg-white rounded-xl border border-charcoal-100 overflow-hidden hover:shadow-md transition-shadow">
+    <div className="group bg-white rounded-2xl border border-charcoal-100 overflow-hidden shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
       <Link to={`/products/${product.slug}`} className="block relative aspect-square bg-charcoal-50 overflow-hidden">
         {primaryImage ? (
           <img
@@ -32,20 +34,20 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
         {discount && (
-          <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
+          <span className="absolute top-2 left-2 bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
             -{discount}%
           </span>
         )}
         {outOfStock && (
-          <span className="absolute top-2 right-2 bg-charcoal-800 text-white text-xs font-medium px-2 py-0.5 rounded">
-            Out of Stock
+          <span className="absolute top-2 right-2 bg-charcoal-800/90 text-white text-[11px] font-medium px-2 py-0.5 rounded-full">
+            {t('outOfStock')}
           </span>
         )}
       </Link>
 
       <div className="p-3 sm:p-4">
         <Link to={`/products/${product.slug}`}>
-          <h3 className="font-medium text-sm sm:text-base text-charcoal-900 line-clamp-2 hover:text-primary-600 transition-colors">
+          <h3 className="font-medium text-sm sm:text-base text-charcoal-900 line-clamp-2 hover:text-primary-600 transition-colors leading-snug">
             {product.name}
           </h3>
         </Link>
@@ -61,16 +63,16 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
 
         <div className="mt-2 flex items-baseline gap-2">
-          <span className="font-bold text-primary-600">{formatETB(effectivePrice)}</span>
+          <span className="font-bold text-primary-600 text-[15px]">{formatETB(effectivePrice)}</span>
           {discount && (
             <span className="text-xs text-charcoal-400 line-through">{formatETB(product.price)}</span>
           )}
         </div>
 
-        <div className="mt-3 flex gap-2">
+        <div className="mt-3">
           <Button
             size="sm"
-            className="flex-1"
+            className="w-full h-9 rounded-xl"
             disabled={outOfStock}
             onClick={(e) => {
               e.preventDefault()
@@ -78,7 +80,7 @@ export function ProductCard({ product }: ProductCardProps) {
             }}
           >
             <ShoppingCart className="h-4 w-4" />
-            <span className="hidden sm:inline">Add</span>
+            <span>{t('add')}</span>
           </Button>
         </div>
       </div>
