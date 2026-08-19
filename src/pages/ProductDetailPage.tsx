@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ShoppingCart, Minus, Plus, ArrowLeft } from 'lucide-react'
+import { ShoppingCart, Minus, Plus, ArrowLeft, X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getProductBySlug, getRelatedProducts } from '@/services/products'
 import { ProductCard } from '@/components/products/ProductCard'
 import { useCart } from '@/features/cart/CartContext'
@@ -15,6 +15,7 @@ export default function ProductDetailPage() {
   const { t } = useLanguage()
   const [qty, setQty] = useState(1)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
 
   const { data: product, isLoading, isError } = useQuery({
     queryKey: ['product', slug],
@@ -27,6 +28,41 @@ export default function ProductDetailPage() {
     queryFn: () => getRelatedProducts(product!.category_id!, product!.id, 4),
     enabled: !!product?.category_id,
   })
+
+  const images = product?.images?.length ? product.images : []
+
+  const openLightbox = (index: number) => {
+    setSelectedImage(index)
+    setLightboxOpen(true)
+  }
+
+  const closeLightbox = useCallback(() => setLightboxOpen(false), [])
+
+  const goPrev = useCallback(() => {
+    if (images.length < 2) return
+    setSelectedImage((i) => (i - 1 + images.length) % images.length)
+  }, [images.length])
+
+  const goNext = useCallback(() => {
+    if (images.length < 2) return
+    setSelectedImage((i) => (i + 1) % images.length)
+  }, [images.length])
+
+  // Keyboard + lock scroll while lightbox open
+  useEffect(() => {
+    if (!lightboxOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeLightbox()
+      if (e.key === 'ArrowLeft') goPrev()
+      if (e.key === 'ArrowRight') goNext()
+    }
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [lightboxOpen, closeLightbox, goPrev, goNext])
 
   if (isLoading) {
     return (
@@ -54,7 +90,6 @@ export default function ProductDetailPage() {
     )
   }
 
-  const images = product.images?.length ? product.images : []
   const primary = images[selectedImage] || images[0]
   const discount = calculateDiscountPercent(product.price, product.discount_price)
   const effective = getEffectivePrice(product.price, product.discount_price)
@@ -71,7 +106,12 @@ export default function ProductDetailPage() {
 
       <div className="grid md:grid-cols-2 gap-6 lg:gap-12">
         <div>
-          <div className="aspect-square bg-charcoal-50 rounded-2xl overflow-hidden border border-charcoal-100 elevation-1">
+          <button
+            type="button"
+            onClick={() => primary && openLightbox(selectedImage)}
+            className="block w-full aspect-square bg-charcoal-50 rounded-2xl overflow-hidden border border-charcoal-100 elevation-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 active:opacity-95"
+            aria-label="View image full screen"
+          >
             {primary ? (
               <img
                 src={primary.url}
@@ -83,13 +123,15 @@ export default function ProductDetailPage() {
                 {product.name.charAt(0)}
               </div>
             )}
-          </div>
+          </button>
           {images.length > 1 && (
             <div className="flex gap-2 mt-3 overflow-x-auto pb-1">
               {images.map((img, i) => (
                 <button
                   key={img.id}
+                  type="button"
                   onClick={() => setSelectedImage(i)}
+                  onDoubleClick={() => openLightbox(i)}
                   className={`w-16 h-16 rounded-xl overflow-hidden border-2 shrink-0 transition-colors ${
                     selectedImage === i ? 'border-primary-600' : 'border-transparent'
                   }`}
@@ -146,7 +188,6 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {/* Desktop add to cart */}
           {!outOfStock && (
             <div className="hidden md:flex mt-8 flex-wrap items-center gap-4">
               <div className="flex items-center border border-charcoal-200 rounded-full overflow-hidden">
@@ -186,7 +227,6 @@ export default function ProductDetailPage() {
         </section>
       )}
 
-      {/* Mobile sticky add-to-cart bar */}
       {!outOfStock && (
         <div className="md:hidden fixed bottom-16 left-0 right-0 z-30 bg-white/95 backdrop-blur-lg border-t border-charcoal-100 px-4 py-3 safe-bottom elevation-3">
           <div className="flex items-center gap-3 max-w-lg mx-auto">
@@ -214,6 +254,92 @@ export default function ProductDetailPage() {
               {t('addToCart')}
             </Button>
           </div>
+        </div>
+      )}
+
+      {/* Full-screen image lightbox */}
+      {lightboxOpen && primary && (
+        <div
+          className="fixed inset-0 z-[100] bg-black flex flex-col"
+          role="dialog"
+          aria-modal="true"
+          aria-label={product.name}
+        >
+          <div className="flex items-center justify-between px-3 pt-safe safe-top h-14 shrink-0">
+            <span className="text-white/80 text-sm px-2 truncate max-w-[60%]">
+              {product.name}
+              {images.length > 1 && (
+                <span className="text-white/50 ml-2">
+                  {selectedImage + 1}/{images.length}
+                </span>
+              )}
+            </span>
+            <button
+              type="button"
+              onClick={closeLightbox}
+              className="w-11 h-11 rounded-full bg-white/10 text-white flex items-center justify-center active:bg-white/20"
+              aria-label="Close"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
+
+          <div
+            className="flex-1 relative flex items-center justify-center min-h-0 px-2"
+            onClick={closeLightbox}
+          >
+            <img
+              src={primary.url}
+              alt={primary.alt_text || product.name}
+              className="max-w-full max-h-full object-contain select-none"
+              onClick={(e) => e.stopPropagation()}
+              draggable={false}
+            />
+
+            {images.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    goPrev()
+                  }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 text-white flex items-center justify-center active:bg-white/25"
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft className="h-7 w-7" />
+                </button>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    goNext()
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 text-white flex items-center justify-center active:bg-white/25"
+                  aria-label="Next image"
+                >
+                  <ChevronRight className="h-7 w-7" />
+                </button>
+              </>
+            )}
+          </div>
+
+          {images.length > 1 && (
+            <div className="shrink-0 flex justify-center gap-2 pb-6 pt-3 px-4 overflow-x-auto safe-bottom">
+              {images.map((img, i) => (
+                <button
+                  key={img.id}
+                  type="button"
+                  onClick={() => setSelectedImage(i)}
+                  className={`w-14 h-14 rounded-lg overflow-hidden border-2 shrink-0 ${
+                    selectedImage === i ? 'border-white' : 'border-transparent opacity-60'
+                  }`}
+                >
+                  <img src={img.url} alt="" className="w-full h-full object-cover" />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
