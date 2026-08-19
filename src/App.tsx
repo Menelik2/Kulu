@@ -34,7 +34,7 @@ const SPLASH_KEY = 'kulu_splash_shown'
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(() => {
-    // Show splash only once per browser session
+    // Show splash once per browser session (like a real app open)
     if (typeof window === 'undefined') return true
     return !sessionStorage.getItem(SPLASH_KEY)
   })
@@ -44,13 +44,13 @@ export default function App() {
     setShowSplash(false)
   }, [])
 
-  // Safety: never block the app if something goes wrong with the timer
+  // Safety: never block the app if timers fail
   useEffect(() => {
     if (!showSplash) return
     const safety = setTimeout(() => {
       sessionStorage.setItem(SPLASH_KEY, '1')
       setShowSplash(false)
-    }, 3500)
+    }, 4000)
     return () => clearTimeout(safety)
   }, [showSplash])
 
