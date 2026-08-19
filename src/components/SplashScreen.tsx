@@ -11,9 +11,14 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
   const [phase, setPhase] = useState<Phase>('in')
 
   useEffect(() => {
-    const holdTimer = setTimeout(() => setPhase('hold'), 450)
-    const outTimer = setTimeout(() => setPhase('out'), 2100)
-    const finishTimer = setTimeout(() => onFinish(), 2700)
+    // Hide the HTML boot splash when React splash takes over
+    if (typeof window !== 'undefined' && (window as any).__hideBootSplash) {
+      ;(window as any).__hideBootSplash()
+    }
+
+    const holdTimer = setTimeout(() => setPhase('hold'), 300)
+    const outTimer = setTimeout(() => setPhase('out'), 1800)
+    const finishTimer = setTimeout(() => onFinish(), 2400)
     return () => {
       clearTimeout(holdTimer)
       clearTimeout(outTimer)
@@ -37,10 +42,10 @@ export function SplashScreen({ onFinish }: SplashScreenProps) {
       <div
         className={`relative z-10 flex flex-col items-center px-8 transition-all duration-700 ease-out ${
           phase === 'in'
-            ? 'opacity-0 scale-75'
+            ? 'opacity-0 scale-90'
             : phase === 'hold'
               ? 'opacity-100 scale-100'
-              : 'opacity-0 scale-110'
+              : 'opacity-0 scale-105'
         }`}
       >
         <div className="relative mb-2">

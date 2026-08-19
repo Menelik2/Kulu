@@ -8,13 +8,76 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <link rel="icon" type="image/svg+xml" href="/kulu-logo.svg" />
+    <link rel="apple-touch-icon" href="/kulu-logo.svg" />
     <title>KULU — በብልሃት ይሸምቱ። በኢትዮጵያ በሙሉ ይደርሳል።</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Ethiopic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      /* Instant splash before React hydrates — Android app feel */
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(180deg, #e8f4ff 0%, #ffffff 50%, #fff4eb 100%);
+        transition: opacity 0.4s ease;
+      }
+      #boot-splash img {
+        width: 200px;
+        height: 200px;
+        object-fit: contain;
+        animation: bootIn 0.6s ease-out forwards;
+      }
+      #boot-splash .dots {
+        display: flex;
+        gap: 8px;
+        margin-top: 20px;
+      }
+      #boot-splash .dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #2563eb;
+        animation: bounce 0.75s ease-in-out infinite;
+      }
+      #boot-splash .dots span:nth-child(2) { animation-delay: 0.15s; }
+      #boot-splash .dots span:nth-child(3) { animation-delay: 0.3s; }
+      @keyframes bootIn {
+        from { opacity: 0; transform: scale(0.75); }
+        to { opacity: 1; transform: scale(1); }
+      }
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+      }
+      #boot-splash.hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
   </head>
   <body>
+    <div id="boot-splash">
+      <img src="/kulu-logo.svg" alt="KULU" />
+      <div class="dots"><span></span><span></span><span></span></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Hide native boot splash once React mounts (or after max 3s)
+      window.__hideBootSplash = function () {
+        var el = document.getElementById('boot-splash');
+        if (el) {
+          el.classList.add('hide');
+          setTimeout(function () { el.remove(); }, 450);
+        }
+      };
+      setTimeout(window.__hideBootSplash, 3000);
+    </script>
   </body>
 </html>
