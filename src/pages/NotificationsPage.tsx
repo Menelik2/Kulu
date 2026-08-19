@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Bell, Check, Trash2, Package, Info, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/features/auth/AuthContext'
+import { useLanguage } from '@/features/language/LanguageContext'
 import {
   getNotifications,
   markAsRead,
@@ -26,6 +27,7 @@ function typeIcon(type: string) {
 
 export default function NotificationsPage() {
   const { user } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
   const qc = useQueryClient()
 
@@ -44,7 +46,7 @@ export default function NotificationsPage() {
     mutationFn: () => markAllAsRead(user!.id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['notifications'] })
-      toast.success('All marked as read')
+      toast.success(t('allMarkedRead'))
     },
   })
 
@@ -52,15 +54,17 @@ export default function NotificationsPage() {
     mutationFn: deleteNotification,
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['notifications'] })
-      toast.success('Notification deleted')
+      toast.success(t('notificationDeleted'))
     },
   })
 
   if (!user) {
     return (
       <div className="max-w-2xl mx-auto container-padding py-16 text-center">
-        <p className="text-charcoal-500">Please sign in to view notifications.</p>
-        <Link to="/login"><Button className="mt-4">Sign In</Button></Link>
+        <p className="text-charcoal-500">{t('signInToNotifications')}</p>
+        <Link to="/login">
+          <Button className="mt-4 rounded-full">{t('signIn')}</Button>
+        </Link>
       </div>
     )
   }
@@ -74,14 +78,24 @@ export default function NotificationsPage() {
 
   return (
     <div className="max-w-2xl mx-auto container-padding py-8">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-charcoal-900">Notifications</h1>
-          {unread > 0 && <p className="text-sm text-charcoal-500 mt-0.5">{unread} unread</p>}
+          <h1 className="text-2xl font-bold text-charcoal-900">{t('notifications')}</h1>
+          {unread > 0 && (
+            <p className="text-sm text-charcoal-500 mt-0.5">
+              {t('unreadCount', { count: unread })}
+            </p>
+          )}
         </div>
         {unread > 0 && (
-          <Button variant="outline" size="sm" onClick={() => markAll.mutate()} loading={markAll.isPending}>
-            <Check className="h-4 w-4" /> Mark all read
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-full shrink-0"
+            onClick={() => markAll.mutate()}
+            loading={markAll.isPending}
+          >
+            <Check className="h-4 w-4" /> {t('markAllRead')}
           </Button>
         )}
       </div>
@@ -95,8 +109,8 @@ export default function NotificationsPage() {
       ) : notifications.length === 0 ? (
         <div className="text-center py-16">
           <Bell className="h-12 w-12 mx-auto text-charcoal-300" />
-          <p className="text-charcoal-500 mt-4">No notifications yet</p>
-          <p className="text-sm text-charcoal-400 mt-1">You&apos;ll be notified about order updates and more.</p>
+          <p className="text-charcoal-500 mt-4">{t('noNotifications')}</p>
+          <p className="text-sm text-charcoal-400 mt-1">{t('noNotificationsDesc')}</p>
         </div>
       ) : (
         <ul className="space-y-2">
@@ -104,23 +118,40 @@ export default function NotificationsPage() {
             <li
               key={n.id}
               className={cn(
-                'bg-white rounded-xl border border-charcoal-100 p-4 flex gap-3 transition-colors',
+                'bg-white rounded-2xl border border-charcoal-100 p-4 flex gap-3 transition-colors',
                 !n.is_read && 'border-primary-200 bg-primary-50/30'
               )}
             >
               <div className="mt-0.5 shrink-0">{typeIcon(n.type)}</div>
               <button onClick={() => handleClick(n)} className="flex-1 text-left min-w-0">
-                <p className={cn('text-sm', !n.is_read ? 'font-semibold text-charcoal-900' : 'text-charcoal-700')}>{n.title}</p>
+                <p
+                  className={cn(
+                    'text-sm',
+                    !n.is_read ? 'font-semibold text-charcoal-900' : 'text-charcoal-700'
+                  )}
+                >
+                  {n.title}
+                </p>
                 <p className="text-sm text-charcoal-500 mt-0.5">{n.message}</p>
-                <p className="text-xs text-charcoal-400 mt-1.5">{new Date(n.created_at).toLocaleString()}</p>
+                <p className="text-xs text-charcoal-400 mt-1.5">
+                  {new Date(n.created_at).toLocaleString()}
+                </p>
               </button>
               <div className="flex flex-col gap-1 shrink-0">
                 {!n.is_read && (
-                  <button onClick={() => markRead.mutate(n.id)} className="p-1.5 rounded-lg hover:bg-charcoal-100 text-charcoal-400 hover:text-primary-600" title="Mark as read">
+                  <button
+                    onClick={() => markRead.mutate(n.id)}
+                    className="p-1.5 rounded-lg hover:bg-charcoal-100 text-charcoal-400 hover:text-primary-600"
+                    title={t('markAllRead')}
+                  >
                     <Check className="h-4 w-4" />
                   </button>
                 )}
-                <button onClick={() => remove.mutate(n.id)} className="p-1.5 rounded-lg hover:bg-red-50 text-charcoal-400 hover:text-red-600" title="Delete">
+                <button
+                  onClick={() => remove.mutate(n.id)}
+                  className="p-1.5 rounded-lg hover:bg-red-50 text-charcoal-400 hover:text-red-600"
+                  title={t('notificationDeleted')}
+                >
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>

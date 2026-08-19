@@ -120,6 +120,46 @@ export const translations = {
     myOrdersBtn: 'ትዕዛዞቼ',
     wishlistBtn: 'የተወደዱ',
 
+    // Orders
+    noOrdersYet: 'እስካሁን ትዕዛዝ የለም',
+    noOrdersDesc: 'ትዕዛዝ ሲያስገቡ እዚህ ይታያል።',
+    startShopping: 'መግዛት ይጀምሩ',
+    track: 'ከታተሉ',
+    itemsCount: '{count} ዕቃ(ዎች)',
+    orderTracking: 'የትዕዛዝ ክትትል',
+    orderPlaced: 'ትዕዛዝ ገብቷል',
+    statusConfirmed: 'ተረጋግጧል',
+    statusProcessing: 'በሂደት ላይ',
+    statusShipped: 'ተልኳል',
+    statusDelivered: 'ደርሷል',
+    orderCancelled: 'ይህ ትዕዛዝ ተሰርዟል።',
+    back: 'ተመለስ',
+    paymentCod: 'ክፍያ፡ በተቀባይ ገንዘብ',
+
+    // Order confirmation
+    orderSuccess: 'ትዕዛዝ በተሳካ ሁኔታ ገብቷል!',
+    thankYouShop: 'ከኩሉ ጋር ስለገዙ እናመሰግናለን',
+    orderNumber: 'የትዕዛዝ ቁጥር',
+    deliveryTo: 'መላኪያ ወደ',
+    status: 'ሁኔታ',
+    orderNotFound: 'ትዕዛዝ አልተገኘም',
+
+    // Wishlist
+    wishlistEmpty: 'የተወደዱ ዝርዝር ባዶ ነው',
+    wishlistEmptyDesc: 'የሚወዷቸውን ምርቶች ለኋላ ያስቀምጡ።',
+    browseProducts: 'ምርቶችን ይመልከቱ',
+    signInToWishlist: 'የተወደዱን ለማየት እባክዎ ይግቡ።',
+    removedFromWishlist: 'ከተወደዱ ተወግዷል',
+
+    // Notifications
+    unreadCount: '{count} ያልተነበቡ',
+    markAllRead: 'ሁሉንም እንደተነበበ ምልክት',
+    noNotifications: 'እስካሁን ማሳወቂያ የለም',
+    noNotificationsDesc: 'ስለ ትዕዛዝ ዝመናዎች እና ሌሎች ይነገርዎታል።',
+    signInToNotifications: 'ማሳወቂያዎችን ለማየት እባክዎ ይግቡ።',
+    allMarkedRead: 'ሁሉም እንደተነበቡ ተመልክተዋል',
+    notificationDeleted: 'ማሳወቂያ ተሰርዟል',
+
     // Footer
     tagline: 'በብልሃት ይሸምቱ። በኢትዮጵያ በሙሉ ይደርሳል።',
     customer: 'ደንበኛ',
@@ -244,6 +284,42 @@ export const translations = {
 
     myOrdersBtn: 'My Orders',
     wishlistBtn: 'Wishlist',
+
+    noOrdersYet: 'No orders yet',
+    noOrdersDesc: 'When you place an order, it will show up here.',
+    startShopping: 'Start Shopping',
+    track: 'Track',
+    itemsCount: '{count} item(s)',
+    orderTracking: 'Order Tracking',
+    orderPlaced: 'Order Placed',
+    statusConfirmed: 'Confirmed',
+    statusProcessing: 'Processing',
+    statusShipped: 'Shipped',
+    statusDelivered: 'Delivered',
+    orderCancelled: 'This order was cancelled.',
+    back: 'Back',
+    paymentCod: 'Payment: Cash on Delivery',
+
+    orderSuccess: 'Order Placed Successfully!',
+    thankYouShop: 'Thank you for shopping with KULU',
+    orderNumber: 'Order Number',
+    deliveryTo: 'Delivery to',
+    status: 'Status',
+    orderNotFound: 'Order not found',
+
+    wishlistEmpty: 'Your wishlist is empty',
+    wishlistEmptyDesc: 'Save products you love for later.',
+    browseProducts: 'Browse Products',
+    signInToWishlist: 'Please sign in to view your wishlist.',
+    removedFromWishlist: 'Removed from wishlist',
+
+    unreadCount: '{count} unread',
+    markAllRead: 'Mark all read',
+    noNotifications: 'No notifications yet',
+    noNotificationsDesc: "You'll be notified about order updates and more.",
+    signInToNotifications: 'Please sign in to view notifications.',
+    allMarkedRead: 'All marked as read',
+    notificationDeleted: 'Notification deleted',
 
     tagline: 'Shop Smart. Delivered Across Ethiopia.',
     customer: 'Customer',
