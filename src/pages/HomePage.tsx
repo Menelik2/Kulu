@@ -5,6 +5,7 @@ import { getFeaturedProducts, getCategories, getProducts } from '@/services/prod
 import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/features/language/LanguageContext'
+import { getCategoryIcon } from '@/lib/categoryIcons'
 
 export default function HomePage() {
   const { t } = useLanguage()
@@ -26,7 +27,7 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero — more compact on mobile */}
+      {/* Hero */}
       <section className="relative bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-12 left-6 w-48 h-48 sm:w-72 sm:h-72 bg-gold-400 rounded-full blur-3xl" />
@@ -95,20 +96,23 @@ export default function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2.5 sm:gap-4">
-            {categories.slice(0, 10).map((cat) => (
-              <Link
-                key={cat.id}
-                to={`/shop?category=${cat.id}`}
-                className="group bg-white rounded-2xl border border-charcoal-100 p-3 sm:p-4 text-center hover:border-primary-300 hover:shadow-md active:scale-[0.98] transition-all"
-              >
-                <div className="w-11 h-11 sm:w-12 sm:h-12 mx-auto rounded-full bg-primary-50 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary-100 transition-colors">
-                  <span className="text-primary-600 font-bold text-base sm:text-lg">{cat.name.charAt(0)}</span>
-                </div>
-                <h3 className="font-medium text-xs sm:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2">
-                  {cat.name}
-                </h3>
-              </Link>
-            ))}
+            {categories.slice(0, 10).map((cat) => {
+              const Icon = getCategoryIcon(cat.slug || cat.name)
+              return (
+                <Link
+                  key={cat.id}
+                  to={`/shop?category=${cat.id}`}
+                  className="group bg-white rounded-2xl border border-charcoal-100 p-3 sm:p-4 text-center hover:border-primary-300 hover:shadow-md active:scale-[0.98] transition-all"
+                >
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto rounded-2xl bg-primary-50 flex items-center justify-center mb-2 sm:mb-3 group-hover:bg-primary-100 group-hover:scale-105 transition-all">
+                    <Icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary-600" strokeWidth={1.75} />
+                  </div>
+                  <h3 className="font-medium text-xs sm:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2">
+                    {cat.name}
+                  </h3>
+                </Link>
+              )
+            })}
           </div>
         </section>
       )}
