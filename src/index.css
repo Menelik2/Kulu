@@ -37,6 +37,10 @@
   --color-charcoal-950: #0f1012;
 
   --font-sans: "Noto Sans Ethiopic", "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-xl: 1rem;
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
 }
 
 @layer base {
@@ -45,21 +49,28 @@
   }
 
   body {
-    @apply bg-white text-charcoal-900 antialiased;
+    @apply bg-charcoal-50 text-charcoal-900 antialiased;
     font-family: var(--font-sans);
-    /* Prevent overscroll bounce feeling more app-like */
     overscroll-behavior-y: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   html {
     scroll-behavior: smooth;
   }
 
-  /* Better touch targets on mobile */
+  /* Android-like touch feedback */
   @media (max-width: 767px) {
-    button, a {
+    button, a, [role="button"] {
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
+  }
+
+  /* Better Amharic line height */
+  :lang(am) {
+    line-height: 1.65;
   }
 }
 
@@ -68,7 +79,6 @@
     @apply px-4 sm:px-6 lg:px-8;
   }
 
-  /* Safe area insets for notched phones (Android/iOS) */
   .safe-top {
     padding-top: env(safe-area-inset-top, 0px);
   }
@@ -83,5 +93,28 @@
 
   .safe-bottom-spacer {
     height: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Material-style elevation */
+  .elevation-1 {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+
+  .elevation-2 {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06), 0 4px 8px rgba(0, 0, 0, 0.08);
+  }
+
+  .elevation-3 {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 8px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Bottom sheet handle */
+  .sheet-handle {
+    @apply w-10 h-1 bg-charcoal-200 rounded-full mx-auto;
+  }
+
+  /* Active press scale for cards/buttons */
+  .pressable {
+    @apply active:scale-[0.97] transition-transform duration-100;
   }
 }
