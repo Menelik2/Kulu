@@ -1,12 +1,14 @@
 {
-  "name": "KULU Ethiopia",
-  "short_name": "KULU",
-  "description": "Shop Smart. Delivered Across Ethiopia.",
+  "name": "ኩሉ — KULU Ethiopia",
+  "short_name": "ኩሉ",
+  "description": "በብልሃት ይሸምቱ። በኢትዮጵያ በሙሉ ይደርሳል።",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0d7a4f",
-  "lang": "en",
+  "orientation": "portrait",
+  "background_color": "#f6f6f7",
+  "theme_color": "#0B6E4F",
+  "lang": "am",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/icon-192.png",
@@ -20,5 +22,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["shopping", "business"]
 }

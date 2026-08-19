@@ -19,7 +19,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const outOfStock = product.stock_quantity < 1
 
   return (
-    <div className="group bg-white rounded-2xl border border-charcoal-100 overflow-hidden shadow-sm hover:shadow-md active:scale-[0.98] transition-all">
+    <div className="group bg-white rounded-2xl border border-charcoal-100 overflow-hidden elevation-1 hover:elevation-2 active:scale-[0.98] transition-all">
       <Link to={`/products/${product.slug}`} className="block relative aspect-square bg-charcoal-50 overflow-hidden">
         {primaryImage ? (
           <img
@@ -34,7 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
         {discount && (
-          <span className="absolute top-2 left-2 bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full">
+          <span className="absolute top-2 left-2 bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
             -{discount}%
           </span>
         )}
@@ -45,9 +45,9 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
       </Link>
 
-      <div className="p-3 sm:p-4">
+      <div className="p-3 sm:p-3.5">
         <Link to={`/products/${product.slug}`}>
-          <h3 className="font-medium text-sm sm:text-base text-charcoal-900 line-clamp-2 hover:text-primary-600 transition-colors leading-snug">
+          <h3 className="font-medium text-sm text-charcoal-900 line-clamp-2 hover:text-primary-600 transition-colors leading-snug min-h-[2.5rem]">
             {product.name}
           </h3>
         </Link>
@@ -62,17 +62,17 @@ export function ProductCard({ product }: ProductCardProps) {
           </div>
         )}
 
-        <div className="mt-2 flex items-baseline gap-2">
+        <div className="mt-1.5 flex items-baseline gap-1.5">
           <span className="font-bold text-primary-600 text-[15px]">{formatETB(effectivePrice)}</span>
           {discount && (
             <span className="text-xs text-charcoal-400 line-through">{formatETB(product.price)}</span>
           )}
         </div>
 
-        <div className="mt-3">
+        <div className="mt-2.5">
           <Button
             size="sm"
-            className="w-full h-9 rounded-xl"
+            className="w-full h-10 rounded-full text-xs sm:text-sm"
             disabled={outOfStock}
             onClick={(e) => {
               e.preventDefault()
