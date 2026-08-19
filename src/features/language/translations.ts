@@ -115,6 +115,9 @@ export const translations = {
     alreadyHaveAccount: 'መለያ አለዎት?',
     noAccount: 'መለያ የለዎትም?',
     createOne: 'ይፍጠሩ',
+    continueWithGoogle: 'በጉግል ይግቡ',
+    orContinueWith: 'ወይም',
+    googleSignInFailed: 'በጉግል መግባት አልተሳካም',
 
     // Account
     myOrdersBtn: 'ትዕዛዞቼ',
@@ -296,6 +299,9 @@ export const translations = {
     alreadyHaveAccount: 'Already have an account?',
     noAccount: "Don't have an account?",
     createOne: 'Create one',
+    continueWithGoogle: 'Continue with Google',
+    orContinueWith: 'or',
+    googleSignInFailed: 'Google sign-in failed',
 
     myOrdersBtn: 'My Orders',
     wishlistBtn: 'Wishlist',
