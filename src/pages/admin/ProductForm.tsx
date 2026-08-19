@@ -45,6 +45,7 @@ export default function AdminProductForm() {
   const qc = useQueryClient()
   const fileRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const [uploadHint, setUploadHint] = useState<string | null>(null)
   const [images, setImages] = useState<ProductImage[]>([])
 
@@ -177,13 +178,27 @@ export default function AdminProductForm() {
   }
 
   const handleDelete = async (img: ProductImage) => {
+    const ok = window.confirm('Delete this image permanently from the database and storage?')
+    if (!ok) return
+
+    setDeletingId(img.id)
     try {
       await deleteProductImage(img)
-      setImages((prev) => prev.filter((i) => i.id !== img.id))
-      toast.success('Image removed')
+      setImages((prev) => {
+        const next = prev.filter((i) => i.id !== img.id)
+        // Reflect primary promotion in UI if needed
+        if (img.is_primary && next.length > 0 && !next.some((i) => i.is_primary)) {
+          next[0] = { ...next[0], is_primary: true }
+        }
+        return next
+      })
+      toast.success('Image deleted from database and storage')
       qc.invalidateQueries({ queryKey: ['admin', 'product', id] })
+      qc.invalidateQueries({ queryKey: ['admin', 'products'] })
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Delete failed')
+    } finally {
+      setDeletingId(null)
     }
   }
 
@@ -285,7 +300,7 @@ export default function AdminProductForm() {
           <div className="mb-2">
             <Label>Product images</Label>
             <p className="text-xs text-charcoal-500 mt-0.5">
-              Upload JPG, PNG, GIF, WebP… Files are compressed and stored as WebP (or JPEG) to save space.
+              Upload any format. Stored compressed. Delete removes the row from the database and the file from storage.
             </p>
           </div>
 
@@ -312,7 +327,7 @@ export default function AdminProductForm() {
                         Primary
                       </span>
                     )}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 sm:opacity-0 transition-opacity flex items-center justify-center gap-1 max-sm:opacity-100 max-sm:bg-black/25">
                       {!img.is_primary && (
                         <button
                           type="button"
@@ -325,11 +340,16 @@ export default function AdminProductForm() {
                       )}
                       <button
                         type="button"
+                        disabled={deletingId === img.id}
                         onClick={() => handleDelete(img)}
-                        className="p-1.5 rounded-full bg-white text-red-600"
-                        title="Delete"
+                        className="p-1.5 rounded-full bg-white text-red-600 disabled:opacity-50"
+                        title="Delete permanently"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        {deletingId === img.id ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-4 w-4" />
+                        )}
                       </button>
                     </div>
                   </div>

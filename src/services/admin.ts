@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabase'
 import type { Product, Category, Order, Profile } from '@/types/database'
 import { slugify } from '@/lib/utils'
+import { deleteAllProductImages } from '@/services/productImages'
 
 export async function adminGetProducts() {
   const { data, error } = await supabase
@@ -48,6 +49,14 @@ export async function adminUpdateProduct(id: string, payload: Partial<{
 }
 
 export async function adminDeleteProduct(id: string) {
+  // Remove storage files + image rows first (product_images FK cascades on product delete,
+  // but storage files would remain orphans without this)
+  try {
+    await deleteAllProductImages(id)
+  } catch (e) {
+    console.warn('Image cleanup before product delete:', e)
+  }
+
   const { error } = await supabase.from('products').delete().eq('id', id)
   if (error) throw error
 }

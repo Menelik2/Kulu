@@ -9,7 +9,14 @@ function friendlyStorageError(message: string): string {
   if (m.includes('bucket') || m.includes('not found')) {
     return 'Storage bucket "product-images" is missing. Create it in Supabase → Storage (public).'
   }
-  if (m.includes('row-level security') || m.includes('rls') || m.includes('policy') || m.includes('permission') || m.includes('not authorized') || m.includes('403')) {
+  if (
+    m.includes('row-level security') ||
+    m.includes('rls') ||
+    m.includes('policy') ||
+    m.includes('permission') ||
+    m.includes('not authorized') ||
+    m.includes('403')
+  ) {
     return 'Upload blocked by storage permissions. Sign in as admin and run the product-images storage SQL migration.'
   }
   if (m.includes('mime') || m.includes('content type') || m.includes('invalid')) {
@@ -21,9 +28,27 @@ function friendlyStorageError(message: string): string {
   return message || 'Upload failed'
 }
 
-/**
- * Convert file → WebP (or JPEG), upload to Supabase Storage, insert product_images row.
- */
+/** Extract storage object path from a public/signed Supabase URL */
+export function storagePathFromUrl(url: string): string | null {
+  if (!url) return null
+  const markers = [`/object/public/${BUCKET}/`, `/object/sign/${BUCKET}/`, `/${BUCKET}/`]
+  for (const marker of markers) {
+    const idx = url.indexOf(marker)
+    if (idx === -1) continue
+    let path = url.slice(idx + marker.length)
+    path = path.split('?')[0]
+    try {
+      path = decodeURIComponent(path)
+    } catch {
+      /* keep */
+    }
+    if (path) return path
+  }
+  // Already a relative path like products/uuid/file.webp
+  if (url.startsWith('products/')) return url.split('?')[0]
+  return null
+}
+
 export async function uploadProductImage(
   productId: string,
   file: File,
@@ -41,11 +66,11 @@ export async function uploadProductImage(
   }
 
   const path = webpFileName(file.name, productId, converted.extension)
-
-  // Upload as File for better Content-Type handling in some environments
-  const uploadFile = new File([converted.blob], path.split('/').pop() || `image.${converted.extension}`, {
-    type: converted.contentType,
-  })
+  const uploadFile = new File(
+    [converted.blob],
+    path.split('/').pop() || `image.${converted.extension}`,
+    { type: converted.contentType }
+  )
 
   const { error: uploadError } = await supabase.storage.from(BUCKET).upload(path, uploadFile, {
     contentType: converted.contentType,
@@ -61,14 +86,10 @@ export async function uploadProductImage(
   const url = publicData.publicUrl
 
   if (options?.isPrimary) {
-    const { error: clearErr } = await supabase
+    await supabase
       .from('product_images')
       .update({ is_primary: false })
       .eq('product_id', productId)
-    if (clearErr) {
-      // non-fatal
-      console.warn('clear primary:', clearErr.message)
-    }
   }
 
   const { data, error } = await supabase
@@ -95,29 +116,83 @@ export async function uploadProductImage(
   return data as ProductImage
 }
 
+/**
+ * Fully remove an image:
+ * 1) Delete row from product_images (database)
+ * 2) Delete file from Storage bucket
+ * 3) If it was primary, promote another image
+ */
 export async function deleteProductImage(image: ProductImage): Promise<void> {
-  const markers = [
-    `/object/public/${BUCKET}/`,
-    `/object/sign/${BUCKET}/`,
-  ]
-  for (const marker of markers) {
-    const idx = image.url.indexOf(marker)
-    if (idx !== -1) {
-      let path = image.url.slice(idx + marker.length)
-      // Strip query string (signed URLs)
-      path = path.split('?')[0]
-      try {
-        path = decodeURIComponent(path)
-      } catch {
-        /* keep raw */
-      }
-      await supabase.storage.from(BUCKET).remove([path])
-      break
+  const productId = image.product_id
+  const wasPrimary = image.is_primary
+
+  // 1. Database row — must succeed
+  const { error: dbError } = await supabase.from('product_images').delete().eq('id', image.id)
+
+  if (dbError) {
+    throw new Error(
+      dbError.message.includes('row-level security')
+        ? 'Cannot delete image (RLS). Sign in as admin.'
+        : dbError.message || 'Failed to delete image from database'
+    )
+  }
+
+  // 2. Storage file — best effort (row is already gone)
+  const path = storagePathFromUrl(image.url)
+  if (path) {
+    const { error: storageError } = await supabase.storage.from(BUCKET).remove([path])
+    if (storageError) {
+      console.warn('Storage file delete failed (DB row already removed):', storageError.message)
     }
   }
 
-  const { error } = await supabase.from('product_images').delete().eq('id', image.id)
+  // 3. Promote another image if we removed the primary
+  if (wasPrimary && productId) {
+    const { data: remaining } = await supabase
+      .from('product_images')
+      .select('id')
+      .eq('product_id', productId)
+      .order('sort_order', { ascending: true })
+      .limit(1)
+
+    if (remaining?.[0]?.id) {
+      await supabase
+        .from('product_images')
+        .update({ is_primary: true })
+        .eq('id', remaining[0].id)
+    }
+  }
+}
+
+/** Delete every image for a product (DB + storage). Used when product is deleted. */
+export async function deleteAllProductImages(productId: string): Promise<void> {
+  const { data: images, error } = await supabase
+    .from('product_images')
+    .select('*')
+    .eq('product_id', productId)
+
   if (error) throw new Error(error.message)
+  if (!images?.length) return
+
+  const paths: string[] = []
+  for (const img of images as ProductImage[]) {
+    const p = storagePathFromUrl(img.url)
+    if (p) paths.push(p)
+  }
+
+  // DB rows (CASCADE may also handle this if product is deleted first)
+  const { error: delErr } = await supabase
+    .from('product_images')
+    .delete()
+    .eq('product_id', productId)
+
+  if (delErr) {
+    throw new Error(delErr.message || 'Failed to delete image records')
+  }
+
+  if (paths.length) {
+    await supabase.storage.from(BUCKET).remove(paths)
+  }
 }
 
 export async function setPrimaryProductImage(
