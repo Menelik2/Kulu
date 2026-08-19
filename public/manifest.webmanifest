@@ -1,1 +1,18 @@
-PLACEHOLDER5
+{
+  "name": "KULU — የሁሉም ገበያ በኪስዎ",
+  "short_name": "KULU",
+  "description": "THE WHOLE MARKET IN YOUR POCKET · THE EVERYTHING MARKETPLACE",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
+  "lang": "am",
+  "icons": [
+    {
+      "src": "/kulu-logo.jpg",
+      "sizes": "400x400",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
