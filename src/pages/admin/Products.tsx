@@ -1,8 +1,72 @@
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Plus, Pencil, Trash2, Search } from 'lucide-react'
+import { adminGetProducts, adminDeleteProduct } from '@/services/admin'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { formatETB, getEffectivePrice } from '@/lib/utils'
+import { toast } from 'sonner'
+
 export default function AdminProducts() {
+  const [search, setSearch] = useState('')
+  const qc = useQueryClient()
+  const { data: products, isLoading } = useQuery({ queryKey: ['admin', 'products'], queryFn: adminGetProducts })
+  const del = useMutation({
+    mutationFn: adminDeleteProduct,
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'products'] }); toast.success('Product deleted') },
+    onError: (e: Error) => toast.error(e.message),
+  })
+  const filtered = products?.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase()))
+
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold text-charcoal-900">Products</h1>
-      <p className="mt-2 text-charcoal-500">Product management CRUD coming next.</p>
+    <div className="p-4 sm:p-6 space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold text-charcoal-900">Products</h1>
+        <Link to="/admin/products/new"><Button><Plus className="h-4 w-4" /> Add Product</Button></Link>
+      </div>
+      <div className="relative max-w-sm">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal-400" />
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name or SKU..." className="pl-10" />
+      </div>
+      {isLoading ? (
+        <div className="animate-pulse space-y-2">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-14 bg-charcoal-100 rounded-lg" />)}</div>
+      ) : (
+        <div className="bg-white rounded-xl border border-charcoal-100 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-charcoal-50 text-left">
+                <tr>
+                  <th className="px-4 py-3 font-medium text-charcoal-600">Product</th>
+                  <th className="px-4 py-3 font-medium text-charcoal-600">SKU</th>
+                  <th className="px-4 py-3 font-medium text-charcoal-600">Price</th>
+                  <th className="px-4 py-3 font-medium text-charcoal-600">Stock</th>
+                  <th className="px-4 py-3 font-medium text-charcoal-600">Status</th>
+                  <th className="px-4 py-3 font-medium text-charcoal-600">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-charcoal-100">
+                {filtered?.map((p) => (
+                  <tr key={p.id} className="hover:bg-charcoal-50">
+                    <td className="px-4 py-3"><div className="font-medium text-charcoal-900">{p.name}</div><div className="text-xs text-charcoal-500">{p.category?.name}</div></td>
+                    <td className="px-4 py-3 font-mono text-xs">{p.sku}</td>
+                    <td className="px-4 py-3">{formatETB(getEffectivePrice(p.price, p.discount_price))}</td>
+                    <td className="px-4 py-3"><span className={p.stock_quantity < 10 ? 'text-red-600 font-medium' : ''}>{p.stock_quantity}</span></td>
+                    <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded-full ${p.is_active ? 'bg-green-100 text-green-700' : 'bg-charcoal-100 text-charcoal-600'}`}>{p.is_active ? 'Active' : 'Hidden'}</span></td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-1">
+                        <Link to={`/admin/products/${p.id}/edit`}><Button variant="ghost" size="icon"><Pencil className="h-4 w-4" /></Button></Link>
+                        <Button variant="ghost" size="icon" className="text-red-600" onClick={() => { if (confirm('Delete this product?')) del.mutate(p.id) }}><Trash2 className="h-4 w-4" /></Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {filtered?.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-charcoal-500">No products found</td></tr>}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
