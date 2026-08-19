@@ -52,7 +52,7 @@ export default function AdminProductForm() {
     queryKey: ['admin', 'categories'],
     queryFn: adminGetCategories,
   })
-  const { data: product } = useQuery({
+  const { data: product, isLoading: productLoading } = useQuery({
     queryKey: ['admin', 'product', id],
     queryFn: () => adminGetProduct(id!),
     enabled: isEdit,
@@ -115,7 +115,6 @@ export default function AdminProductForm() {
       qc.invalidateQueries({ queryKey: ['admin', 'products'] })
       toast.success(isEdit ? 'Product updated' : 'Product created')
       if (!isEdit && created?.id) {
-        // Go to edit so admin can upload images
         navigate(`/admin/products/${created.id}/edit`, { replace: true })
       } else {
         navigate('/admin/products')
@@ -139,17 +138,19 @@ export default function AdminProductForm() {
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i]
-        if (!file.type.startsWith('image/')) {
+        const isImage =
+          file.type.startsWith('image/') ||
+          /\.(jpe?g|png|gif|webp|bmp|heic|heif)$/i.test(file.name)
+        if (!isImage) {
           toast.error(`${file.name}: not an image`)
           continue
         }
-        // Soft limit 12 MB original — WebP will be much smaller
         if (file.size > 12 * 1024 * 1024) {
           toast.error(`${file.name}: max 12 MB`)
           continue
         }
 
-        setUploadHint(`Converting ${file.name} → WebP…`)
+        setUploadHint(`Processing ${file.name}…`)
         const makePrimary = !primarySet && added.length === 0 && images.length === 0
         const img = await uploadProductImage(id, file, {
           isPrimary: makePrimary,
@@ -157,17 +158,16 @@ export default function AdminProductForm() {
         })
         if (makePrimary) primarySet = true
         added.push(img)
-        setUploadHint(
-          `${file.name} → WebP saved (${formatBytes(file.size)} → smaller WebP)`
-        )
+        setUploadHint(`${file.name} uploaded (${formatBytes(file.size)} → compressed)`)
       }
 
       if (added.length) {
         setImages((prev) => [...prev, ...added])
         qc.invalidateQueries({ queryKey: ['admin', 'product', id] })
-        toast.success(`${added.length} image(s) uploaded as WebP`)
+        toast.success(`${added.length} image(s) uploaded`)
       }
     } catch (e) {
+      console.error('Image upload error:', e)
       toast.error(e instanceof Error ? e.message : 'Upload failed')
     } finally {
       setUploading(false)
@@ -191,13 +191,19 @@ export default function AdminProductForm() {
     if (!id) return
     try {
       await setPrimaryProductImage(id, img.id)
-      setImages((prev) =>
-        prev.map((i) => ({ ...i, is_primary: i.id === img.id }))
-      )
+      setImages((prev) => prev.map((i) => ({ ...i, is_primary: i.id === img.id })))
       toast.success('Primary image set')
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed')
     }
+  }
+
+  if (isEdit && productLoading) {
+    return (
+      <div className="p-6 flex items-center gap-2 text-charcoal-500">
+        <Loader2 className="h-5 w-5 animate-spin" /> Loading product…
+      </div>
+    )
   }
 
   return (
@@ -275,20 +281,17 @@ export default function AdminProductForm() {
           </label>
         </div>
 
-        {/* Images — only after product exists */}
         <div className="border-t border-charcoal-100 pt-5 mt-2">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <div>
-              <Label>Product images</Label>
-              <p className="text-xs text-charcoal-500 mt-0.5">
-                Upload any format (JPG, PNG, GIF…). Stored as <strong>WebP</strong> to save space.
-              </p>
-            </div>
+          <div className="mb-2">
+            <Label>Product images</Label>
+            <p className="text-xs text-charcoal-500 mt-0.5">
+              Upload JPG, PNG, GIF, WebP… Files are compressed and stored as WebP (or JPEG) to save space.
+            </p>
           </div>
 
           {!isEdit ? (
             <p className="text-sm text-amber-700 bg-amber-50 rounded-lg px-3 py-2">
-              Create the product first, then you can upload images on the edit page.
+              Create the product first, then upload images on the edit page.
             </p>
           ) : (
             <>
@@ -298,7 +301,12 @@ export default function AdminProductForm() {
                     key={img.id}
                     className="relative aspect-square rounded-xl overflow-hidden border border-charcoal-100 bg-charcoal-50 group"
                   >
-                    <img src={img.url} alt={img.alt_text || ''} className="w-full h-full object-cover" />
+                    <img
+                      src={img.url}
+                      alt={img.alt_text || ''}
+                      className="w-full h-full object-cover"
+                      loading="lazy"
+                    />
                     {img.is_primary && (
                       <span className="absolute top-1 left-1 bg-primary-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded">
                         Primary
@@ -347,15 +355,13 @@ export default function AdminProductForm() {
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/*"
+                accept="image/*,.jpg,.jpeg,.png,.gif,.webp,.bmp"
                 multiple
                 className="hidden"
                 onChange={(e) => handleFiles(e.target.files)}
               />
 
-              {uploadHint && (
-                <p className="text-xs text-primary-600 mt-1">{uploadHint}</p>
-              )}
+              {uploadHint && <p className="text-xs text-primary-600 mt-1">{uploadHint}</p>}
             </>
           )}
         </div>
