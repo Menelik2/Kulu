@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useCart } from '@/features/cart/CartContext'
 import { Button } from '@/components/ui/button'
+import { NotificationBell } from '@/components/notifications/NotificationBell'
 import { Input } from '@/components/ui/input'
 
 export function StoreLayout() {
@@ -38,13 +39,7 @@ export function StoreLayout() {
             <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-4">
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal-400" />
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 pr-4"
-                />
+                <Input type="search" placeholder="Search products..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10 pr-4" />
               </div>
             </form>
 
@@ -53,6 +48,7 @@ export function StoreLayout() {
               <Link to="/wishlist">
                 <Button variant="ghost" size="icon"><Heart className="h-5 w-5" /></Button>
               </Link>
+              <NotificationBell />
               <Link to="/cart">
                 <Button variant="ghost" size="icon" className="relative">
                   <ShoppingCart className="h-5 w-5" />
@@ -72,13 +68,12 @@ export function StoreLayout() {
                   <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border border-charcoal-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-1 z-50">
                     <Link to="/account" className="block px-4 py-2 text-sm hover:bg-charcoal-50">My Account</Link>
                     <Link to="/orders" className="block px-4 py-2 text-sm hover:bg-charcoal-50">My Orders</Link>
+                    <Link to="/notifications" className="block px-4 py-2 text-sm hover:bg-charcoal-50">Notifications</Link>
                     <Link to="/wishlist" className="block px-4 py-2 text-sm hover:bg-charcoal-50">Wishlist</Link>
                     {isAdmin && (
                       <Link to="/admin" className="block px-4 py-2 text-sm hover:bg-charcoal-50 text-primary-600 font-medium">Admin Dashboard</Link>
                     )}
-                    <button onClick={() => signOut()} className="w-full text-left px-4 py-2 text-sm hover:bg-charcoal-50 text-red-600">
-                      Sign Out
-                    </button>
+                    <button onClick={() => signOut()} className="w-full text-left px-4 py-2 text-sm hover:bg-charcoal-50 text-red-600">Sign Out</button>
                   </div>
                 </div>
               ) : (
@@ -108,6 +103,7 @@ export function StoreLayout() {
               <Link to="/cart" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2 rounded-lg hover:bg-charcoal-50">Cart ({itemCount})</Link>
               {user ? (
                 <>
+                  <Link to="/notifications" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2 rounded-lg hover:bg-charcoal-50">Notifications</Link>
                   <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2 rounded-lg hover:bg-charcoal-50">Account</Link>
                   <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2 rounded-lg hover:bg-charcoal-50">Orders</Link>
                   {isAdmin && <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="px-3 py-2 rounded-lg hover:bg-charcoal-50 text-primary-600">Admin</Link>}
@@ -148,6 +144,7 @@ export function StoreLayout() {
               <ul className="space-y-2 text-sm">
                 <li><Link to="/account" className="hover:text-white">My Account</Link></li>
                 <li><Link to="/orders" className="hover:text-white">Track Order</Link></li>
+                <li><Link to="/notifications" className="hover:text-white">Notifications</Link></li>
                 <li><Link to="/wishlist" className="hover:text-white">Wishlist</Link></li>
               </ul>
             </div>
