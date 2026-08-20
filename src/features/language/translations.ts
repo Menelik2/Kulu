@@ -19,7 +19,7 @@ export const translations = {
     admin: 'አስተዳዳሪ',
 
     // Home
-    heroTitle1: 'ኩሉ የመስመር ላይ ግዢ',
+    heroTitle1: 'ለኩሉ ኦንላይን ግዢ',
     heroTitle2: 'በኢትዮጵያ በሙሉ ይደርሳል።',
     heroSubtitle:
       'ጥራት ያላቸው ምርቶችን በተመጣጣኝ ዋጋ ያግኙ። ፈጣን ማድረስ በሀገር አቀፍ ደረጃ፣ በደረሰ ጊዜ ክፍያ (COD) ጋር።',
@@ -192,7 +192,7 @@ export const translations = {
     notificationDeleted: 'ማሳወቂያ ተሰርዟል',
 
     // Footer
-    tagline: 'ኩሉ የመስመር ላይ ግዢ። በኢትዮጵያ በሙሉ ይደርሳል።',
+    tagline: 'ለኩሉ ኦንላይን ግዢ። በኢትዮጵያ በሙሉ ይደርሳል።',
     customer: 'ደንበኛ',
     trackOrder: 'ትዕዛዝ ይከታተሉ',
     deliveryDesc: 'በኢትዮጵያ ሁሉም ክልሎች እናደርሳለን። በደረሰ ጊዜ ክፍያ ይገኛል።',
