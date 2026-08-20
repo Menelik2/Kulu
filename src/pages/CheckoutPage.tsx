@@ -19,11 +19,11 @@ const ETHIOPIAN_REGIONS = [
 ]
 
 const schema = z.object({
-  fullName: z.string().min(2, 'Full name is required'),
-  phone: z.string().min(9, 'Valid Ethiopian phone required').regex(/^(\+251|0)?[79]\d{8}$/, 'Use format +2519XXXXXXXX or 09XXXXXXXX'),
-  email: z.string().email('Valid email required'),
-  region: z.string().min(1, 'Select a region'),
-  city: z.string().min(1, 'City is required'),
+  fullName: z.string().min(2),
+  phone: z.string().min(9).regex(/^(\+251|0)?[79]\d{8}$/),
+  email: z.string().email(),
+  region: z.string().min(1),
+  city: z.string().min(1),
   subCity: z.string().optional(),
   woreda: z.string().optional(),
   kebele: z.string().optional(),
@@ -104,15 +104,15 @@ export default function CheckoutPage() {
       })
 
       if (error) {
-        toast.error(error.message || 'Failed to place order')
+        toast.error(error.message || t('orderFailed'))
         return
       }
 
       clearCart()
-      toast.success(t('placeOrder'))
+      toast.success(t('orderSuccess'))
       navigate(`/order-confirmation/${orderId}`)
     } catch (err) {
-      toast.error('Something went wrong. Please try again.')
+      toast.error(t('orderFailed'))
       console.error(err)
     } finally {
       setLoading(false)
@@ -134,17 +134,17 @@ export default function CheckoutPage() {
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="fullName">{t('fullName')} *</Label>
                 <Input id="fullName" className="h-12 rounded-xl" {...register('fullName')} />
-                {errors.fullName && <p className="text-sm text-red-600">{errors.fullName.message}</p>}
+                {errors.fullName && <p className="text-sm text-red-600">{t('errFullName')}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">{t('phone')} *</Label>
                 <Input id="phone" placeholder="+2519XXXXXXXX" className="h-12 rounded-xl" {...register('phone')} />
-                {errors.phone && <p className="text-sm text-red-600">{errors.phone.message}</p>}
+                {errors.phone && <p className="text-sm text-red-600">{t('errPhone')}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">{t('email')} *</Label>
                 <Input id="email" type="email" className="h-12 rounded-xl" {...register('email')} />
-                {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
+                {errors.email && <p className="text-sm text-red-600">{t('errEmail')}</p>}
               </div>
             </div>
           </section>
@@ -163,12 +163,12 @@ export default function CheckoutPage() {
                     <option key={r} value={r}>{r}</option>
                   ))}
                 </select>
-                {errors.region && <p className="text-sm text-red-600">{errors.region.message}</p>}
+                {errors.region && <p className="text-sm text-red-600">{t('errRegion')}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="city">{t('city')} *</Label>
                 <Input id="city" placeholder="e.g. Bole, Adama" className="h-12 rounded-xl" {...register('city')} />
-                {errors.city && <p className="text-sm text-red-600">{errors.city.message}</p>}
+                {errors.city && <p className="text-sm text-red-600">{t('errCity')}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="subCity">{t('subCity')}</Label>
@@ -207,7 +207,6 @@ export default function CheckoutPage() {
           </section>
         </div>
 
-        {/* Desktop summary */}
         <div className="hidden lg:block lg:col-span-1">
           <div className="bg-white rounded-2xl border border-charcoal-100 p-6 sticky top-24 elevation-1">
             <h2 className="font-semibold text-lg mb-4">{t('orderSummary')}</h2>
@@ -245,7 +244,6 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Mobile sticky place order */}
         <div className="lg:hidden fixed bottom-16 left-0 right-0 z-30 bg-white/95 backdrop-blur-lg border-t border-charcoal-100 px-4 py-3 safe-bottom elevation-3">
           <div className="flex items-center justify-between gap-4 max-w-lg mx-auto">
             <div>

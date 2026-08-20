@@ -65,13 +65,23 @@ export function CartProvider({ children }: { children: ReactNode }) {
       removeItem(productId)
       return
     }
-    setItems((prev) =>
-      prev.map((i) => {
+    setItems((prev) => {
+      let hitMax = false
+      const next = prev.map((i) => {
         if (i.product_id !== productId) return i
         const max = i.product?.stock_quantity ?? quantity
-        return { ...i, quantity: Math.min(quantity, max) }
+        if (quantity > max) {
+          hitMax = true
+          return { ...i, quantity: max }
+        }
+        return { ...i, quantity }
       })
-    )
+      if (hitMax) {
+        // Defer toast so we don't call it during render of setState
+        queuePromise.resolve().then(() => toast.info('Maximum available stock reached'))
+      }
+      return next
+    })
   }
 
   const clearCart = () => {
