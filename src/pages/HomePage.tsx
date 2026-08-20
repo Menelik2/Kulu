@@ -30,17 +30,34 @@ function ProductGridSkeleton({ count = 8 }: { count?: number }) {
 
 function CategorySkeleton() {
   return (
-    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4">
-      {Array.from({ length: 10 }).map((_, i) => (
-        <div
-          key={i}
-          className="bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2 sm:p-4 text-center animate-pulse"
-        >
-          <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 mx-auto rounded-xl sm:rounded-2xl bg-charcoal-100 mb-1.5 sm:mb-3" />
-          <div className="h-3 bg-charcoal-100 rounded w-2/3 mx-auto" />
+    <>
+      {/* Mobile: horizontal scroll skeleton */}
+      <div className="sm:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide">
+        <div className="flex gap-3 pb-1 w-max">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="w-[76px] shrink-0 bg-white rounded-xl border border-charcoal-100 p-2.5 text-center animate-pulse"
+            >
+              <div className="w-10 h-10 mx-auto rounded-xl bg-charcoal-100 mb-1.5" />
+              <div className="h-2.5 bg-charcoal-100 rounded w-3/4 mx-auto" />
+            </div>
+          ))}
         </div>
-      ))}
-    </div>
+      </div>
+      {/* sm+: grid skeleton */}
+      <div className="hidden sm:grid grid-cols-4 md:grid-cols-5 gap-4">
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div
+            key={i}
+            className="bg-white rounded-2xl border border-charcoal-100 p-4 text-center animate-pulse"
+          >
+            <div className="w-12 h-12 md:w-14 md:h-14 mx-auto rounded-2xl bg-charcoal-100 mb-3" />
+            <div className="h-3 bg-charcoal-100 rounded w-2/3 mx-auto" />
+          </div>
+        ))}
+      </div>
+    </>
   )
 }
 
@@ -134,25 +151,51 @@ export default function HomePage() {
         {categoriesLoading ? (
           <CategorySkeleton />
         ) : categories && categories.length > 0 ? (
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4">
-            {categories.slice(0, 10).map((cat) => {
-              const Icon = getCategoryIcon(cat.slug || cat.name)
-              return (
-                <Link
-                  key={cat.id}
-                  to={`/shop?category=${cat.id}`}
-                  className="group bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2 sm:p-4 text-center hover:border-primary-300 hover:shadow-md active:scale-[0.98] transition-all"
-                >
-                  <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 mx-auto rounded-xl sm:rounded-2xl bg-primary-50 flex items-center justify-center mb-1.5 sm:mb-3 group-hover:bg-primary-100 group-hover:scale-105 transition-all">
-                    <Icon className="h-4 w-4 sm:h-6 sm:w-6 md:h-7 md:w-7 text-primary-600" strokeWidth={1.75} />
-                  </div>
-                  <h3 className="font-medium text-[10px] sm:text-xs md:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2 leading-tight">
-                    {cat.name}
-                  </h3>
-                </Link>
-              )
-            })}
-          </div>
+          <>
+            {/* Mobile: single-row horizontal scroll */}
+            <div className="sm:hidden -mx-4 px-4 overflow-x-auto overscroll-x-contain scrollbar-hide snap-x snap-mandatory">
+              <div className="flex gap-3 pb-1 w-max">
+                {categories.map((cat) => {
+                  const Icon = getCategoryIcon(cat.slug || cat.name)
+                  return (
+                    <Link
+                      key={cat.id}
+                      to={`/shop?category=${cat.id}`}
+                      className="group w-[76px] shrink-0 snap-start bg-white rounded-xl border border-charcoal-100 p-2.5 text-center active:scale-[0.97] transition-all"
+                    >
+                      <div className="w-10 h-10 mx-auto rounded-xl bg-primary-50 flex items-center justify-center mb-1.5 group-active:bg-primary-100">
+                        <Icon className="h-5 w-5 text-primary-600" strokeWidth={1.75} />
+                      </div>
+                      <h3 className="font-medium text-[10px] text-charcoal-800 line-clamp-2 leading-tight">
+                        {cat.name}
+                      </h3>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+
+            {/* sm+: grid */}
+            <div className="hidden sm:grid grid-cols-4 md:grid-cols-5 gap-4">
+              {categories.slice(0, 10).map((cat) => {
+                const Icon = getCategoryIcon(cat.slug || cat.name)
+                return (
+                  <Link
+                    key={cat.id}
+                    to={`/shop?category=${cat.id}`}
+                    className="group bg-white rounded-2xl border border-charcoal-100 p-4 text-center hover:border-primary-300 hover:shadow-md active:scale-[0.98] transition-all"
+                  >
+                    <div className="w-12 h-12 md:w-14 md:h-14 mx-auto rounded-2xl bg-primary-50 flex items-center justify-center mb-3 group-hover:bg-primary-100 group-hover:scale-105 transition-all">
+                      <Icon className="h-6 w-6 md:h-7 md:w-7 text-primary-600" strokeWidth={1.75} />
+                    </div>
+                    <h3 className="font-medium text-xs md:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2 leading-tight">
+                      {cat.name}
+                    </h3>
+                  </Link>
+                )
+              })}
+            </div>
+          </>
         ) : null}
       </section>
 
