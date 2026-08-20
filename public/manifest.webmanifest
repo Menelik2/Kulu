@@ -1,18 +1,28 @@
 {
   "name": "KULU — የሁሉም ገበያ በኪስዎ",
   "short_name": "KULU",
-  "description": "THE WHOLE MARKET IN YOUR POCKET · THE EVERYTHING MARKETPLACE",
-  "start_url": "/",
+  "description": "THE WHOLE MARKET IN YOUR POCKET · Ethiopian online shopping with Cash on Delivery",
+  "start_url": "/?source=pwa",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait-primary",
   "background_color": "#ffffff",
   "theme_color": "#1e40af",
   "lang": "am",
+  "dir": "ltr",
+  "categories": ["shopping", "lifestyle"],
   "icons": [
     {
-      "src": "/kulu-logo.jpg",
-      "sizes": "400x400",
-      "type": "image/jpeg",
+      "src": "/kulu-logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
+    },
+    {
+      "src": "/kulu-logo.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }
