@@ -2,7 +2,6 @@ export type Locale = 'am' | 'en'
 
 export const translations = {
   am: {
-    // Nav
     home: 'መነሻ',
     shop: 'ሱቅ',
     wishlist: 'የተወደዱ ዝርዝር',
@@ -17,12 +16,9 @@ export const translations = {
     notifications: 'ማሳወቂያዎች',
     adminDashboard: 'የአስተዳዳሪ ዳሽቦርድ',
     admin: 'አስተዳዳሪ',
-
-    // Home
     heroTitle1: 'ለኩሉ ኦንላይን ግዢ',
     heroTitle2: 'በኢትዮጵያ በሙሉ ይደርሳል።',
-    heroSubtitle:
-      'ጥራት ያላቸው ምርቶችን በተመጣጣኝ ዋጋ ያግኙ። ፈጣን ማድረስ በሀገር አቀፍ ደረጃ፣ በደረሰ ጊዜ ክፍያ (COD) ጋር።',
+    heroSubtitle: 'ጥራት ያላቸው ምርቶችን በተመጣጣኝ ዋጋ ያግኙ። ፈጣን ማድረስ በሀገር አቀፍ ደረጃ፣ በደረሰ ጊዜ ክፍያ (COD) ጋር።',
     shopNow: 'አሁን ይግዙ',
     newArrivals: 'አዳዲስ ምርቶች',
     nationwideDelivery: 'በሀገር አቀፍ ማድረስ',
@@ -37,11 +33,8 @@ export const translations = {
     viewAll: 'ሁሉንም ይመልከቱ',
     featuredProducts: 'ተመራጭ ምርቶች',
     readyToShop: 'ለመግዛት ዝግጁ ነዎት?',
-    readyToShopDesc:
-      'በሺዎች የሚቆጠሩ ምርቶችን በደህንነት ይመልከቱ። በደረሰ ጊዜ ክፍያ በኢትዮጵያ በሙሉ ይገኛል።',
+    readyToShopDesc: 'በሺዎች የሚቆጠሩ ምርቶችን በደህንነት ይመልከቱ። በደረሰ ጊዜ ክፍያ በኢትዮጵያ በሙሉ ይገኛል።',
     exploreShop: 'ሱቁን ያስሱ',
-
-    // Shop
     products: 'ምርቶች',
     product: 'ምርት',
     loading: 'በመጫን ላይ...',
@@ -66,8 +59,6 @@ export const translations = {
     sortPriceDesc: 'ዋጋ፡ ከከፍተኛ ወደ ዝቅተኛ',
     sortPopular: 'ታዋቂ',
     sortBestselling: 'በጣም የሚሸጡ',
-
-    // Product
     outOfStock: 'አልቋል',
     inStock: 'በመደብር አለ',
     inStockCount: 'በመደብር አለ ({count})',
@@ -78,8 +69,6 @@ export const translations = {
     relatedProducts: 'ተዛማጅ ምርቶች',
     backToShop: 'ወደ ሱቅ ተመለስ',
     productNotFound: 'ምርቱ አልተገኘም',
-
-    // Cart
     shoppingCart: 'የግዢ ጋሪ',
     cartEmpty: 'ጋሪዎ ባዶ ነው',
     cartEmptyDesc: 'እስካሁን ምንም አልጨመሩም።',
@@ -92,8 +81,6 @@ export const translations = {
     deliveryCalc: 'በትዕዛዝ ማረጋገጫ ጊዜ ይሰላል',
     total: 'ጠቅላላ',
     proceedCheckout: 'ወደ ክፍያ ይቀጥሉ',
-
-    // Checkout
     checkout: 'ክፍያ ማጠናቀቅ',
     customerInfo: 'የደንበኛ መረጃ',
     fullName: 'ሙሉ ስም',
@@ -117,8 +104,6 @@ export const translations = {
     errRegion: 'ክልል ይምረጡ',
     errCity: 'ከተማ ያስፈልጋል',
     orderFailed: 'ትዕዛዝ ማስገባት አልተሳካም። እባክዎ እንደገና ይሞክሩ።',
-
-    // Auth
     welcomeBack: 'እንኳን ደህና መጡ ወደ ኩሉ',
     createAccount: 'መለያ ይፍጠሩ',
     joinKulu: 'ኩሉን ይቀላቀሉ እና መግዛት ይጀምሩ',
@@ -131,8 +116,6 @@ export const translations = {
     continueWithGoogle: 'በጉግል ይቀጥሉ',
     orContinueWith: 'ወይም',
     googleSignInFailed: 'በጉግል መግባት አልተሳካም',
-
-    // Account
     myOrdersBtn: 'ትዕዛዞቼ',
     wishlistBtn: 'የተወደዱ ዝርዝር',
     settings: 'ቅንብሮች',
@@ -152,8 +135,6 @@ export const translations = {
     emailCannotChange: 'ኢሜይል መቀየር አይቻልም',
     phoneRequiredNotice: 'እባክዎ የስልክ ቁጥርዎን ያስገቡ። ለትዕዛዝ እና ማድረስ ያስፈልጋል።',
     phoneMissing: 'ስልክ ቁጥር አልተጨመረም — እባክዎ ያክሉ',
-
-    // Orders
     noOrdersYet: 'እስካሁን ትዕዛዝ የለዎትም',
     noOrdersDesc: 'ትዕዛዝ ሲያስገቡ እዚህ ይታያል።',
     startShopping: 'መግዛት ይጀምሩ',
@@ -168,23 +149,17 @@ export const translations = {
     orderCancelled: 'ይህ ትዕዛዝ ተሰርዟል።',
     back: 'ተመለስ',
     paymentCod: 'ክፍያ፡ በደረሰ ጊዜ',
-
-    // Order confirmation
     orderSuccess: 'ትዕዛዝዎ በተሳካ ሁኔታ ገብቷል!',
     thankYouShop: 'ከኩሉ ጋር ስለገዙ እናመሰግናለን',
     orderNumber: 'የትዕዛዝ ቁጥር',
     deliveryTo: 'መላኪያ ወደ',
     status: 'ሁኔታ',
     orderNotFound: 'ትዕዛዝ አልተገኘም',
-
-    // Wishlist
     wishlistEmpty: 'የተወደዱ ዝርዝርዎ ባዶ ነው',
     wishlistEmptyDesc: 'የሚወዷቸውን ምርቶች ለኋላ ያስቀምጡ።',
     browseProducts: 'ምርቶችን ይመልከቱ',
     signInToWishlist: 'የተወደዱ ዝርዝርን ለማየት እባክዎ ይግቡ።',
     removedFromWishlist: 'ከተወደዱ ዝርዝር ተወግዷል',
-
-    // Notifications
     unreadCount: '{count} ያልተነበቡ',
     markAllRead: 'ሁሉንም እንደተነበበ ምልክት ያድርጉ',
     noNotifications: 'እስካሁን ማሳወቂያ የለም',
@@ -192,8 +167,6 @@ export const translations = {
     signInToNotifications: 'ማሳወቂያዎችን ለማየት እባክዎ ይግቡ።',
     allMarkedRead: 'ሁሉም እንደተነበቡ ተመልክተዋል',
     notificationDeleted: 'ማሳወቂያ ተሰርዟል',
-
-    // Footer / company
     tagline: 'ለኩሉ ኦንላይን ግዢ። በኢትዮጵያ በሙሉ ይደርሳል።',
     customer: 'ደንበኛ',
     company: 'ኩባንያ',
@@ -206,67 +179,45 @@ export const translations = {
     contact: 'አግኙን',
     privacy: 'ግላዊነት',
     legal: 'ሕጋዊ ማስታወቂያ',
-    legalDisclaimerShort:
-      'በዚህ ድረ-ገጽ ላይ ያሉ መረጃዎች እና ዋጋዎች ለመረጃ ብቻ ናቸው፤ ሊለወጡ ይችላሉ። ኩሉ በሶስተኛ ወገን ማድረስ ወይም በምርት መግለጫ ስህተቶች ላይ ኃላፊነት አይወስድም።',
+    legalDisclaimerShort: 'በዚህ ድረ-ገጽ ላይ ያሉ መረጃዎች እና ዋጋዎች ለመረጃ ብቻ ናቸው፤ ሊለወጡ ይችላሉ። ኩሉ በሶስተኛ ወገን ማድረስ ወይም በምርት መግለጫ ስህተቶች ላይ ኃላፊነት አይወስድም።',
     legalReadMore: 'ሙሉ ጽሑፍ',
     or: 'ወይም',
-
-    // About
     aboutTitle: 'ከኩሉ ኦንላይን ጋር ግብይትዎን ያቃልሉ',
     aboutTagline: 'The whole market in your pocket.',
-    aboutP1:
-      'ፋሽን፣ ጫማዎች፣ ሽቶዎች እንዲሁም የባልትና ምርቶችን ፍለጋ መንገላታት ቀረ! Kulu Online Shopping ሁሉንም ወደ እርስዎ ደጅ ያመጣል።',
+    aboutP1: 'ፋሽን፣ ጫማዎች፣ ሽቶዎች እንዲሁም የባልትና ምርቶችን ፍለጋ መንገላታት ቀረ! Kulu Online Shopping ሁሉንም ወደ እርስዎ ደጅ ያመጣል።',
     aboutWhyTitle: 'ለምን በ Kulu ይሸምጣሉ?',
     aboutBenefit1: 'ጥራት ያላቸው ምርቶች',
     aboutBenefit2: 'ተመጣጣኝ ዋጋ',
     aboutBenefit3: 'ታማኝ እና ፈጣን ማድረስ',
     aboutOrderNow: 'አሁኑኑ ይዘዙ',
-
-    // Contact
     contactTitle: 'አግኙን',
     contactIntro: 'ጥያቄ፣ አስተያየት ወይም ድጋፍ ካስፈለገዎት ከታች ባሉት መንገዶች ያግኙን። አሁኑኑ ይደውሉ።',
     contactLocation: 'አድራሻ',
     contactAddress: 'ባሕር ዳር፣ ኢትዮጵያ',
     contactHours: 'የስራ ሰዓት፡ ሰኞ – አርብ፣ ከጠዋት 8:00 እስከ ምሽት 6:00',
-
-    // Privacy
     privacyTitle: 'የግላዊነት ፖሊሲ',
     privacyUpdated: 'መጨረሻ የተሻሻለው፡ ነሐሴ 2026',
-    privacyIntro:
-      'ኩሉ የእርስዎን ግላዊ መረጃ በከባድ ይይዛል። ይህ ፖሊሲ መረጃ እንዴት እንደምንሰበስብ፣ እንደምንጠቀም እና እንደምንጠብቅ ያብራራል።',
+    privacyIntro: 'ኩሉ የእርስዎን ግላዊ መረጃ በከባድ ይይዛል። ይህ ፖሊሲ መረጃ እንዴት እንደምንሰበስብ፣ እንደምንጠቀም እና እንደምንጠብቅ ያብራራል።',
     privacyS1Title: '1. የምንሰበስበው መረጃ',
-    privacyS1Body:
-      'ስም፣ ስልክ፣ ኢሜይል፣ የመላኪያ አድራሻ እና የትዕዛዝ ታሪክን ለአገልግሎት ማቅረብ እንሰበስባለን።',
+    privacyS1Body: 'ስም፣ ስልክ፣ ኢሜይል፣ የመላኪያ አድራሻ እና የትዕዛዝ ታሪክን ለአገልግሎት ማቅረብ እንሰበስባለን።',
     privacyS2Title: '2. መረጃ እንዴት እንጠቀማለን',
-    privacyS2Body:
-      'ትዕዛዝ ለማስተናገድ፣ ማድረስ ለማደራጀት፣ ድጋፍ ለመስጠት እና አገልግሎታችንን ለማሻሻል እንጠቀማለን።',
+    privacyS2Body: 'ትዕዛዝ ለማስተናገድ፣ ማድረስ ለማደራጀት፣ ድጋፍ ለመስጠት እና አገልግሎታችንን ለማሻሻል እንጠቀማለን።',
     privacyS3Title: '3. መረጃ ማጋራት',
-    privacyS3Body:
-      'መረጃዎን ከሶስተኛ ወገኖች ጋር አንሸጥም። የማድረስ አገልግሎት ለመስጠት አስፈላጊ ሲሆን ብቻ ሊጋራ ይችላል።',
+    privacyS3Body: 'መረጃዎን ከሶስተኛ ወገኖች ጋር አንሸጥም። የማድረስ አገልግሎት ለመስጠት አስፈላጊ ሲሆን ብቻ ሊጋራ ይችላል።',
     privacyS4Title: '4. መብቶችዎ',
-    privacyS4Body:
-      'መረጃዎን ማረም፣ መሰረዝ ወይም ስለ አጠቃቀሙ ጥያቄ ማቅረብ ይችላሉ። በ support@kulu.et ያግኙን።',
-
-    // Legal
+    privacyS4Body: 'መረጃዎን ማረም፣ መሰረዝ ወይም ስለ አጠቃቀሙ ጥያቄ ማቅረብ ይችላሉ። በ support@kulu.et ያግኙን።',
     legalTitle: 'ሕጋዊ ማስታወቂያ',
     legalUpdated: 'መጨረሻ የተሻሻለው፡ ነሐሴ 2026',
-    legalIntro:
-      'ይህ ማስታወቂያ የኩሉ ድረ-ገጽን እና አገልግሎቶችን በሚጠቀሙበት ጊዜ የሚመለከቱ ጠቃሚ ሕጋዊ ነጥቦችን ያብራራል። ድረ-ገጹን በመጠቀምዎ እነዚህን ውሎች ይቀበላሉ።',
+    legalIntro: 'ይህ ማስታወቂያ የኩሉ ድረ-ገጽን እና አገልግሎቶችን በሚጠቀሙበት ጊዜ የሚመለከቱ ጠቃሚ ሕጋዊ ነጥቦችን ያብራራል። ድረ-ገጹን በመጠቀምዎ እነዚህን ውሎች ይቀበላሉ።',
     legalS1Title: '1. መረጃ እና ዋጋ',
-    legalS1Body:
-      'በድረ-ገጹ ላይ ያሉ ምርት መግለጫዎች፣ ምስሎች እና ዋጋዎች ለመረጃ ብቻ ናቸው። በስህተት፣ በአቅርቦት ወይም በገበያ ሁኔታ ምክንያት ሊለወጡ ይችላሉ። የመጨረሻ ዋጋ በትዕዛዝ ማረጋገጫ ጊዜ ይረጋገጣል።',
+    legalS1Body: 'በድረ-ገጹ ላይ ያሉ ምርት መግለጫዎች፣ ምስሎች እና ዋጋዎች ለመረጃ ብቻ ናቸው። በስህተት፣ በአቅርቦት ወይም በገበያ ሁኔታ ምክንያት ሊለወጡ ይችላሉ። የመጨረሻ ዋጋ በትዕዛዝ ማረጋገጫ ጊዜ ይረጋገጣል።',
     legalS2Title: '2. ማድረስ እና ክፍያ',
-    legalS2Body:
-      'የማድረስ ጊዜ ግምታዊ ነው። መዘግየት በአየር ሁኔታ፣ በመንገድ ወይም በሶስተኛ ወገን አገልግሎት ሊከሰት ይችላል። በደረሰ ጊዜ ክፍያ (COD) ሲመረጥ ክፍያ በምርቱ ሲደርስ ይከናወናል።',
+    legalS2Body: 'የማድረስ ጊዜ ግምታዊ ነው። መዘግየት በአየር ሁኔታ፣ በመንገድ ወይም በሶስተኛ ወገን አገልግሎት ሊከሰት ይችላል። በደረሰ ጊዜ ክፍያ (COD) ሲመረጥ ክፍያ በምርቱ ሲደርስ ይከናወናል።',
     legalS3Title: '3. ኃላፊነት ገደብ',
-    legalS3Body:
-      'ኩሉ በተቻለ መጠን ትክክለኛ አገልግሎት ለመስጠት ይጥራል። ነገር ግን በተዘዋዋሪ፣ በአጋጣሚ ወይም በተከታታይ ጉዳት (እንደ ገቢ ማጣት) ላይ በሕግ በተፈቀደው ከፍተኛ ገደብ ውስጥ ብቻ ኃላፊነት ይወስዳል።',
+    legalS3Body: 'ኩሉ በተቻለ መጠን ትክክለኛ አገልግሎት ለመስጠት ይጥራል። ነገር ግን በተዘዋዋሪ፣ በአጋጣሚ ወይም በተከታታይ ጉዳት (እንደ ገቢ ማጣት) ላይ በሕግ በተፈቀደው ከፍተኛ ገደብ ውስጥ ብቻ ኃላፊነት ይወስዳል።',
     legalS4Title: '4. ተፈጻሚ ሕግ',
-    legalS4Body:
-      'እነዚህ ውሎች በኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ ሕግ ይመራሉ። ማንኛውም ክርክር በተቻለ መጠን በሰላም ይፈታል።',
+    legalS4Body: 'እነዚህ ውሎች በኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ ሕግ ይመራሉ። ማንኛውም ክርክር በተቻለ መጠን በሰላም ይፈታል።',
     legalSeeAlso: 'ተዛማጅ፡',
-
-    // PWA install
     installApp: 'መተግበሪያውን ይጫኑ',
     installAppDesc: 'ኩሉን ወደ መነሻ ስክሪንዎ ያክሉ — ፈጣን መዳረሻ፣ እንደ መተግበሪያ ይሰማል።',
     installAppBtn: 'ጫን',
@@ -275,8 +226,16 @@ export const translations = {
     dismiss: 'ዝጋ',
     installIosHint: 'በ Safari ውስጥ ኩሉን ወደ መነሻ ስክሪን ያክሉ።',
     installIosSteps: 'Share → Add to Home Screen ይጫኑ',
-
-    // Language
+    deleteAccount: 'መለያ ሰርዝ',
+    deleteAccountDesc: 'መለያዎን እና ውሂብዎን በቋሚነት ይሰርዛል',
+    deleteAccountTitle: 'መለያ በቋሚነት ሰርዝ',
+    deleteAccountWarning: 'ይህ እርምጃ ሊቀለበስ አይችልም። መገለጫዎ፣ የተወደዱ ዝርዝር፣ አድራሻዎች እና ማሳወቂያዎች ይሰረዛሉ። የትዕዛዝ ታሪክ ለመደብሩ ይቀራል ነገር ግን ከመለያዎ ይላቀቃል።',
+    deleteAccountConfirmHint: 'ለማረጋገጥ DELETE ይጻፉ',
+    deleteAccountConfirmWord: 'DELETE',
+    deleteAccountBtn: 'መለያዬን በቋሚነት ሰርዝ',
+    deleteAccountSuccess: 'መለያዎ ተሰርዟል',
+    deleteAccountFailed: 'መለያ መሰረዝ አልተሳካም',
+    deleteAccountAdminBlocked: 'የአስተዳዳሪ መለያ ከመተግበሪያው ሊሰረዝ አይችልም',
     language: 'ቋንቋ',
     amharic: 'አማርኛ',
     english: 'English',
@@ -296,11 +255,9 @@ export const translations = {
     notifications: 'Notifications',
     adminDashboard: 'Admin Dashboard',
     admin: 'Admin',
-
     heroTitle1: 'Kulu Online Shopping',
     heroTitle2: 'Delivered Across Ethiopia.',
-    heroSubtitle:
-      'Discover quality products at fair prices. Fast delivery nationwide with Cash on Delivery.',
+    heroSubtitle: 'Discover quality products at fair prices. Fast delivery nationwide with Cash on Delivery.',
     shopNow: 'Shop Now',
     newArrivals: 'New Arrivals',
     nationwideDelivery: 'Nationwide Delivery',
@@ -315,10 +272,8 @@ export const translations = {
     viewAll: 'View all',
     featuredProducts: 'Featured Products',
     readyToShop: 'Ready to start shopping?',
-    readyToShopDesc:
-      'Browse thousands of products with secure Cash on Delivery across Ethiopia.',
+    readyToShopDesc: 'Browse thousands of products with secure Cash on Delivery across Ethiopia.',
     exploreShop: 'Explore the Shop',
-
     products: 'products',
     product: 'product',
     loading: 'Loading...',
@@ -343,7 +298,6 @@ export const translations = {
     sortPriceDesc: 'Price: High to Low',
     sortPopular: 'Popular',
     sortBestselling: 'Best Selling',
-
     outOfStock: 'Out of Stock',
     inStock: 'In Stock',
     inStockCount: 'In Stock ({count} available)',
@@ -354,7 +308,6 @@ export const translations = {
     relatedProducts: 'Related Products',
     backToShop: 'Back to Shop',
     productNotFound: 'Product not found',
-
     shoppingCart: 'Shopping Cart',
     cartEmpty: 'Your cart is empty',
     cartEmptyDesc: "Looks like you haven't added anything yet.",
@@ -367,7 +320,6 @@ export const translations = {
     deliveryCalc: 'Calculated at checkout',
     total: 'Total',
     proceedCheckout: 'Proceed to Checkout',
-
     checkout: 'Checkout',
     customerInfo: 'Customer Information',
     fullName: 'Full Name',
@@ -391,7 +343,6 @@ export const translations = {
     errRegion: 'Select a region',
     errCity: 'City is required',
     orderFailed: 'Failed to place order. Please try again.',
-
     welcomeBack: 'Welcome back to KULU',
     createAccount: 'Create Account',
     joinKulu: 'Join KULU and start shopping',
@@ -404,7 +355,6 @@ export const translations = {
     continueWithGoogle: 'Continue with Google',
     orContinueWith: 'or',
     googleSignInFailed: 'Google sign-in failed',
-
     myOrdersBtn: 'My Orders',
     wishlistBtn: 'Wishlist',
     settings: 'Settings',
@@ -424,7 +374,6 @@ export const translations = {
     emailCannotChange: 'Email cannot be changed',
     phoneRequiredNotice: 'Please add your phone number. It is required for orders and delivery.',
     phoneMissing: 'Phone number missing — please add it',
-
     noOrdersYet: 'No orders yet',
     noOrdersDesc: 'When you place an order, it will show up here.',
     startShopping: 'Start Shopping',
@@ -439,20 +388,17 @@ export const translations = {
     orderCancelled: 'This order was cancelled.',
     back: 'Back',
     paymentCod: 'Payment: Cash on Delivery',
-
     orderSuccess: 'Order Placed Successfully!',
     thankYouShop: 'Thank you for shopping with KULU',
     orderNumber: 'Order Number',
     deliveryTo: 'Delivery to',
     status: 'Status',
     orderNotFound: 'Order not found',
-
     wishlistEmpty: 'Your wishlist is empty',
     wishlistEmptyDesc: 'Save products you love for later.',
     browseProducts: 'Browse Products',
     signInToWishlist: 'Please sign in to view your wishlist.',
     removedFromWishlist: 'Removed from wishlist',
-
     unreadCount: '{count} unread',
     markAllRead: 'Mark all read',
     noNotifications: 'No notifications yet',
@@ -460,7 +406,6 @@ export const translations = {
     signInToNotifications: 'Please sign in to view notifications.',
     allMarkedRead: 'All marked as read',
     notificationDeleted: 'Notification deleted',
-
     tagline: 'Kulu Online Shopping. Delivered Across Ethiopia.',
     customer: 'Customer',
     company: 'Company',
@@ -473,63 +418,45 @@ export const translations = {
     contact: 'Contact',
     privacy: 'Privacy',
     legal: 'Legal',
-    legalDisclaimerShort:
-      'Product details and prices on this site are for information only and may change. KULU is not liable for third-party delivery delays or product description errors.',
+    legalDisclaimerShort: 'Product details and prices on this site are for information only and may change. KULU is not liable for third-party delivery delays or product description errors.',
     legalReadMore: 'Read full disclaimer',
     or: 'or',
-
     aboutTitle: 'Simplify your shopping with Kulu Online',
     aboutTagline: 'The whole market in your pocket.',
-    aboutP1:
-      'No more hunting for fashion, shoes, fragrances, and household essentials. Kulu Online Shopping brings everything to your door.',
+    aboutP1: 'No more hunting for fashion, shoes, fragrances, and household essentials. Kulu Online Shopping brings everything to your door.',
     aboutWhyTitle: 'Why shop with Kulu?',
     aboutBenefit1: 'Quality products',
     aboutBenefit2: 'Fair prices',
     aboutBenefit3: 'Reliable and fast delivery',
     aboutOrderNow: 'Order now',
-
     contactTitle: 'Contact us',
     contactIntro: 'Questions, feedback, or support — reach us below. Call us anytime during business hours.',
     contactLocation: 'Location',
     contactAddress: 'Bahir Dar, Ethiopia',
     contactHours: 'Hours: Monday – Friday, 8:00 AM – 6:00 PM',
-
     privacyTitle: 'Privacy Policy',
     privacyUpdated: 'Last updated: August 2026',
-    privacyIntro:
-      'KULU takes your privacy seriously. This policy explains how we collect, use, and protect your information.',
+    privacyIntro: 'KULU takes your privacy seriously. This policy explains how we collect, use, and protect your information.',
     privacyS1Title: '1. Information we collect',
-    privacyS1Body:
-      'We collect name, phone, email, delivery address, and order history to provide our service.',
+    privacyS1Body: 'We collect name, phone, email, delivery address, and order history to provide our service.',
     privacyS2Title: '2. How we use information',
-    privacyS2Body:
-      'We use your data to process orders, arrange delivery, provide support, and improve our service.',
+    privacyS2Body: 'We use your data to process orders, arrange delivery, provide support, and improve our service.',
     privacyS3Title: '3. Sharing',
-    privacyS3Body:
-      'We do not sell your data. We may share details only when needed to complete delivery.',
+    privacyS3Body: 'We do not sell your data. We may share details only when needed to complete delivery.',
     privacyS4Title: '4. Your rights',
-    privacyS4Body:
-      'You may request correction, deletion, or information about your data. Contact support@kulu.et.',
-
+    privacyS4Body: 'You may request correction, deletion, or information about your data. Contact support@kulu.et.',
     legalTitle: 'Legal Disclaimer',
     legalUpdated: 'Last updated: August 2026',
-    legalIntro:
-      'This disclaimer sets out important legal points when you use the KULU website and services. By using the site, you accept these terms.',
+    legalIntro: 'This disclaimer sets out important legal points when you use the KULU website and services. By using the site, you accept these terms.',
     legalS1Title: '1. Information and pricing',
-    legalS1Body:
-      'Product descriptions, images, and prices on this site are for general information. They may change due to errors, stock, or market conditions. The final price is confirmed at checkout.',
+    legalS1Body: 'Product descriptions, images, and prices on this site are for general information. They may change due to errors, stock, or market conditions. The final price is confirmed at checkout.',
     legalS2Title: '2. Delivery and payment',
-    legalS2Body:
-      'Delivery times are estimates. Delays may occur due to weather, roads, or third-party carriers. With Cash on Delivery (COD), payment is collected when the order is delivered.',
+    legalS2Body: 'Delivery times are estimates. Delays may occur due to weather, roads, or third-party carriers. With Cash on Delivery (COD), payment is collected when the order is delivered.',
     legalS3Title: '3. Limitation of liability',
-    legalS3Body:
-      'KULU aims to provide accurate service. To the extent allowed by law, we are not liable for indirect, incidental, or consequential loss (including lost profits) arising from use of the site or products.',
+    legalS3Body: 'KULU aims to provide accurate service. To the extent allowed by law, we are not liable for indirect, incidental, or consequential loss (including lost profits) arising from use of the site or products.',
     legalS4Title: '4. Governing law',
-    legalS4Body:
-      'These terms are governed by the laws of the Federal Democratic Republic of Ethiopia. Disputes should be resolved amicably where possible.',
+    legalS4Body: 'These terms are governed by the laws of the Federal Democratic Republic of Ethiopia. Disputes should be resolved amicably where possible.',
     legalSeeAlso: 'See also:',
-
-    // PWA install
     installApp: 'Install KULU app',
     installAppDesc: 'Add KULU to your home screen for faster access and an app-like experience.',
     installAppBtn: 'Install',
@@ -538,7 +465,16 @@ export const translations = {
     dismiss: 'Dismiss',
     installIosHint: 'Add KULU to your Home Screen from Safari.',
     installIosSteps: 'Tap Share → Add to Home Screen',
-
+    deleteAccount: 'Delete account',
+    deleteAccountDesc: 'Permanently remove your account and data',
+    deleteAccountTitle: 'Permanently delete account',
+    deleteAccountWarning: 'This cannot be undone. Your profile, wishlist, addresses, and notifications will be deleted. Order history is kept for the store but unlinked from your account.',
+    deleteAccountConfirmHint: 'Type DELETE to confirm',
+    deleteAccountConfirmWord: 'DELETE',
+    deleteAccountBtn: 'Permanently delete my account',
+    deleteAccountSuccess: 'Your account has been deleted',
+    deleteAccountFailed: 'Failed to delete account',
+    deleteAccountAdminBlocked: 'Admin accounts cannot be deleted from the app',
     language: 'Language',
     amharic: 'አማርኛ',
     english: 'English',

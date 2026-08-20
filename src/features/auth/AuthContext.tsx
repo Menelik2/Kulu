@@ -16,6 +16,7 @@ interface AuthContextType {
   refreshProfile: () => Promise<void>
   updateProfile: (data: { full_name?: string; phone?: string | null }) => Promise<{ error: Error | null }>
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>
+  deleteAccount: () => Promise<{ error: Error | null }>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -153,6 +154,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  /** Permanently deletes the user in auth + app tables via RPC */
+  const deleteAccount = async () => {
+    if (!user) return { error: new Error('Not signed in') }
+    try {
+      const { error } = await supabase.rpc('delete_own_account')
+      if (error) return { error: error as Error }
+
+      // Clear local session (user already removed server-side)
+      await supabase.auth.signOut({ scope: 'local' })
+      setUser(null)
+      setSession(null)
+      setProfile(null)
+      try {
+        localStorage.removeItem('kulu_cart')
+      } catch {
+        /* ignore */
+      }
+      return { error: null }
+    } catch (err) {
+      return { error: err as Error }
+    }
+  }
+
   const isAdmin = profile?.role === 'admin'
 
   return (
@@ -170,6 +194,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshProfile,
         updateProfile,
         updatePassword,
+        deleteAccount,
       }}
     >
       {children}
