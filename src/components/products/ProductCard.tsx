@@ -1,11 +1,16 @@
 import { memo } from 'react'
-import { Link } from 'react-router-dom'
-import { ShoppingCart, Star } from 'lucide-react'
+import { Link, useNavigate } from 'react-router-dom'
+import { ShoppingCart, Star, Heart } from 'lucide-react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import type { Product } from '@/types/database'
 import { formatETB, calculateDiscountPercent, getEffectivePrice } from '@/lib/utils'
 import { useCart } from '@/features/cart/CartContext'
+import { useAuth } from '@/features/auth/AuthContext'
 import { useLanguage } from '@/features/language/LanguageContext'
+import { getWishlistProductIds, toggleWishlist } from '@/services/wishlist'
 import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 interface ProductCardProps {
   product: Product
@@ -13,40 +18,92 @@ interface ProductCardProps {
 
 function ProductCardComponent({ product }: ProductCardProps) {
   const { addItem } = useCart()
+  const { user } = useAuth()
   const { t } = useLanguage()
+  const navigate = useNavigate()
+  const qc = useQueryClient()
+
   const primaryImage = product.images?.find((i) => i.is_primary) || product.images?.[0]
   const discount = calculateDiscountPercent(product.price, product.discount_price)
   const effectivePrice = getEffectivePrice(product.price, product.discount_price)
   const outOfStock = product.stock_quantity < 1
 
+  const { data: wishIds } = useQuery({
+    queryKey: ['wishlist-ids', user?.id],
+    queryFn: () => getWishlistProductIds(user!.id),
+    enabled: !!user,
+    staleTime: 60_000,
+  })
+
+  const wished = !!wishIds?.has(product.id)
+
+  const toggle = useMutation({
+    mutationFn: () => toggleWishlist(user!.id, product.id),
+    onSuccess: (nowOn) => {
+      qc.invalidateQueries({ queryKey: ['wishlist-ids', user?.id] })
+      qc.invalidateQueries({ queryKey: ['wishlist', user?.id] })
+      toast.success(nowOn ? t('addedToWishlist') : t('removedFromWishlist'))
+    },
+    onError: () => toast.error(t('wishlistFailed')),
+  })
+
+  const onHeartClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    if (!user) {
+      toast.info(t('signInToWishlist'))
+      navigate('/login')
+      return
+    }
+    toggle.mutate()
+  }
+
   return (
     <div className="group bg-white rounded-2xl border border-charcoal-100 overflow-hidden elevation-1 hover:elevation-2 active:scale-[0.98] transition-all">
-      <Link to={`/products/${product.slug}`} className="block relative aspect-square bg-charcoal-50 overflow-hidden">
-        {primaryImage ? (
-          <img
-            src={primaryImage.url}
-            alt={primaryImage.alt_text || product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-            decoding="async"
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-charcoal-300">
-            <span className="text-4xl font-bold opacity-30">{product.name.charAt(0)}</span>
-          </div>
-        )}
+      <div className="relative aspect-square bg-charcoal-50 overflow-hidden">
+        <Link to={`/products/${product.slug}`} className="block w-full h-full">
+          {primaryImage ? (
+            <img
+              src={primaryImage.url}
+              alt={primaryImage.alt_text || product.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+              decoding="async"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-charcoal-300">
+              <span className="text-4xl font-bold opacity-30">{product.name.charAt(0)}</span>
+            </div>
+          )}
+        </Link>
+
         {discount && (
-          <span className="absolute top-2 left-2 bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm">
+          <span className="absolute top-2 left-2 bg-red-500 text-white text-[11px] font-bold px-2 py-0.5 rounded-full shadow-sm z-[1]">
             -{discount}%
           </span>
         )}
+
+        <button
+          type="button"
+          onClick={onHeartClick}
+          disabled={toggle.isPending}
+          className={cn(
+            'absolute top-2 right-2 z-[2] w-9 h-9 rounded-full bg-white/95 shadow flex items-center justify-center',
+            'active:scale-95 transition-transform disabled:opacity-60',
+            wished ? 'text-red-500' : 'text-charcoal-400'
+          )}
+          aria-label={wished ? t('removedFromWishlist') : t('addedToWishlist')}
+        >
+          <Heart className={cn('h-4 w-4', wished && 'fill-red-500')} />
+        </button>
+
         {outOfStock && (
-          <span className="absolute top-2 right-2 bg-charcoal-800/90 text-white text-[11px] font-medium px-2 py-0.5 rounded-full">
+          <span className="absolute bottom-2 left-2 bg-charcoal-800/90 text-white text-[11px] font-medium px-2 py-0.5 rounded-full z-[1]">
             {t('outOfStock')}
           </span>
         )}
-      </Link>
+      </div>
 
       <div className="p-3 sm:p-3.5">
         <Link to={`/products/${product.slug}`}>
