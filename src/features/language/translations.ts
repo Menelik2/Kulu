@@ -203,6 +203,10 @@ export const translations = {
     about: 'ስለ እኛ',
     contact: 'አግኙን',
     privacy: 'ግላዊነት',
+    legal: 'ሕጋዊ ማስታወቂያ',
+    legalDisclaimerShort:
+      'በዚህ ድረ-ገጽ ላይ ያሉ መረጃዎች እና ዋጋዎች ለመረጃ ብቻ ናቸው፤ ሊለወጡ ይችላሉ። ኩሉ በሶስተኛ ወገን ማድረስ ወይም በምርት መግለጫ ስህተቶች ላይ ኃላፊነት አይወስድም።',
+    legalReadMore: 'ሙሉ ጽሑፍ',
 
     // About
     aboutTitle: 'ስለ ኩሉ',
@@ -236,6 +240,25 @@ export const translations = {
     privacyS4Title: '4. መብቶችዎ',
     privacyS4Body:
       'መረጃዎን ማረም፣ መሰረዝ ወይም ስለ አጠቃቀሙ ጥያቄ ማቅረብ ይችላሉ። በ support@kulu.et ያግኙን።',
+
+    // Legal
+    legalTitle: 'ሕጋዊ ማስታወቂያ',
+    legalUpdated: 'መጨረሻ የተሻሻለው፡ ነሐሴ 2026',
+    legalIntro:
+      'ይህ ማስታወቂያ የኩሉ ድረ-ገጽን እና አገልግሎቶችን በሚጠቀሙበት ጊዜ የሚመለከቱ ጠቃሚ ሕጋዊ ነጥቦችን ያብራራል። ድረ-ገጹን በመጠቀምዎ እነዚህን ውሎች ይቀበላሉ።',
+    legalS1Title: '1. መረጃ እና ዋጋ',
+    legalS1Body:
+      'በድረ-ገጹ ላይ ያሉ ምርት መግለጫዎች፣ ምስሎች እና ዋጋዎች ለመረጃ ብቻ ናቸው። በስህተት፣ በአቅርቦት ወይም በገበያ ሁኔታ ምክንያት ሊለወጡ ይችላሉ። የመጨረሻ ዋጋ በትዕዛዝ ማረጋገጫ ጊዜ ይረጋገጣል።',
+    legalS2Title: '2. ማድረስ እና ክፍያ',
+    legalS2Body:
+      'የማድረስ ጊዜ ግምታዊ ነው። መዘግየት በአየር ሁኔታ፣ በመንገድ ወይም በሶስተኛ ወገን አገልግሎት ሊከሰት ይችላል። በደረሰ ጊዜ ክፍያ (COD) ሲመረጥ ክፍያ በምርቱ ሲደርስ ይከናወናል።',
+    legalS3Title: '3. ኃላፊነት ገደብ',
+    legalS3Body:
+      'ኩሉ በተቻለ መጠን ትክክለኛ አገልግሎት ለመስጠት ይጥራል። ነገር ግን በተዘዋዋሪ፣ በአጋጣሚ ወይም በተከታታይ ጉዳት (እንደ ገቢ ማጣት) ላይ በሕግ በተፈቀደው ከፍተኛ ገደብ ውስጥ ብቻ ኃላፊነት ይወስዳል።',
+    legalS4Title: '4. ተፈጻሚ ሕግ',
+    legalS4Body:
+      'እነዚህ ውሎች በኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ ሕግ ይመራሉ። ማንኛውም ክርክር በተቻለ መጠን በሰላም ይፈታል።',
+    legalSeeAlso: 'ተዛማጅ፡',
 
     // Language
     language: 'ቋንቋ',
@@ -431,6 +454,10 @@ export const translations = {
     about: 'About',
     contact: 'Contact',
     privacy: 'Privacy',
+    legal: 'Legal',
+    legalDisclaimerShort:
+      'Product details and prices on this site are for information only and may change. KULU is not liable for third-party delivery delays or product description errors.',
+    legalReadMore: 'Read full disclaimer',
 
     aboutTitle: 'About KULU',
     aboutP1:
@@ -462,6 +489,24 @@ export const translations = {
     privacyS4Title: '4. Your rights',
     privacyS4Body:
       'You may request correction, deletion, or information about your data. Contact support@kulu.et.',
+
+    legalTitle: 'Legal Disclaimer',
+    legalUpdated: 'Last updated: August 2026',
+    legalIntro:
+      'This disclaimer sets out important legal points when you use the KULU website and services. By using the site, you accept these terms.',
+    legalS1Title: '1. Information and pricing',
+    legalS1Body:
+      'Product descriptions, images, and prices on this site are for general information. They may change due to errors, stock, or market conditions. The final price is confirmed at checkout.',
+    legalS2Title: '2. Delivery and payment',
+    legalS2Body:
+      'Delivery times are estimates. Delays may occur due to weather, roads, or third-party carriers. With Cash on Delivery (COD), payment is collected when the order is delivered.',
+    legalS3Title: '3. Limitation of liability',
+    legalS3Body:
+      'KULU aims to provide accurate service. To the extent allowed by law, we are not liable for indirect, incidental, or consequential loss (including lost profits) arising from use of the site or products.',
+    legalS4Title: '4. Governing law',
+    legalS4Body:
+      'These terms are governed by the laws of the Federal Democratic Republic of Ethiopia. Disputes should be resolved amicably where possible.',
+    legalSeeAlso: 'See also:',
 
     language: 'Language',
     amharic: 'አማርኛ',
