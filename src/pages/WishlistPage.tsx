@@ -27,7 +27,7 @@ export default function WishlistPage() {
       qc.invalidateQueries({ queryKey: ['wishlist-ids', user?.id] })
       toast.success(t('removedFromWishlist'))
     },
-    onError: () => toast.error(t('wishlistFailed')),
+    onError: () => toast.error(t('failedLoad')),
   })
 
   if (!user) {
@@ -56,7 +56,7 @@ export default function WishlistPage() {
   if (isError) {
     return (
       <div className="max-w-7xl mx-auto container-padding py-16 text-center">
-        <p className="text-charcoal-500">{t('wishlistFailed')}</p>
+        <p className="text-charcoal-500">{t('failedLoad')}</p>
         <Button className="mt-4 rounded-full" onClick={() => refetch()}>
           {t('browseProducts')}
         </Button>
