@@ -7,20 +7,57 @@ import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/features/language/LanguageContext'
 import { getCategoryIcon } from '@/lib/categoryIcons'
 
+function ProductGridSkeleton({ count = 8 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="bg-white rounded-2xl border border-charcoal-100 overflow-hidden animate-pulse"
+        >
+          <div className="aspect-square bg-charcoal-100" />
+          <div className="p-3 sm:p-3.5 space-y-2">
+            <div className="h-4 bg-charcoal-100 rounded w-4/5" />
+            <div className="h-3 bg-charcoal-100 rounded w-1/3" />
+            <div className="h-4 bg-charcoal-100 rounded w-1/2" />
+            <div className="h-10 bg-charcoal-100 rounded-full mt-2" />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+function CategorySkeleton() {
+  return (
+    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4">
+      {Array.from({ length: 10 }).map((_, i) => (
+        <div
+          key={i}
+          className="bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2 sm:p-4 text-center animate-pulse"
+        >
+          <div className="w-9 h-9 sm:w-12 sm:h-12 md:w-14 md:h-14 mx-auto rounded-xl sm:rounded-2xl bg-charcoal-100 mb-1.5 sm:mb-3" />
+          <div className="h-3 bg-charcoal-100 rounded w-2/3 mx-auto" />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 export default function HomePage() {
   const { t } = useLanguage()
 
-  const { data: featured } = useQuery({
+  const { data: featured, isLoading: featuredLoading } = useQuery({
     queryKey: ['products', 'featured'],
     queryFn: () => getFeaturedProducts(8),
   })
 
-  const { data: newest } = useQuery({
+  const { data: newest, isLoading: newestLoading } = useQuery({
     queryKey: ['products', 'newest'],
     queryFn: () => getProducts({ sort: 'newest', limit: 8 }),
   })
 
-  const { data: categories } = useQuery({
+  const { data: categories, isLoading: categoriesLoading } = useQuery({
     queryKey: ['categories'],
     queryFn: getCategories,
   })
@@ -53,7 +90,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   variant="outline"
-                  className="border-white/30 text-white hover:bg-white/10 h-12 px-6 rounded-full"
+                  className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white h-12 px-6 rounded-full backdrop-blur-sm"
                 >
                   {t('newArrivals')}
                 </Button>
@@ -87,14 +124,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      {categories && categories.length > 0 && (
-        <section className="max-w-7xl mx-auto container-padding py-6 sm:py-12">
-          <div className="flex items-center justify-between mb-3 sm:mb-6">
-            <h2 className="text-lg sm:text-2xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
-            <Link to="/shop" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
-              {t('viewAll')} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+      <section className="max-w-7xl mx-auto container-padding py-6 sm:py-12">
+        <div className="flex items-center justify-between mb-3 sm:mb-6">
+          <h2 className="text-lg sm:text-2xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
+          <Link to="/shop" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
+            {t('viewAll')} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+        {categoriesLoading ? (
+          <CategorySkeleton />
+        ) : categories && categories.length > 0 ? (
           <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-4">
             {categories.slice(0, 10).map((cat) => {
               const Icon = getCategoryIcon(cat.slug || cat.name)
@@ -114,42 +153,46 @@ export default function HomePage() {
               )
             })}
           </div>
-        </section>
-      )}
+        ) : null}
+      </section>
 
-      {featured && featured.products.length > 0 && (
-        <section className="max-w-7xl mx-auto container-padding py-8 sm:py-12">
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-charcoal-900">{t('featuredProducts')}</h2>
-            <Link to="/shop" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
-              {t('viewAll')} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
+      <section className="max-w-7xl mx-auto container-padding py-8 sm:py-12">
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-charcoal-900">{t('featuredProducts')}</h2>
+          <Link to="/shop" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
+            {t('viewAll')} <ArrowRight className="h-4 w-4" />
+          </Link>
+        </div>
+        {featuredLoading ? (
+          <ProductGridSkeleton />
+        ) : featured && featured.products.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
             {featured.products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>
-        </section>
-      )}
+        ) : null}
+      </section>
 
-      {newest && newest.products.length > 0 && (
-        <section className="bg-white py-8 sm:py-12">
-          <div className="max-w-7xl mx-auto container-padding">
-            <div className="flex items-center justify-between mb-4 sm:mb-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-charcoal-900">{t('newArrivals')}</h2>
-              <Link to="/shop?sort=newest" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
-                {t('viewAll')} <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+      <section className="bg-white py-8 sm:py-12">
+        <div className="max-w-7xl mx-auto container-padding">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            <h2 className="text-xl sm:text-2xl font-bold text-charcoal-900">{t('newArrivals')}</h2>
+            <Link to="/shop?sort=newest" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
+              {t('viewAll')} <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          {newestLoading ? (
+            <ProductGridSkeleton />
+          ) : newest && newest.products.length > 0 ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
               {newest.products.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          ) : null}
+        </div>
+      </section>
 
       <section className="max-w-7xl mx-auto container-padding py-10 sm:py-16">
         <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center text-white">

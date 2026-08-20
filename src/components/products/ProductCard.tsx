@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Link } from 'react-router-dom'
 import { ShoppingCart, Star } from 'lucide-react'
 import type { Product } from '@/types/database'
@@ -10,7 +11,7 @@ interface ProductCardProps {
   product: Product
 }
 
-export function ProductCard({ product }: ProductCardProps) {
+function ProductCardComponent({ product }: ProductCardProps) {
   const { addItem } = useCart()
   const { t } = useLanguage()
   const primaryImage = product.images?.find((i) => i.is_primary) || product.images?.[0]
@@ -27,6 +28,8 @@ export function ProductCard({ product }: ProductCardProps) {
             alt={primaryImage.alt_text || product.name}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
             loading="lazy"
+            decoding="async"
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center text-charcoal-300">
@@ -87,3 +90,5 @@ export function ProductCard({ product }: ProductCardProps) {
     </div>
   )
 }
+
+export const ProductCard = memo(ProductCardComponent)
