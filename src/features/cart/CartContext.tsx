@@ -77,8 +77,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         return { ...i, quantity }
       })
       if (hitMax) {
-        // Defer toast so we don't call it during render of setState
-        queuePromise.resolve().then(() => toast.info('Maximum available stock reached'))
+        // Defer toast so we don't call it during setState updater
+        void Promise.resolve().then(() => toast.info('Maximum available stock reached'))
       }
       return next
     })
