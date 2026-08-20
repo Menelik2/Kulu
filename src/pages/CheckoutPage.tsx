@@ -3,17 +3,19 @@ import { useNavigate, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
+import { useQuery } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useCart } from '@/features/cart/CartContext'
 import { useLanguage } from '@/features/language/LanguageContext'
 import { supabase } from '@/lib/supabase'
+import { getDeliveryConfigs, feeForRegion } from '@/services/admin'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { formatETB, getEffectivePrice } from '@/lib/utils'
 
-const ETHIOPIAN_REGIONS = [
+const FALLBACK_REGIONS = [
   'Addis Ababa', 'Oromia', 'Amhara', 'Tigray', 'SNNPR', 'Sidama',
   'Dire Dawa', 'Harari', 'Somali', 'Afar', 'Benishangul-Gumuz', 'Gambela',
 ]
@@ -40,27 +42,31 @@ export default function CheckoutPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
 
+  const { data: deliveryConfigs = [] } = useQuery({
+    queryKey: ['delivery_configs'],
+    queryFn: getDeliveryConfigs,
+    staleTime: 1000 * 60 * 5,
+  })
+
+  const regions =
+    deliveryConfigs.length > 0
+      ? deliveryConfigs.map((c) => c.region)
+      : FALLBACK_REGIONS
+
   const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       fullName: profile?.full_name || '',
       phone: profile?.phone || '',
       email: profile?.email || user?.email || '',
-      region: 'Addis Ababa',
+      region: regions[0] || 'Addis Ababa',
       city: '',
     },
   })
 
   const region = watch('region')
-
-  const estimateFee = (r: string) => {
-    const fees: Record<string, number> = {
-      'Addis Ababa': 80, Oromia: 150, Amhara: 180, Tigray: 220,
-      SNNPR: 180, Sidama: 160, 'Dire Dawa': 200, Harari: 200,
-      Somali: 250, Afar: 250, 'Benishangul-Gumuz': 220, Gambela: 250,
-    }
-    return fees[r] ?? 150
-  }
+  const fee = feeForRegion(deliveryConfigs, region)
+  const total = subtotal + fee
 
   if (items.length === 0) {
     return (
@@ -119,9 +125,6 @@ export default function CheckoutPage() {
     }
   }
 
-  const fee = estimateFee(region)
-  const total = subtotal + fee
-
   return (
     <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8 pb-28 md:pb-8">
       <h1 className="text-xl sm:text-3xl font-bold text-charcoal-900 mb-6 sm:mb-8">{t('checkout')}</h1>
@@ -159,7 +162,7 @@ export default function CheckoutPage() {
                   {...register('region')}
                   className="flex h-12 w-full rounded-xl border border-charcoal-200 bg-white px-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
                 >
-                  {ETHIOPIAN_REGIONS.map((r) => (
+                  {regions.map((r) => (
                     <option key={r} value={r}>{r}</option>
                   ))}
                 </select>

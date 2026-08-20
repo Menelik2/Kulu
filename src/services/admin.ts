@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { Product, Category, Order, Profile } from '@/types/database'
+import type { Product, Category, Order, Profile, Review, DeliveryConfig } from '@/types/database'
 import { slugify } from '@/lib/utils'
 import { deleteAllProductImages } from '@/services/productImages'
 
@@ -49,8 +49,6 @@ export async function adminUpdateProduct(id: string, payload: Partial<{
 }
 
 export async function adminDeleteProduct(id: string) {
-  // Remove storage files + image rows first (product_images FK cascades on product delete,
-  // but storage files would remain orphans without this)
   try {
     await deleteAllProductImages(id)
   } catch (e) {
@@ -130,6 +128,115 @@ export async function adminGetCustomers() {
   const { data, error } = await supabase.from('profiles').select('*').eq('role', 'customer').order('created_at', { ascending: false })
   if (error) throw error
   return (data || []) as Profile[]
+}
+
+export async function adminGetReviews() {
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*, product:products(id, name, slug), user:profiles(id, full_name, email)')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data || []) as Review[]
+}
+
+export async function adminSetReviewVisibility(id: string, is_visible: boolean) {
+  const { data, error } = await supabase
+    .from('reviews')
+    .update({ is_visible })
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data as Review
+}
+
+export async function adminDeleteReview(id: string) {
+  const { error } = await supabase.from('reviews').delete().eq('id', id)
+  if (error) throw error
+}
+
+const DEFAULT_DELIVERY: { region: string; fee: number; estimated_days_min: number; estimated_days_max: number }[] = [
+  { region: 'Addis Ababa', fee: 80, estimated_days_min: 1, estimated_days_max: 2 },
+  { region: 'Oromia', fee: 150, estimated_days_min: 2, estimated_days_max: 4 },
+  { region: 'Amhara', fee: 180, estimated_days_min: 3, estimated_days_max: 5 },
+  { region: 'Tigray', fee: 220, estimated_days_min: 4, estimated_days_max: 7 },
+  { region: 'SNNPR', fee: 180, estimated_days_min: 3, estimated_days_max: 5 },
+  { region: 'Sidama', fee: 160, estimated_days_min: 2, estimated_days_max: 4 },
+  { region: 'Dire Dawa', fee: 200, estimated_days_min: 3, estimated_days_max: 5 },
+  { region: 'Harari', fee: 200, estimated_days_min: 3, estimated_days_max: 5 },
+  { region: 'Somali', fee: 250, estimated_days_min: 4, estimated_days_max: 8 },
+  { region: 'Afar', fee: 250, estimated_days_min: 4, estimated_days_max: 8 },
+  { region: 'Benishangul-Gumuz', fee: 220, estimated_days_min: 4, estimated_days_max: 7 },
+  { region: 'Gambela', fee: 250, estimated_days_min: 4, estimated_days_max: 8 },
+]
+
+export async function adminGetDeliveryConfigs() {
+  const { data, error } = await supabase
+    .from('delivery_configs')
+    .select('*')
+    .order('region')
+  if (error) throw error
+  return (data || []) as DeliveryConfig[]
+}
+
+export async function adminUpdateDeliveryConfig(
+  id: string,
+  payload: Partial<{ fee: number; estimated_days_min: number; estimated_days_max: number; is_active: boolean }>
+) {
+  const { data, error } = await supabase
+    .from('delivery_configs')
+    .update(payload)
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data as DeliveryConfig
+}
+
+export async function adminEnsureDefaultDeliveryConfigs() {
+  const existing = await adminGetDeliveryConfigs()
+  if (existing.length > 0) return existing
+
+  const { data, error } = await supabase
+    .from('delivery_configs')
+    .insert(
+      DEFAULT_DELIVERY.map((d) => ({
+        region: d.region,
+        city: null,
+        fee: d.fee,
+        estimated_days_min: d.estimated_days_min,
+        estimated_days_max: d.estimated_days_max,
+        is_active: true,
+      }))
+    )
+    .select()
+  if (error) throw error
+  return (data || []) as DeliveryConfig[]
+}
+
+/** Public storefront: active delivery configs (falls back to defaults if table empty). */
+export async function getDeliveryConfigs() {
+  const { data, error } = await supabase
+    .from('delivery_configs')
+    .select('*')
+    .eq('is_active', true)
+    .order('region')
+  if (error) throw error
+  if (data && data.length > 0) return data as DeliveryConfig[]
+  return DEFAULT_DELIVERY.map((d, i) => ({
+    id: `default-${i}`,
+    region: d.region,
+    city: null,
+    fee: d.fee,
+    estimated_days_min: d.estimated_days_min,
+    estimated_days_max: d.estimated_days_max,
+    is_active: true,
+  })) as DeliveryConfig[]
+}
+
+export function feeForRegion(configs: DeliveryConfig[], region: string, fallback = 150): number {
+  const match = configs.find((c) => c.region === region && c.is_active)
+  return match ? Number(match.fee) : fallback
 }
 
 export async function adminGetDashboardStats() {
