@@ -19,12 +19,23 @@ export default function ShopPage() {
   const sort = (searchParams.get('sort') as string) || 'newest'
   const page = Number(searchParams.get('page') || '1')
   const inStock = searchParams.get('inStock') === '1'
+  const minPriceParam = searchParams.get('minPrice') || ''
+  const maxPriceParam = searchParams.get('maxPrice') || ''
+  const minPrice = minPriceParam ? Number(minPriceParam) : undefined
+  const maxPrice = maxPriceParam ? Number(maxPriceParam) : undefined
 
   const [searchInput, setSearchInput] = useState(q)
+  const [minPriceInput, setMinPriceInput] = useState(minPriceParam)
+  const [maxPriceInput, setMaxPriceInput] = useState(maxPriceParam)
 
   useEffect(() => {
     setSearchInput(q)
   }, [q])
+
+  useEffect(() => {
+    setMinPriceInput(minPriceParam)
+    setMaxPriceInput(maxPriceParam)
+  }, [minPriceParam, maxPriceParam])
 
   const SORT_OPTIONS = [
     { value: 'newest', label: t('sortNewest') },
@@ -37,7 +48,7 @@ export default function ShopPage() {
   const { data: categories } = useQuery({ queryKey: ['categories'], queryFn: getCategories })
 
   const { data, isLoading, isError, isFetching } = useQuery({
-    queryKey: ['products', { q, category, sort, page, inStock }],
+    queryKey: ['products', { q, category, sort, page, inStock, minPrice, maxPrice }],
     queryFn: () =>
       getProducts({
         search: q || undefined,
@@ -46,6 +57,8 @@ export default function ShopPage() {
         page,
         limit: 12,
         inStock: inStock || undefined,
+        minPrice: minPrice !== undefined && !Number.isNaN(minPrice) ? minPrice : undefined,
+        maxPrice: maxPrice !== undefined && !Number.isNaN(maxPrice) ? maxPrice : undefined,
       }),
     placeholderData: keepPreviousData,
   })
@@ -58,12 +71,56 @@ export default function ShopPage() {
     setSearchParams(next)
   }
 
+  const applyPriceFilter = () => {
+    const next = new URLSearchParams(searchParams)
+    const min = minPriceInput.trim()
+    const max = maxPriceInput.trim()
+    if (min && !Number.isNaN(Number(min))) next.set('minPrice', min)
+    else next.delete('minPrice')
+    if (max && !Number.isNaN(Number(max))) next.set('maxPrice', max)
+    else next.delete('maxPrice')
+    next.delete('page')
+    setSearchParams(next)
+  }
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
     updateParam('q', searchInput.trim())
   }
 
-  const activeFilterCount = (category ? 1 : 0) + (inStock ? 1 : 0)
+  const activeFilterCount =
+    (category ? 1 : 0) +
+    (inStock ? 1 : 0) +
+    (minPriceParam ? 1 : 0) +
+    (maxPriceParam ? 1 : 0)
+
+  const PriceFields = ({ className }: { className?: string }) => (
+    <div className={cn('space-y-2', className)}>
+      <h3 className="font-semibold text-sm text-charcoal-900">{t('priceRange')}</h3>
+      <div className="flex items-center gap-2">
+        <Input
+          type="number"
+          min={0}
+          placeholder={t('minPrice')}
+          value={minPriceInput}
+          onChange={(e) => setMinPriceInput(e.target.value)}
+          className="h-10 rounded-xl text-sm"
+        />
+        <span className="text-charcoal-400">–</span>
+        <Input
+          type="number"
+          min={0}
+          placeholder={t('maxPrice')}
+          value={maxPriceInput}
+          onChange={(e) => setMaxPriceInput(e.target.value)}
+          className="h-10 rounded-xl text-sm"
+        />
+      </div>
+      <Button type="button" size="sm" variant="outline" className="rounded-full w-full" onClick={applyPriceFilter}>
+        {t('applyPrice')}
+      </Button>
+    </div>
+  )
 
   return (
     <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8">
@@ -123,6 +180,9 @@ export default function ShopPage() {
               ))}
             </ul>
           </div>
+
+          <PriceFields />
+
           <div>
             <h3 className="font-semibold text-sm text-charcoal-900 mb-3">{t('availability')}</h3>
             <label className="flex items-center gap-2 text-sm cursor-pointer">
@@ -247,10 +307,7 @@ export default function ShopPage() {
             <ul className="space-y-1 mb-6">
               <li>
                 <button
-                  onClick={() => {
-                    updateParam('category', '')
-                    setMobileFilters(false)
-                  }}
+                  onClick={() => updateParam('category', '')}
                   className={cn(
                     'w-full text-left px-4 py-3 rounded-xl text-[15px]',
                     !category && 'bg-primary-50 text-primary-700 font-medium'
@@ -262,10 +319,7 @@ export default function ShopPage() {
               {categories?.map((c) => (
                 <li key={c.id}>
                   <button
-                    onClick={() => {
-                      updateParam('category', c.id)
-                      setMobileFilters(false)
-                    }}
+                    onClick={() => updateParam('category', c.id)}
                     className={cn(
                       'w-full text-left px-4 py-3 rounded-xl text-[15px]',
                       category === c.id && 'bg-primary-50 text-primary-700 font-medium'
@@ -276,6 +330,10 @@ export default function ShopPage() {
                 </li>
               ))}
             </ul>
+
+            <div className="mb-6">
+              <PriceFields />
+            </div>
 
             <h4 className="font-medium text-sm text-charcoal-600 mb-2">{t('availability')}</h4>
             <label className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] cursor-pointer hover:bg-charcoal-50">
@@ -294,12 +352,20 @@ export default function ShopPage() {
                 className="flex-1 rounded-full h-11"
                 onClick={() => {
                   setSearchParams({})
+                  setMinPriceInput('')
+                  setMaxPriceInput('')
                   setMobileFilters(false)
                 }}
               >
                 {t('clearFilters')}
               </Button>
-              <Button className="flex-1 rounded-full h-11" onClick={() => setMobileFilters(false)}>
+              <Button
+                className="flex-1 rounded-full h-11"
+                onClick={() => {
+                  applyPriceFilter()
+                  setMobileFilters(false)
+                }}
+              >
                 {t('applyFilters')}
               </Button>
             </div>
