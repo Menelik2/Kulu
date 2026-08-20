@@ -348,10 +348,19 @@ export function StoreLayout() {
                 <li>
                   <Link to="/privacy" className="hover:text-white">{t('privacy')}</Link>
                 </li>
+                <li>
+                  <Link to="/legal" className="hover:text-white">{t('legal')}</Link>
+                </li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-charcoal-700 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-sm">
+          <div className="border-t border-charcoal-700 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-sm space-y-3">
+            <p className="text-[11px] sm:text-xs text-charcoal-400 max-w-3xl mx-auto leading-relaxed">
+              {t('legalDisclaimerShort')}{' '}
+              <Link to="/legal" className="text-charcoal-200 underline hover:text-white">
+                {t('legalReadMore')}
+              </Link>
+            </p>
             <p>
               &copy; {new Date().getFullYear()} KULU. {t('allRights')}
             </p>
