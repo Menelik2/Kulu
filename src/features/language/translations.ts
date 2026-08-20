@@ -191,14 +191,51 @@ export const translations = {
     allMarkedRead: 'ሁሉም እንደተነበቡ ተመልክተዋል',
     notificationDeleted: 'ማሳወቂያ ተሰርዟል',
 
-    // Footer
+    // Footer / company
     tagline: 'ለኩሉ ኦንላይን ግዢ። በኢትዮጵያ በሙሉ ይደርሳል።',
     customer: 'ደንበኛ',
+    company: 'ኩባንያ',
     trackOrder: 'ትዕዛዝ ይከታተሉ',
     deliveryDesc: 'በኢትዮጵያ ሁሉም ክልሎች እናደርሳለን። በደረሰ ጊዜ ክፍያ ይገኛል።',
     allRights: 'መብቱ በሕግ የተጠበቀ ነው።',
     allProducts: 'ሁሉም ምርቶች',
     bestSellers: 'በጣም የሚሸጡ',
+    about: 'ስለ እኛ',
+    contact: 'አግኙን',
+    privacy: 'ግላዊነት',
+
+    // About
+    aboutTitle: 'ስለ ኩሉ',
+    aboutP1:
+      'ኩሉ የኢትዮጵያ ኦንላይን ግዢ መድረክ ነው። ጥራት ያላቸው ምርቶችን በተመጣጣኝ ዋጋ እና በደረሰ ጊዜ ክፍያ እናቀርባለን።',
+    aboutP2:
+      'ከአዲስ አበባ እስከ ሁሉም ክልሎች በፍጥነት እናደርሳለን። ደንበኞቻችን በደህንነት እንዲገዙ እንሰራለን።',
+    aboutP3: 'ተልእኳችን — ለኢትዮጵያውያን ቀላል፣ አስተማማኝ እና ተደራሽ የኦንላይን ግዢ ማቅረብ ነው።',
+
+    // Contact
+    contactTitle: 'አግኙን',
+    contactIntro: 'ጥያቄ፣ አስተያየት ወይም ድጋፍ ካስፈለገዎት ከታች ባሉት መንገዶች ያግኙን።',
+    contactLocation: 'አድራሻ',
+    contactAddress: 'አዲስ አበባ፣ ኢትዮጵያ',
+    contactHours: 'የስራ ሰዓት፡ ሰኞ – አርብ፣ ከጠዋት 8:00 እስከ ምሽት 6:00',
+
+    // Privacy
+    privacyTitle: 'የግላዊነት ፖሊሲ',
+    privacyUpdated: 'መጨረሻ የተሻሻለው፡ ነሐሴ 2026',
+    privacyIntro:
+      'ኩሉ የእርስዎን ግላዊ መረጃ በከባድ ይይዛል። ይህ ፖሊሲ መረጃ እንዴት እንደምንሰበስብ፣ እንደምንጠቀም እና እንደምንጠብቅ ያብራራል።',
+    privacyS1Title: '1. የምንሰበስበው መረጃ',
+    privacyS1Body:
+      'ስም፣ ስልክ፣ ኢሜይል፣ የመላኪያ አድራሻ እና የትዕዛዝ ታሪክን ለአገልግሎት ማቅረብ እንሰበስባለን።',
+    privacyS2Title: '2. መረጃ እንዴት እንጠቀማለን',
+    privacyS2Body:
+      'ትዕዛዝ ለማስተናገድ፣ ማድረስ ለማደራጀት፣ ድጋፍ ለመስጠት እና አገልግሎታችንን ለማሻሻል እንጠቀማለን።',
+    privacyS3Title: '3. መረጃ ማጋራት',
+    privacyS3Body:
+      'መረጃዎን ከሶስተኛ ወገኖች ጋር አንሸጥም። የማድረስ አገልግሎት ለመስጠት አስፈላጊ ሲሆን ብቻ ሊጋራ ይችላል።',
+    privacyS4Title: '4. መብቶችዎ',
+    privacyS4Body:
+      'መረጃዎን ማረም፣ መሰረዝ ወይም ስለ አጠቃቀሙ ጥያቄ ማቅረብ ይችላሉ። በ support@kulu.et ያግኙን።',
 
     // Language
     language: 'ቋንቋ',
@@ -385,11 +422,46 @@ export const translations = {
 
     tagline: 'Kulu Online Shopping. Delivered Across Ethiopia.',
     customer: 'Customer',
+    company: 'Company',
     trackOrder: 'Track Order',
     deliveryDesc: 'We deliver across all regions of Ethiopia. Cash on Delivery available.',
     allRights: 'All rights reserved.',
     allProducts: 'All Products',
     bestSellers: 'Best Sellers',
+    about: 'About',
+    contact: 'Contact',
+    privacy: 'Privacy',
+
+    aboutTitle: 'About KULU',
+    aboutP1:
+      'KULU is an Ethiopian online shopping platform. We offer quality products at fair prices with Cash on Delivery.',
+    aboutP2:
+      'We deliver from Addis Ababa across all regions. Our goal is safe, simple shopping for every customer.',
+    aboutP3:
+      'Our mission is to make online shopping accessible, reliable, and convenient for Ethiopians everywhere.',
+
+    contactTitle: 'Contact us',
+    contactIntro: 'Questions, feedback, or support — reach us using the details below.',
+    contactLocation: 'Location',
+    contactAddress: 'Addis Ababa, Ethiopia',
+    contactHours: 'Hours: Monday – Friday, 8:00 AM – 6:00 PM',
+
+    privacyTitle: 'Privacy Policy',
+    privacyUpdated: 'Last updated: August 2026',
+    privacyIntro:
+      'KULU takes your privacy seriously. This policy explains how we collect, use, and protect your information.',
+    privacyS1Title: '1. Information we collect',
+    privacyS1Body:
+      'We collect name, phone, email, delivery address, and order history to provide our service.',
+    privacyS2Title: '2. How we use information',
+    privacyS2Body:
+      'We use your data to process orders, arrange delivery, provide support, and improve our service.',
+    privacyS3Title: '3. Sharing',
+    privacyS3Body:
+      'We do not sell your data. We may share details only when needed to complete delivery.',
+    privacyS4Title: '4. Your rights',
+    privacyS4Body:
+      'You may request correction, deletion, or information about your data. Contact support@kulu.et.',
 
     language: 'Language',
     amharic: 'አማርኛ',
