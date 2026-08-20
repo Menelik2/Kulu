@@ -19,6 +19,9 @@ import OrdersPage from '@/pages/OrdersPage'
 import OrderDetailPage from '@/pages/OrderDetailPage'
 import WishlistPage from '@/pages/WishlistPage'
 import NotificationsPage from '@/pages/NotificationsPage'
+import AboutPage from '@/pages/AboutPage'
+import ContactPage from '@/pages/ContactPage'
+import PrivacyPage from '@/pages/PrivacyPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import AdminDashboard from '@/pages/admin/Dashboard'
 import AdminProducts from '@/pages/admin/Products'
@@ -66,6 +69,9 @@ export default function App() {
             <Route path="cart" element={<CartPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="contact" element={<ContactPage />} />
+            <Route path="privacy" element={<PrivacyPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="checkout" element={<CheckoutPage />} />
               <Route path="order-confirmation/:orderId" element={<OrderConfirmationPage />} />
