@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# KULU commit-msg: non-empty subject, reasonable length, no WIP spam on main
+set -euo pipefail
+
+MSG_FILE="$1"
+SUBJECT=$(head -n 1 "$MSG_FILE" | sed 's/[[:space:]]*$//')
+
+if [ -z "$SUBJECT" ]; then
+  echo "❌ Empty commit message."
+  exit 1
+fi
+
+# Allow merge/revert commits as-is
+if echo "$SUBJECT" | grep -Eiq '^(Merge|Revert|fixup!)'; then
+  exit 0
+fi
+
+LEN=${#SUBJECT}
+if [ "$LEN" -lt 8 ]; then
+  echo "❌ Commit subject too short (min 8 chars)."
+  echo "   Got: $SUBJECT"
+  exit 1
+fi
+
+if [ "$LEN" -gt 100 ]; then
+  echo "❌ Commit subject too long (max 100 chars, got $LEN)."
+  exit 1
+fi
+
+# Soft convention hint (does not fail)
+if ! echo "$SUBJECT" | grep -Eiq '^(feat|fix|chore|docs|style|refactor|perf|test|build|ci)(\(.*\))?:|^[A-Z]'; then
+  echo "ℹ️  Tip: prefer Conventional Commits, e.g. feat: add cart toast"
+fi
+
+exit 0

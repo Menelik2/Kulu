@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# KULU pre-commit: block secrets + typecheck when TS/TSX staged
+set -euo pipefail
+
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+
+# --- Secret / env leak scan on staged files ---
+STAGED=$(git diff --cached --name-only --diff-filter=ACM || true)
+if [ -n "$STAGED" ]; then
+  # Block committing .env files
+  if echo "$STAGED" | grep -E '(^|/)\.env($|\.)' >/dev/null 2>&1; then
+    echo "❌ Refuse to commit .env files. Keep secrets out of git."
+    echo "$STAGED" | grep -E '(^|/)\.env($|\.)' || true
+    exit 1
+  fi
+
+  # Scan staged content for common secret patterns (high-confidence only)
+  if git diff --cached -U0 | grep -Eiq \
+    'sb_secret_|service_role|SUPABASE_SERVICE_ROLE|BEGIN (RSA |OPENSSH )?PRIVATE KEY|sk_live_|AKIA[0-9A-Z]{16}'; then
+    echo "❌ Possible secret detected in staged changes."
+    echo "   Remove secrets and use .env.local (gitignored) instead."
+    exit 1
+  fi
+fi
+
+# --- Typecheck if TypeScript sources are staged ---
+TS_STAGED=$(echo "$STAGED" | grep -E '\.(ts|tsx)$' || true)
+if [ -n "$TS_STAGED" ]; then
+  if [ ! -d node_modules ]; then
+    echo "⚠️  node_modules missing — skip typecheck (run npm install)."
+    exit 0
+  fi
+  echo "→ pre-commit: typecheck…"
+  npm run typecheck
+fi
+
+exit 0
