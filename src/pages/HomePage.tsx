@@ -102,11 +102,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link to="/shop?sort=newest">
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-white/40 bg-white/10 text-white hover:bg-white/20 hover:text-white h-12 px-6 rounded-full backdrop-blur-sm"
-                >
+                <Button size="lg" variant="onPrimary" className="h-12 px-6 rounded-full">
                   {t('newArrivals')}
                 </Button>
               </Link>
