@@ -20,6 +20,7 @@ import { useCart } from '@/features/cart/CartContext'
 import { useLanguage } from '@/features/language/LanguageContext'
 import { Button } from '@/components/ui/button'
 import { NotificationBell } from '@/components/notifications/NotificationBell'
+import { PwaInstallBanner } from '@/components/PwaInstallBanner'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { KULU_LOGO_SRC } from '@/lib/logoSrc'
@@ -403,6 +404,8 @@ export function StoreLayout() {
           })}
         </div>
       </nav>
+
+      <PwaInstallBanner />
     </div>
   )
 }
