@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { Search, SlidersHorizontal, X } from 'lucide-react'
 import { getProducts, getCategories } from '@/services/products'
 import { ProductCard } from '@/components/products/ProductCard'
@@ -36,7 +36,7 @@ export default function ShopPage() {
 
   const { data: categories } = useQuery({ queryKey: ['categories'], queryFn: getCategories })
 
-  const { data, isLoading, isError } = useQuery({
+  const { data, isLoading, isError, isFetching } = useQuery({
     queryKey: ['products', { q, category, sort, page, inStock }],
     queryFn: () =>
       getProducts({
@@ -47,6 +47,7 @@ export default function ShopPage() {
         limit: 12,
         inStock: inStock || undefined,
       }),
+    placeholderData: keepPreviousData,
   })
 
   const updateParam = (key: string, value: string) => {
@@ -61,6 +62,8 @@ export default function ShopPage() {
     e.preventDefault()
     updateParam('q', searchInput.trim())
   }
+
+  const activeFilterCount = (category ? 1 : 0) + (inStock ? 1 : 0)
 
   return (
     <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8">
@@ -139,10 +142,15 @@ export default function ShopPage() {
             <Button
               variant="outline"
               size="sm"
-              className="lg:hidden rounded-full h-9"
+              className="lg:hidden rounded-full h-9 relative"
               onClick={() => setMobileFilters(true)}
             >
               <SlidersHorizontal className="h-4 w-4" /> {t('filters')}
+              {activeFilterCount > 0 && (
+                <span className="ml-1 min-w-[18px] h-[18px] px-1 rounded-full bg-primary-600 text-white text-[10px] font-bold flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
+              )}
             </Button>
             <select
               value={sort}
@@ -157,7 +165,7 @@ export default function ShopPage() {
             </select>
           </div>
 
-          {isLoading && (
+          {isLoading && !data && (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="bg-white rounded-2xl border border-charcoal-100 overflow-hidden animate-pulse">
@@ -171,13 +179,13 @@ export default function ShopPage() {
             </div>
           )}
 
-          {isError && (
+          {isError && !data && (
             <div className="text-center py-16">
               <p className="text-charcoal-500">{t('failedLoad')}</p>
             </div>
           )}
 
-          {!isLoading && data && data.products.length === 0 && (
+          {data && data.products.length === 0 && (
             <div className="text-center py-16">
               <p className="text-charcoal-500 text-lg">{t('noProducts')}</p>
               <Button variant="outline" className="mt-4 rounded-full" onClick={() => setSearchParams({})}>
@@ -186,9 +194,9 @@ export default function ShopPage() {
             </div>
           )}
 
-          {!isLoading && data && data.products.length > 0 && (
+          {data && data.products.length > 0 && (
             <>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
+              <div className={cn('grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5', isFetching && 'opacity-70 transition-opacity')}>
                 {data.products.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
@@ -223,7 +231,6 @@ export default function ShopPage() {
         </div>
       </div>
 
-      {/* Mobile filters bottom sheet style */}
       {mobileFilters && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setMobileFilters(false)} />
@@ -235,6 +242,7 @@ export default function ShopPage() {
                 <X className="h-5 w-5" />
               </button>
             </div>
+
             <h4 className="font-medium text-sm text-charcoal-600 mb-2">{t('categories')}</h4>
             <ul className="space-y-1 mb-6">
               <li>
@@ -268,6 +276,33 @@ export default function ShopPage() {
                 </li>
               ))}
             </ul>
+
+            <h4 className="font-medium text-sm text-charcoal-600 mb-2">{t('availability')}</h4>
+            <label className="flex items-center gap-3 px-4 py-3 rounded-xl text-[15px] cursor-pointer hover:bg-charcoal-50">
+              <input
+                type="checkbox"
+                checked={inStock}
+                onChange={(e) => updateParam('inStock', e.target.checked ? '1' : '')}
+                className="rounded border-charcoal-300 text-primary-600 focus:ring-primary-600 h-4 w-4"
+              />
+              {t('inStockOnly')}
+            </label>
+
+            <div className="mt-6 flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 rounded-full h-11"
+                onClick={() => {
+                  setSearchParams({})
+                  setMobileFilters(false)
+                }}
+              >
+                {t('clearFilters')}
+              </Button>
+              <Button className="flex-1 rounded-full h-11" onClick={() => setMobileFilters(false)}>
+                {t('applyFilters')}
+              </Button>
+            </div>
           </div>
         </div>
       )}
