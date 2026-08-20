@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "hooks:install": "bash scripts/setup-git-hooks.sh",
+    "prepare": "bash scripts/setup-git-hooks.sh || true"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
