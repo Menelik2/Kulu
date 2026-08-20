@@ -224,7 +224,7 @@ export const translations = {
     contactTitle: 'አግኙን',
     contactIntro: 'ጥያቄ፣ አስተያየት ወይም ድጋፍ ካስፈለገዎት ከታች ባሉት መንገዶች ያግኙን። አሁኑኑ ይደውሉ።',
     contactLocation: 'አድራሻ',
-    contactAddress: 'አዲስ አበባ፣ ኢትዮጵያ',
+    contactAddress: 'ባሕር ዳር፣ ኢትዮጵያ',
     contactHours: 'የስራ ሰዓት፡ ሰኞ – አርብ፣ ከጠዋት 8:00 እስከ ምሽት 6:00',
 
     // Privacy
@@ -477,7 +477,7 @@ export const translations = {
     contactTitle: 'Contact us',
     contactIntro: 'Questions, feedback, or support — reach us below. Call us anytime during business hours.',
     contactLocation: 'Location',
-    contactAddress: 'Addis Ababa, Ethiopia',
+    contactAddress: 'Bahir Dar, Ethiopia',
     contactHours: 'Hours: Monday – Friday, 8:00 AM – 6:00 PM',
 
     privacyTitle: 'Privacy Policy',
