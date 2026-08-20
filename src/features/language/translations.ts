@@ -266,6 +266,16 @@ export const translations = {
       'እነዚህ ውሎች በኢትዮጵያ ፌዴራላዊ ዲሞክራሲያዊ ሪፐብሊክ ሕግ ይመራሉ። ማንኛውም ክርክር በተቻለ መጠን በሰላም ይፈታል።',
     legalSeeAlso: 'ተዛማጅ፡',
 
+    // PWA install
+    installApp: 'መተግበሪያውን ይጫኑ',
+    installAppDesc: 'ኩሉን ወደ መነሻ ስክሪንዎ ያክሉ — ፈጣን መዳረሻ፣ እንደ መተግበሪያ ይሰማል።',
+    installAppBtn: 'ጫን',
+    installing: 'በመጫን ላይ...',
+    notNow: 'አሁን አይደለም',
+    dismiss: 'ዝጋ',
+    installIosHint: 'በ Safari ውስጥ ኩሉን ወደ መነሻ ስክሪን ያክሉ።',
+    installIosSteps: 'Share → Add to Home Screen ይጫኑ',
+
     // Language
     language: 'ቋንቋ',
     amharic: 'አማርኛ',
@@ -518,6 +528,16 @@ export const translations = {
     legalS4Body:
       'These terms are governed by the laws of the Federal Democratic Republic of Ethiopia. Disputes should be resolved amicably where possible.',
     legalSeeAlso: 'See also:',
+
+    // PWA install
+    installApp: 'Install KULU app',
+    installAppDesc: 'Add KULU to your home screen for faster access and an app-like experience.',
+    installAppBtn: 'Install',
+    installing: 'Installing...',
+    notNow: 'Not now',
+    dismiss: 'Dismiss',
+    installIosHint: 'Add KULU to your Home Screen from Safari.',
+    installIosSteps: 'Tap Share → Add to Home Screen',
 
     language: 'Language',
     amharic: 'አማርኛ',
