@@ -4,13 +4,12 @@ import { ShoppingCart, Star, Heart } from 'lucide-react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { Product } from '@/types/database'
-import { formatETB, calculateDiscountPercent, getEffectivePrice } from '@/lib/utils'
+import { formatETB, calculateDiscountPercent, getEffectivePrice, cn } from '@/lib/utils'
 import { useCart } from '@/features/cart/CartContext'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useLanguage } from '@/features/language/LanguageContext'
 import { getWishlistProductIds, toggleWishlist } from '@/services/wishlist'
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
 
 interface ProductCardProps {
   product: Product
@@ -42,9 +41,9 @@ function ProductCardComponent({ product }: ProductCardProps) {
     onSuccess: (nowOn) => {
       qc.invalidateQueries({ queryKey: ['wishlist-ids', user?.id] })
       qc.invalidateQueries({ queryKey: ['wishlist', user?.id] })
-      toast.success(nowOn ? t('addedToWishlist') : t('removedFromWishlist'))
+      toast.success(nowOn ? t('wishlist') : t('removedFromWishlist'))
     },
-    onError: () => toast.error(t('wishlistFailed')),
+    onError: () => toast.error(t('failedLoad')),
   })
 
   const onHeartClick = (e: React.MouseEvent) => {
@@ -93,7 +92,7 @@ function ProductCardComponent({ product }: ProductCardProps) {
             'active:scale-95 transition-transform disabled:opacity-60',
             wished ? 'text-red-500' : 'text-charcoal-400'
           )}
-          aria-label={wished ? t('removedFromWishlist') : t('addedToWishlist')}
+          aria-label={t('wishlist')}
         >
           <Heart className={cn('h-4 w-4', wished && 'fill-red-500')} />
         </button>
