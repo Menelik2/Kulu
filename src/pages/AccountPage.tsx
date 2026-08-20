@@ -14,6 +14,7 @@ import {
   Lock,
   ChevronRight,
   Save,
+  AlertCircle,
 } from 'lucide-react'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useLanguage } from '@/features/language/LanguageContext'
@@ -21,9 +22,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
+const ETH_PHONE = /^(\+251|0)?[79]\d{8}$/
+
 const profileSchema = z.object({
   fullName: z.string().min(2, 'Name is required'),
-  phone: z.string().optional(),
+  phone: z
+    .string()
+    .min(9, 'Phone is required')
+    .regex(ETH_PHONE, 'Valid Ethiopian phone (+2519... or 09...)'),
 })
 
 const passwordSchema = z
@@ -46,6 +52,8 @@ export default function AccountPage() {
   const [savingPassword, setSavingPassword] = useState(false)
   const [section, setSection] = useState<'menu' | 'profile' | 'password'>('menu')
 
+  const needsPhone = !profile?.phone?.trim()
+
   const profileForm = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
     defaultValues: { fullName: '', phone: '' },
@@ -65,12 +73,19 @@ export default function AccountPage() {
     }
   }, [profile]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Prompt users without a phone to complete their profile
+  useEffect(() => {
+    if (!loading && profile && needsPhone && section === 'menu') {
+      setSection('profile')
+    }
+  }, [loading, profile, needsPhone, section])
+
   const onSaveProfile = async (data: ProfileForm) => {
     setSavingProfile(true)
     try {
       const { error } = await updateProfile({
         full_name: data.fullName.trim(),
-        phone: data.phone?.trim() || null,
+        phone: data.phone.trim(),
       })
       if (error) {
         toast.error(error.message || t('profileSaveFailed'))
@@ -115,14 +130,22 @@ export default function AccountPage() {
   if (section === 'profile') {
     return (
       <div className="max-w-lg mx-auto container-padding py-8 sm:py-12">
-        <button
-          type="button"
-          onClick={() => setSection('menu')}
-          className="text-sm text-primary-600 mb-4 font-medium"
-        >
-          ← {t('back')}
-        </button>
-        <h1 className="text-xl sm:text-2xl font-bold text-charcoal-900 mb-6">{t('editProfile')}</h1>
+        {!needsPhone && (
+          <button
+            type="button"
+            onClick={() => setSection('menu')}
+            className="text-sm text-primary-600 mb-4 font-medium"
+          >
+            ← {t('back')}
+          </button>
+        )}
+        <h1 className="text-xl sm:text-2xl font-bold text-charcoal-900 mb-2">{t('editProfile')}</h1>
+        {needsPhone && (
+          <div className="mb-5 flex items-start gap-2 rounded-xl bg-amber-50 border border-amber-200 p-3 text-sm text-amber-900">
+            <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+            <p>{t('phoneRequiredNotice')}</p>
+          </div>
+        )}
 
         <form
           onSubmit={profileForm.handleSubmit(onSaveProfile)}
@@ -146,18 +169,22 @@ export default function AccountPage() {
               {...profileForm.register('fullName')}
             />
             {profileForm.formState.errors.fullName && (
-              <p className="text-sm text-red-600">{profileForm.formState.errors.fullName.message}</p>
+              <p className="text-sm text-red-600">{t('errFullName')}</p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="phone">{t('phone')}</Label>
+            <Label htmlFor="phone">{t('phone')} *</Label>
             <Input
               id="phone"
               type="tel"
-              placeholder="+251 9XX XXX XXX"
+              inputMode="tel"
+              placeholder="09XXXXXXXX or +2519XXXXXXXX"
               className="h-12 rounded-xl"
               {...profileForm.register('phone')}
             />
+            {profileForm.formState.errors.phone && (
+              <p className="text-sm text-red-600">{t('errPhone')}</p>
+            )}
           </div>
           <Button type="submit" className="w-full h-12 rounded-full" loading={savingProfile}>
             <Save className="h-4 w-4" />
@@ -234,7 +261,6 @@ export default function AccountPage() {
 
   return (
     <div className="max-w-lg mx-auto container-padding py-8 sm:py-12">
-      {/* Header card */}
       <div className="bg-white rounded-2xl border border-charcoal-100 p-5 elevation-1 mb-6 flex items-center gap-4">
         <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
           <User className="h-8 w-8 text-primary-600" />
@@ -244,13 +270,14 @@ export default function AccountPage() {
             {profile?.full_name || t('myAccount')}
           </h1>
           <p className="text-charcoal-500 text-sm truncate">{profile?.email || user?.email}</p>
-          {profile?.phone && (
+          {profile?.phone ? (
             <p className="text-charcoal-400 text-xs mt-0.5">{profile.phone}</p>
+          ) : (
+            <p className="text-amber-600 text-xs mt-0.5 font-medium">{t('phoneMissing')}</p>
           )}
         </div>
       </div>
 
-      {/* Quick links */}
       <p className="text-xs font-semibold text-charcoal-400 uppercase tracking-wide mb-2 px-1">
         {t('quickLinks')}
       </p>
@@ -287,7 +314,6 @@ export default function AccountPage() {
         })}
       </div>
 
-      {/* Settings */}
       <p className="text-xs font-semibold text-charcoal-400 uppercase tracking-wide mb-2 px-1">
         {t('settings')}
       </p>
@@ -322,7 +348,6 @@ export default function AccountPage() {
           <ChevronRight className="h-5 w-5 text-charcoal-300" />
         </button>
 
-        {/* Language toggle */}
         <div className="flex items-center gap-4 bg-white rounded-2xl p-4 elevation-1">
           <div className="w-11 h-11 rounded-xl bg-primary-50 flex items-center justify-center">
             <Languages className="h-5 w-5 text-primary-600" />
