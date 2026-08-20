@@ -285,22 +285,5 @@ export async function getMyOrder(orderId: string) {
   return data as Order
 }
 
-export async function getWishlist(userId: string) {
-  const { data: wl } = await supabase.from('wishlists').select('id').eq('user_id', userId).single()
-  if (!wl) return []
-  const { data, error } = await supabase.from('wishlist_items').select('*, product:products(*, images:product_images(*))').eq('wishlist_id', wl.id)
-  if (error) throw error
-  return data || []
-}
-
-export async function toggleWishlist(userId: string, productId: string) {
-  const { data: wl } = await supabase.from('wishlists').select('id').eq('user_id', userId).single()
-  if (!wl) throw new Error('Wishlist not found')
-  const { data: existing } = await supabase.from('wishlist_items').select('id').eq('wishlist_id', wl.id).eq('product_id', productId).maybeSingle()
-  if (existing) {
-    await supabase.from('wishlist_items').delete().eq('id', existing.id)
-    return false
-  }
-  await supabase.from('wishlist_items').insert({ wishlist_id: wl.id, product_id: productId })
-  return true
-}
+/** @deprecated use @/services/wishlist */
+export { getWishlist, toggleWishlist } from '@/services/wishlist'
