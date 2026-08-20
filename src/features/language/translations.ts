@@ -19,7 +19,7 @@ export const translations = {
     admin: 'አስተዳዳሪ',
 
     // Home
-    heroTitle1: 'በብልሃት ይሸምቱ።',
+    heroTitle1: 'ኩሉ የመስመር ላይ ግዢ',
     heroTitle2: 'በኢትዮጵያ በሙሉ ይደርሳል።',
     heroSubtitle: 'ጥራት ያላቸው ምርቶች በተመጣጣኝ ዋጋ። በፍጥነት ማድረስ እና በተቀባይ ገንዘብ (COD)።',
     shopNow: 'አሁን ይግዙ',
@@ -190,7 +190,7 @@ export const translations = {
     notificationDeleted: 'ማሳወቂያ ተሰርዟል',
 
     // Footer
-    tagline: 'በብልሃት ይሸምቱ። በኢትዮጵያ በሙሉ ይደርሳል።',
+    tagline: 'ኩሉ የመስመር ላይ ግዢ። በኢትዮጵያ በሙሉ ይደርሳል።',
     customer: 'ደንበኛ',
     trackOrder: 'ትዕዛዝ ይከታተሉ',
     deliveryDesc: 'በኢትዮጵያ ሁሉም ክልሎች እናደርሳለን። በተቀባይ ገንዘብ ይገኛል።',
@@ -219,7 +219,7 @@ export const translations = {
     adminDashboard: 'Admin Dashboard',
     admin: 'Admin',
 
-    heroTitle1: 'Shop Smart.',
+    heroTitle1: 'Kulu Online Shopping',
     heroTitle2: 'Delivered Across Ethiopia.',
     heroSubtitle: 'Discover quality products at fair prices. Fast delivery nationwide with Cash on Delivery.',
     shopNow: 'Shop Now',
@@ -379,7 +379,7 @@ export const translations = {
     allMarkedRead: 'All marked as read',
     notificationDeleted: 'Notification deleted',
 
-    tagline: 'Shop Smart. Delivered Across Ethiopia.',
+    tagline: 'Kulu Online Shopping. Delivered Across Ethiopia.',
     customer: 'Customer',
     trackOrder: 'Track Order',
     deliveryDesc: 'We deliver across all regions of Ethiopia. Cash on Delivery available.',
