@@ -13,16 +13,25 @@ export interface ProductFilters {
   featured?: boolean
 }
 
-/** Normalize and escape text for PostgREST ilike filters (works with Amharic/Unicode). */
+/**
+ * Normalize search text for PostgREST ilike filters.
+ * Keeps Ethiopic (Amharic) letters intact; only strips characters that break filter syntax.
+ */
 function sanitizeSearchTerm(raw: string): string {
   return raw
     .normalize('NFC')
     .trim()
     .replace(/\s+/g, ' ')
-    // PostgREST filter special chars that break .or() / ilike
-    .replace(/[%_,.()"'\\]/g, ' ')
+    // Remove PostgREST reserved filter delimiters only (keep Amharic/Unicode letters)
+    .replace(/[%_,.()\\]/g, ' ')
+    .replace(/"/g, '')
     .replace(/\s+/g, ' ')
     .trim()
+}
+
+/** Quote a value for PostgREST so Unicode / spaces are safe inside .or() filters. */
+function quoteFilterValue(value: string): string {
+  return `"${value.replace(/"/g, '""')}"`
 }
 
 export async function getProducts(filters: ProductFilters = {}) {
@@ -52,8 +61,8 @@ export async function getProducts(filters: ProductFilters = {}) {
 
   const term = search ? sanitizeSearchTerm(search) : ''
   if (term) {
-    // Match name, description, slug, brand — pattern works for Latin + Ethiopic scripts
-    const pattern = `%${term}%`
+    // Quoted pattern required for Amharic and any non-ASCII text in PostgREST
+    const pattern = quoteFilterValue(`%${term}%`)
     query = query.or(
       `name.ilike.${pattern},description.ilike.${pattern},slug.ilike.${pattern},brand.ilike.${pattern}`
     )
