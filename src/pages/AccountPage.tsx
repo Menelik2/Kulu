@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Save,
   AlertCircle,
+  Trash2,
 } from 'lucide-react'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useLanguage } from '@/features/language/LanguageContext'
@@ -46,13 +47,19 @@ type ProfileForm = z.infer<typeof profileSchema>
 type PasswordForm = z.infer<typeof passwordSchema>
 
 export default function AccountPage() {
-  const { profile, user, isAdmin, signOut, updateProfile, updatePassword, loading } = useAuth()
+  const { profile, user, isAdmin, signOut, updateProfile, updatePassword, deleteAccount, loading } =
+    useAuth()
   const { t, locale, setLocale } = useLanguage()
+  const navigate = useNavigate()
   const [savingProfile, setSavingProfile] = useState(false)
   const [savingPassword, setSavingPassword] = useState(false)
-  const [section, setSection] = useState<'menu' | 'profile' | 'password'>('menu')
+  const [deleting, setDeleting] = useState(false)
+  const [deleteConfirm, setDeleteConfirm] = useState('')
+  const [section, setSection] = useState<'menu' | 'profile' | 'password' | 'delete'>('menu')
 
   const needsPhone = !profile?.phone?.trim()
+  const confirmWord = t('deleteAccountConfirmWord')
+  const canDelete = deleteConfirm.trim().toUpperCase() === String(confirmWord).toUpperCase()
 
   const profileForm = useForm<ProfileForm>({
     resolver: zodResolver(profileSchema),
@@ -73,7 +80,6 @@ export default function AccountPage() {
     }
   }, [profile]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Prompt users without a phone to complete their profile
   useEffect(() => {
     if (!loading && profile && needsPhone && section === 'menu') {
       setSection('profile')
@@ -114,6 +120,27 @@ export default function AccountPage() {
     }
   }
 
+  const onDeleteAccount = async () => {
+    if (!canDelete || isAdmin) return
+    setDeleting(true)
+    try {
+      const { error } = await deleteAccount()
+      if (error) {
+        const msg = error.message || ''
+        if (/admin/i.test(msg)) {
+          toast.error(t('deleteAccountAdminBlocked'))
+        } else {
+          toast.error(msg || t('deleteAccountFailed'))
+        }
+        return
+      }
+      toast.success(t('deleteAccountSuccess'))
+      navigate('/', { replace: true })
+    } finally {
+      setDeleting(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="max-w-lg mx-auto container-padding py-16">
@@ -126,7 +153,6 @@ export default function AccountPage() {
     )
   }
 
-  /* ── Profile edit ── */
   if (section === 'profile') {
     return (
       <div className="max-w-lg mx-auto container-padding py-8 sm:py-12">
@@ -195,7 +221,6 @@ export default function AccountPage() {
     )
   }
 
-  /* ── Password change ── */
   if (section === 'password') {
     return (
       <div className="max-w-lg mx-auto container-padding py-8 sm:py-12">
@@ -249,7 +274,59 @@ export default function AccountPage() {
     )
   }
 
-  /* ── Main menu ── */
+  if (section === 'delete') {
+    return (
+      <div className="max-w-lg mx-auto container-padding py-8 sm:py-12">
+        <button
+          type="button"
+          onClick={() => {
+            setDeleteConfirm('')
+            setSection('menu')
+          }}
+          className="text-sm text-primary-600 mb-4 font-medium"
+        >
+          ← {t('back')}
+        </button>
+        <h1 className="text-xl sm:text-2xl font-bold text-charcoal-900 mb-2">{t('deleteAccountTitle')}</h1>
+
+        <div className="mb-5 flex items-start gap-2 rounded-xl bg-red-50 border border-red-200 p-3.5 text-sm text-red-900">
+          <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
+          <p className="leading-relaxed">{t('deleteAccountWarning')}</p>
+        </div>
+
+        {isAdmin ? (
+          <div className="bg-white rounded-2xl border border-charcoal-100 p-5 elevation-1 text-sm text-charcoal-600">
+            {t('deleteAccountAdminBlocked')}
+          </div>
+        ) : (
+          <div className="bg-white rounded-2xl border border-charcoal-100 p-5 sm:p-6 space-y-4 elevation-1">
+            <div className="space-y-2">
+              <Label htmlFor="deleteConfirm">{t('deleteAccountConfirmHint')}</Label>
+              <Input
+                id="deleteConfirm"
+                value={deleteConfirm}
+                onChange={(e) => setDeleteConfirm(e.target.value)}
+                placeholder={confirmWord}
+                className="h-12 rounded-xl font-mono tracking-wide"
+                autoComplete="off"
+              />
+            </div>
+            <Button
+              type="button"
+              className="w-full h-12 rounded-full bg-red-600 hover:bg-red-700 text-white"
+              disabled={!canDelete || deleting}
+              loading={deleting}
+              onClick={onDeleteAccount}
+            >
+              <Trash2 className="h-4 w-4" />
+              {t('deleteAccountBtn')}
+            </Button>
+          </div>
+        )}
+      </div>
+    )
+  }
+
   const quickLinks = [
     { to: '/orders', icon: Package, label: t('myOrdersBtn') },
     { to: '/wishlist', icon: Heart, label: t('wishlistBtn') },
@@ -377,6 +454,24 @@ export default function AccountPage() {
             </button>
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setDeleteConfirm('')
+            setSection('delete')
+          }}
+          className="w-full flex items-center gap-4 bg-white rounded-2xl p-4 elevation-1 active:scale-[0.98] transition-transform text-left"
+        >
+          <div className="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center">
+            <Trash2 className="h-5 w-5 text-red-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-red-600">{t('deleteAccount')}</p>
+            <p className="text-xs text-charcoal-500">{t('deleteAccountDesc')}</p>
+          </div>
+          <ChevronRight className="h-5 w-5 text-charcoal-300" />
+        </button>
       </div>
 
       <Button
