@@ -14,6 +14,9 @@ const buttonVariants = cva(
         secondary: 'bg-gold-500 text-charcoal-900 hover:bg-gold-600',
         ghost: 'hover:bg-charcoal-100 text-charcoal-700',
         link: 'text-primary-600 underline-offset-4 hover:underline',
+        /** White/transparent CTA on dark (hero) backgrounds — no white fill conflict */
+        onPrimary:
+          'border border-white/50 bg-white/10 text-white hover:bg-white/20 hover:text-white backdrop-blur-sm',
       },
       size: {
         default: 'h-11 px-5 py-2',
