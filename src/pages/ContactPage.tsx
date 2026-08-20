@@ -6,16 +6,22 @@ export default function ContactPage() {
 
   const items = [
     {
-      icon: Mail,
-      label: t('email'),
-      value: 'support@kulu.et',
-      href: 'mailto:support@kulu.et',
+      icon: Phone,
+      label: t('phone'),
+      value: '0955 214 105',
+      href: 'tel:+251955214105',
     },
     {
       icon: Phone,
       label: t('phone'),
-      value: '+251 911 000 000',
-      href: 'tel:+251911000000',
+      value: '0918 117 828',
+      href: 'tel:+251918117828',
+    },
+    {
+      icon: Mail,
+      label: t('email'),
+      value: 'support@kulu.et',
+      href: 'mailto:support@kulu.et',
     },
     {
       icon: MapPin,
@@ -45,7 +51,7 @@ export default function ContactPage() {
             </div>
           )
           return item.href ? (
-            <li key={item.label}>
+            <li key={`${item.label}-${item.value}`}>
               <a href={item.href} className="block hover:opacity-90">
                 {body}
               </a>
