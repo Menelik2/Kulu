@@ -35,7 +35,6 @@ export function StoreLayout() {
 
   const isHome = location.pathname === '/'
 
-  // Close mobile drawer when route changes
   useEffect(() => {
     setMobileMenuOpen(false)
   }, [location.pathname])
@@ -70,7 +69,6 @@ export function StoreLayout() {
 
   return (
     <div className="min-h-screen flex flex-col bg-charcoal-50">
-      {/* Full header with search — home only */}
       {isHome && (
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top">
           <div className="max-w-7xl mx-auto container-padding">
@@ -193,48 +191,29 @@ export function StoreLayout() {
           {mobileMenuOpen && (
             <div className="md:hidden border-t border-charcoal-100 bg-white">
               <nav className="flex flex-col p-3 gap-0.5">
-                <Link to="/" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">
-                  {t('home')}
-                </Link>
-                <Link to="/shop" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">
-                  {t('shop')}
-                </Link>
-                <Link to="/wishlist" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">
-                  {t('wishlist')}
-                </Link>
-                <Link to="/cart" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">
-                  {t('cart')} ({itemCount})
-                </Link>
+                <Link to="/" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('home')}</Link>
+                <Link to="/shop" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('shop')}</Link>
+                <Link to="/wishlist" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('wishlist')}</Link>
+                <Link to="/cart" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('cart')} ({itemCount})</Link>
+                <Link to="/about" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('about')}</Link>
+                <Link to="/contact" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('contact')}</Link>
                 {user ? (
                   <>
-                    <Link to="/notifications" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">
-                      {t('notifications')}
-                    </Link>
-                    <Link to="/account" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">
-                      {t('account')}
-                    </Link>
-                    <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">
-                      {t('myOrders')}
-                    </Link>
+                    <Link to="/notifications" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('notifications')}</Link>
+                    <Link to="/account" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('account')}</Link>
+                    <Link to="/orders" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('myOrders')}</Link>
                     {isAdmin && (
-                      <Link to="/admin" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-primary-600 font-medium text-[15px]">
-                        {t('admin')}
-                      </Link>
+                      <Link to="/admin" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-primary-600 font-medium text-[15px]">{t('admin')}</Link>
                     )}
                     <button
-                      onClick={() => {
-                        signOut()
-                        setMobileMenuOpen(false)
-                      }}
+                      onClick={() => signOut()}
                       className="text-left px-4 py-3 rounded-xl hover:bg-charcoal-50 text-red-600 text-[15px]"
                     >
                       {t('signOut')}
                     </button>
                   </>
                 ) : (
-                  <Link to="/login" onClick={() => setMobileMenuOpen(false)} className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">
-                    {t('signIn')}
-                  </Link>
+                  <Link to="/login" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('signIn')}</Link>
                 )}
               </nav>
             </div>
@@ -242,7 +221,6 @@ export function StoreLayout() {
         </header>
       )}
 
-      {/* Compact top bar on non-home pages (desktop navigation) */}
       {!isHome && (
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top hidden md:block">
           <div className="max-w-7xl mx-auto container-padding">
@@ -334,19 +312,13 @@ export function StoreLayout() {
               <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('shop')}</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/shop" className="hover:text-white">
-                    {t('allProducts')}
-                  </Link>
+                  <Link to="/shop" className="hover:text-white">{t('allProducts')}</Link>
                 </li>
                 <li>
-                  <Link to="/shop?sort=newest" className="hover:text-white">
-                    {t('newArrivals')}
-                  </Link>
+                  <Link to="/shop?sort=newest" className="hover:text-white">{t('newArrivals')}</Link>
                 </li>
                 <li>
-                  <Link to="/shop?sort=popular" className="hover:text-white">
-                    {t('bestSellers')}
-                  </Link>
+                  <Link to="/shop?sort=popular" className="hover:text-white">{t('bestSellers')}</Link>
                 </li>
               </ul>
             </div>
@@ -354,30 +326,29 @@ export function StoreLayout() {
               <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('customer')}</h4>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/account" className="hover:text-white">
-                    {t('myAccount')}
-                  </Link>
+                  <Link to="/account" className="hover:text-white">{t('myAccount')}</Link>
                 </li>
                 <li>
-                  <Link to="/orders" className="hover:text-white">
-                    {t('trackOrder')}
-                  </Link>
+                  <Link to="/orders" className="hover:text-white">{t('trackOrder')}</Link>
                 </li>
                 <li>
-                  <Link to="/notifications" className="hover:text-white">
-                    {t('notifications')}
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/wishlist" className="hover:text-white">
-                    {t('wishlist')}
-                  </Link>
+                  <Link to="/wishlist" className="hover:text-white">{t('wishlist')}</Link>
                 </li>
               </ul>
             </div>
-            <div className="col-span-2 sm:col-span-2 md:col-span-1">
-              <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('delivery')}</h4>
-              <p className="text-sm leading-relaxed">{t('deliveryDesc')}</p>
+            <div>
+              <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('company')}</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link to="/about" className="hover:text-white">{t('about')}</Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="hover:text-white">{t('contact')}</Link>
+                </li>
+                <li>
+                  <Link to="/privacy" className="hover:text-white">{t('privacy')}</Link>
+                </li>
+              </ul>
             </div>
           </div>
           <div className="border-t border-charcoal-700 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-sm">
