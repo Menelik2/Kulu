@@ -79,30 +79,38 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
+      {/* Hero — compact on mobile for app-like density */}
       <section className="relative bg-gradient-to-br from-primary-700 via-primary-600 to-primary-800 text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-12 left-6 w-48 h-48 sm:w-72 sm:h-72 bg-gold-400 rounded-full blur-3xl" />
-          <div className="absolute bottom-6 right-6 w-56 h-56 sm:w-96 sm:h-96 bg-white rounded-full blur-3xl" />
+        <div className="absolute inset-0 opacity-10 pointer-events-none">
+          <div className="absolute top-8 left-4 w-32 h-32 sm:w-72 sm:h-72 bg-gold-400 rounded-full blur-3xl" />
+          <div className="absolute bottom-4 right-4 w-40 h-40 sm:w-96 sm:h-96 bg-white rounded-full blur-3xl" />
         </div>
-        <div className="relative max-w-7xl mx-auto container-padding py-12 sm:py-20 lg:py-28">
+        <div className="relative max-w-7xl mx-auto container-padding py-6 sm:py-16 lg:py-24">
           <div className="max-w-2xl">
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
+            <h1 className="text-[1.35rem] leading-snug sm:text-5xl lg:text-6xl font-bold tracking-tight sm:leading-tight">
               {t('heroTitle1')}
               <br />
-              <span className="text-gold-400">{t('heroTitle2')}</span>
+              <span className="text-gold-400 text-[1.25rem] sm:text-inherit">{t('heroTitle2')}</span>
             </h1>
-            <p className="mt-4 sm:mt-6 text-base sm:text-lg text-primary-100 max-w-xl">
+            <p className="mt-2.5 sm:mt-6 text-[13px] leading-relaxed sm:text-lg text-primary-100/95 max-w-xl line-clamp-3 sm:line-clamp-none">
               {t('heroSubtitle')}
             </p>
-            <div className="mt-6 sm:mt-8 flex flex-wrap gap-3">
+            <div className="mt-4 sm:mt-8 flex flex-wrap gap-2.5 sm:gap-3">
               <Link to="/shop">
-                <Button size="lg" variant="secondary" className="gap-2 h-12 px-6 rounded-full shadow-lg">
-                  {t('shopNow')} <ArrowRight className="h-4 w-4" />
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="gap-1.5 h-10 px-4 text-sm rounded-full shadow-md sm:h-12 sm:px-6 sm:text-base sm:shadow-lg"
+                >
+                  {t('shopNow')} <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                 </Button>
               </Link>
               <Link to="/shop?sort=newest">
-                <Button size="lg" variant="onPrimary" className="h-12 px-6 rounded-full">
+                <Button
+                  size="lg"
+                  variant="onPrimary"
+                  className="h-10 px-4 text-sm rounded-full sm:h-12 sm:px-6 sm:text-base"
+                >
                   {t('newArrivals')}
                 </Button>
               </Link>
@@ -111,11 +119,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto container-padding py-6 sm:py-12">
+      <section className="max-w-7xl mx-auto container-padding py-5 sm:py-12">
         <div className="flex items-center justify-between mb-3 sm:mb-6">
-          <h2 className="text-lg sm:text-2xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
-          <Link to="/shop" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
-            {t('viewAll')} <ArrowRight className="h-4 w-4" />
+          <h2 className="text-base sm:text-2xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
+          <Link to="/shop" className="text-xs sm:text-sm text-primary-600 hover:underline flex items-center gap-1">
+            {t('viewAll')} <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Link>
         </div>
         {categoriesLoading ? (
@@ -169,11 +177,11 @@ export default function HomePage() {
         ) : null}
       </section>
 
-      <section className="max-w-7xl mx-auto container-padding py-8 sm:py-12">
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-xl sm:text-2xl font-bold text-charcoal-900">{t('featuredProducts')}</h2>
-          <Link to="/shop" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
-            {t('viewAll')} <ArrowRight className="h-4 w-4" />
+      <section className="max-w-7xl mx-auto container-padding py-6 sm:py-12">
+        <div className="flex items-center justify-between mb-3 sm:mb-6">
+          <h2 className="text-base sm:text-2xl font-bold text-charcoal-900">{t('featuredProducts')}</h2>
+          <Link to="/shop" className="text-xs sm:text-sm text-primary-600 hover:underline flex items-center gap-1">
+            {t('viewAll')} <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
           </Link>
         </div>
         {featuredLoading ? (
@@ -187,12 +195,12 @@ export default function HomePage() {
         ) : null}
       </section>
 
-      <section className="bg-white py-8 sm:py-12">
+      <section className="bg-white py-6 sm:py-12">
         <div className="max-w-7xl mx-auto container-padding">
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-charcoal-900">{t('newArrivals')}</h2>
-            <Link to="/shop?sort=newest" className="text-sm text-primary-600 hover:underline flex items-center gap-1">
-              {t('viewAll')} <ArrowRight className="h-4 w-4" />
+          <div className="flex items-center justify-between mb-3 sm:mb-6">
+            <h2 className="text-base sm:text-2xl font-bold text-charcoal-900">{t('newArrivals')}</h2>
+            <Link to="/shop?sort=newest" className="text-xs sm:text-sm text-primary-600 hover:underline flex items-center gap-1">
+              {t('viewAll')} <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
             </Link>
           </div>
           {newestLoading ? (
@@ -207,14 +215,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto container-padding py-10 sm:py-16">
-        <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl sm:rounded-3xl p-6 sm:p-12 text-center text-white">
-          <h2 className="text-xl sm:text-3xl font-bold">{t('readyToShop')}</h2>
-          <p className="mt-2 sm:mt-3 text-sm sm:text-base text-primary-100 max-w-lg mx-auto">
+      <section className="max-w-7xl mx-auto container-padding py-8 sm:py-16">
+        <div className="bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl sm:rounded-3xl p-5 sm:p-12 text-center text-white">
+          <h2 className="text-lg sm:text-3xl font-bold">{t('readyToShop')}</h2>
+          <p className="mt-1.5 sm:mt-3 text-xs sm:text-base text-primary-100 max-w-lg mx-auto leading-relaxed">
             {t('readyToShopDesc')}
           </p>
-          <Link to="/shop" className="inline-block mt-5 sm:mt-6">
-            <Button size="lg" variant="secondary" className="rounded-full h-12 px-8">
+          <Link to="/shop" className="inline-block mt-4 sm:mt-6">
+            <Button size="lg" variant="secondary" className="rounded-full h-10 px-6 text-sm sm:h-12 sm:px-8 sm:text-base">
               {t('exploreShop')}
             </Button>
           </Link>
