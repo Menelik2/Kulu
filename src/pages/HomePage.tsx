@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, Truck, Shield, Headphones, MapPin } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { getFeaturedProducts, getCategories, getProducts } from '@/services/products'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
@@ -107,30 +107,6 @@ export default function HomePage() {
                 </Button>
               </Link>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust badges */}
-      <section className="bg-white border-b border-charcoal-100">
-        <div className="max-w-7xl mx-auto container-padding py-5 sm:py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
-            {[
-              { icon: Truck, title: t('nationwideDelivery'), desc: t('allRegions') },
-              { icon: Shield, title: t('secureShopping'), desc: t('safeProtected') },
-              { icon: Headphones, title: t('customerSupport'), desc: t('hereToHelp') },
-              { icon: MapPin, title: t('cashOnDelivery'), desc: t('payWhenReceive') },
-            ].map((item) => (
-              <div key={item.title} className="flex items-start gap-2.5 sm:gap-3">
-                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
-                  <item.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary-600" />
-                </div>
-                <div className="min-w-0">
-                  <h3 className="font-semibold text-xs sm:text-sm text-charcoal-900 leading-snug">{item.title}</h3>
-                  <p className="text-[11px] sm:text-xs text-charcoal-500 mt-0.5 leading-snug">{item.desc}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
