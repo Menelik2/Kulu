@@ -13,6 +13,18 @@ export interface ProductFilters {
   featured?: boolean
 }
 
+/** Normalize and escape text for PostgREST ilike filters (works with Amharic/Unicode). */
+function sanitizeSearchTerm(raw: string): string {
+  return raw
+    .normalize('NFC')
+    .trim()
+    .replace(/\s+/g, ' ')
+    // PostgREST filter special chars that break .or() / ilike
+    .replace(/[%_,.()"'\\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
 export async function getProducts(filters: ProductFilters = {}) {
   const {
     search,
@@ -28,15 +40,23 @@ export async function getProducts(filters: ProductFilters = {}) {
 
   let query = supabase
     .from('products')
-    .select(`
+    .select(
+      `
       *,
       category:categories(*),
       images:product_images(*)
-    `, { count: 'exact' })
+    `,
+      { count: 'exact' }
+    )
     .eq('is_active', true)
 
-  if (search) {
-    query = query.or(`name.ilike.%${search}%,description.ilike.%${search}%`)
+  const term = search ? sanitizeSearchTerm(search) : ''
+  if (term) {
+    // Match name, description, slug, brand — pattern works for Latin + Ethiopic scripts
+    const pattern = `%${term}%`
+    query = query.or(
+      `name.ilike.${pattern},description.ilike.${pattern},slug.ilike.${pattern},brand.ilike.${pattern}`
+    )
   }
   if (category) {
     query = query.eq('category_id', category)
@@ -90,11 +110,13 @@ export async function getProducts(filters: ProductFilters = {}) {
 export async function getProductBySlug(slug: string) {
   const { data, error } = await supabase
     .from('products')
-    .select(`
+    .select(
+      `
       *,
       category:categories(*),
       images:product_images(*)
-    `)
+    `
+    )
     .eq('slug', slug)
     .eq('is_active', true)
     .single()
@@ -121,10 +143,12 @@ export async function getFeaturedProducts(limit = 8) {
 export async function getRelatedProducts(categoryId: string, excludeId: string, limit = 4) {
   const { data, error } = await supabase
     .from('products')
-    .select(`
+    .select(
+      `
       *,
       images:product_images(*)
-    `)
+    `
+    )
     .eq('category_id', categoryId)
     .eq('is_active', true)
     .neq('id', excludeId)
