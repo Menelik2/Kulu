@@ -1,0 +1,5 @@
+kulu-deploy-stamp
+branch=main
+sha=trigger-all-ui-fixes
+time=2026-08-20T03:22:00Z
+includes=hero-onPrimary,category-snap-scroll,kulu-online-shopping-title,reviews-fees-price-filters
