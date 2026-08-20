@@ -118,12 +118,53 @@
     @apply active:scale-[0.97] transition-transform duration-100;
   }
 
-  /* Hide scrollbar for horizontal carousels (mobile category strip) */
+  /* Hide scrollbar for horizontal carousels */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /*
+   * Smooth horizontal snap strip (mobile categories, etc.)
+   * - momentum scrolling on iOS
+   * - proximity snap (less janky than mandatory while flinging)
+   * - smooth programmatic / residual scroll
+   */
+  .snap-strip {
+    display: flex;
+    width: max-content;
+    gap: 0.75rem;
+    padding-bottom: 0.25rem;
+  }
+
+  .snap-strip-scroller {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 1rem;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .snap-strip-scroller::-webkit-scrollbar {
+    display: none;
+  }
+
+  .snap-strip-item {
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+    flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .snap-strip-scroller {
+      scroll-behavior: auto;
+    }
   }
 }
