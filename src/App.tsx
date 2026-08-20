@@ -22,6 +22,7 @@ import NotificationsPage from '@/pages/NotificationsPage'
 import AboutPage from '@/pages/AboutPage'
 import ContactPage from '@/pages/ContactPage'
 import PrivacyPage from '@/pages/PrivacyPage'
+import LegalPage from '@/pages/LegalPage'
 import NotFoundPage from '@/pages/NotFoundPage'
 import AdminDashboard from '@/pages/admin/Dashboard'
 import AdminProducts from '@/pages/admin/Products'
@@ -72,6 +73,7 @@ export default function App() {
             <Route path="about" element={<AboutPage />} />
             <Route path="contact" element={<ContactPage />} />
             <Route path="privacy" element={<PrivacyPage />} />
+            <Route path="legal" element={<LegalPage />} />
             <Route element={<ProtectedRoute />}>
               <Route path="checkout" element={<CheckoutPage />} />
               <Route path="order-confirmation/:orderId" element={<OrderConfirmationPage />} />
