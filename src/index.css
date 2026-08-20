@@ -68,9 +68,17 @@
     }
   }
 
-  /* Better Amharic line height */
+  /* Amharic body readable; headings stay tight on mobile */
   :lang(am) {
-    line-height: 1.65;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 639px) {
+    :lang(am) h1,
+    :lang(am) h2,
+    :lang(am) h3 {
+      line-height: 1.3;
+    }
   }
 }
 
