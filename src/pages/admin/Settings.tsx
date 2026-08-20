@@ -105,12 +105,12 @@ export default function AdminSettings() {
           <div className="flex justify-between gap-4">
             <span className="text-charcoal-500">Live site</span>
             <a
-              href="https://kuluapps.vercel.app"
+              href="https://kulu.sites.bd"
               target="_blank"
               rel="noreferrer"
               className="font-medium text-primary-600 hover:underline"
             >
-              kuluapps.vercel.app
+              kulu.sites.bd
             </a>
           </div>
         </CardContent>
