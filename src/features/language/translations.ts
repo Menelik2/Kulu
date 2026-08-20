@@ -207,18 +207,22 @@ export const translations = {
     legalDisclaimerShort:
       'በዚህ ድረ-ገጽ ላይ ያሉ መረጃዎች እና ዋጋዎች ለመረጃ ብቻ ናቸው፤ ሊለወጡ ይችላሉ። ኩሉ በሶስተኛ ወገን ማድረስ ወይም በምርት መግለጫ ስህተቶች ላይ ኃላፊነት አይወስድም።',
     legalReadMore: 'ሙሉ ጽሑፍ',
+    or: 'ወይም',
 
     // About
-    aboutTitle: 'ስለ ኩሉ',
+    aboutTitle: 'ከኩሉ ኦንላይን ጋር ግብይትዎን ያቃልሉ',
+    aboutTagline: 'The whole market in your pocket.',
     aboutP1:
-      'ኩሉ የኢትዮጵያ ኦንላይን ግዢ መድረክ ነው። ጥራት ያላቸው ምርቶችን በተመጣጣኝ ዋጋ እና በደረሰ ጊዜ ክፍያ እናቀርባለን።',
-    aboutP2:
-      'ከአዲስ አበባ እስከ ሁሉም ክልሎች በፍጥነት እናደርሳለን። ደንበኞቻችን በደህንነት እንዲገዙ እንሰራለን።',
-    aboutP3: 'ተልእኳችን — ለኢትዮጵያውያን ቀላል፣ አስተማማኝ እና ተደራሽ የኦንላይን ግዢ ማቅረብ ነው።',
+      'ፋሽን፣ ጫማዎች፣ ሽቶዎች እንዲሁም የባልትና ምርቶችን ፍለጋ መንገላታት ቀረ! Kulu Online Shopping ሁሉንም ወደ እርስዎ ደጅ ያመጣል።',
+    aboutWhyTitle: 'ለምን በ Kulu ይሸምጣሉ?',
+    aboutBenefit1: 'ጥራት ያላቸው ምርቶች',
+    aboutBenefit2: 'ተመጣጣኝ ዋጋ',
+    aboutBenefit3: 'ታማኝ እና ፈጣን ማድረስ',
+    aboutOrderNow: 'አሁኑኑ ይዘዙ',
 
     // Contact
     contactTitle: 'አግኙን',
-    contactIntro: 'ጥያቄ፣ አስተያየት ወይም ድጋፍ ካስፈለገዎት ከታች ባሉት መንገዶች ያግኙን።',
+    contactIntro: 'ጥያቄ፣ አስተያየት ወይም ድጋፍ ካስፈለገዎት ከታች ባሉት መንገዶች ያግኙን። አሁኑኑ ይደውሉ።',
     contactLocation: 'አድራሻ',
     contactAddress: 'አዲስ አበባ፣ ኢትዮጵያ',
     contactHours: 'የስራ ሰዓት፡ ሰኞ – አርብ፣ ከጠዋት 8:00 እስከ ምሽት 6:00',
@@ -458,17 +462,20 @@ export const translations = {
     legalDisclaimerShort:
       'Product details and prices on this site are for information only and may change. KULU is not liable for third-party delivery delays or product description errors.',
     legalReadMore: 'Read full disclaimer',
+    or: 'or',
 
-    aboutTitle: 'About KULU',
+    aboutTitle: 'Simplify your shopping with Kulu Online',
+    aboutTagline: 'The whole market in your pocket.',
     aboutP1:
-      'KULU is an Ethiopian online shopping platform. We offer quality products at fair prices with Cash on Delivery.',
-    aboutP2:
-      'We deliver from Addis Ababa across all regions. Our goal is safe, simple shopping for every customer.',
-    aboutP3:
-      'Our mission is to make online shopping accessible, reliable, and convenient for Ethiopians everywhere.',
+      'No more hunting for fashion, shoes, fragrances, and household essentials. Kulu Online Shopping brings everything to your door.',
+    aboutWhyTitle: 'Why shop with Kulu?',
+    aboutBenefit1: 'Quality products',
+    aboutBenefit2: 'Fair prices',
+    aboutBenefit3: 'Reliable and fast delivery',
+    aboutOrderNow: 'Order now',
 
     contactTitle: 'Contact us',
-    contactIntro: 'Questions, feedback, or support — reach us using the details below.',
+    contactIntro: 'Questions, feedback, or support — reach us below. Call us anytime during business hours.',
     contactLocation: 'Location',
     contactAddress: 'Addis Ababa, Ethiopia',
     contactHours: 'Hours: Monday – Friday, 8:00 AM – 6:00 PM',
