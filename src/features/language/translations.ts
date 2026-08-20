@@ -150,6 +150,8 @@ export const translations = {
     passwordChanged: 'የይለፍ ቃል ተቀይሯል',
     passwordChangeFailed: 'የይለፍ ቃል መቀየር አልተሳካም',
     emailCannotChange: 'ኢሜይል መቀየር አይቻልም',
+    phoneRequiredNotice: 'እባክዎ የስልክ ቁጥርዎን ያስገቡ። ለትዕዛዝ እና ማድረስ ያስፈልጋል።',
+    phoneMissing: 'ስልክ ቁጥር አልተጨመረም — እባክዎ ያክሉ',
 
     // Orders
     noOrdersYet: 'እስካሁን ትዕዛዝ የለዎትም',
@@ -410,6 +412,8 @@ export const translations = {
     passwordChanged: 'Password changed',
     passwordChangeFailed: 'Failed to change password',
     emailCannotChange: 'Email cannot be changed',
+    phoneRequiredNotice: 'Please add your phone number. It is required for orders and delivery.',
+    phoneMissing: 'Phone number missing — please add it',
 
     noOrdersYet: 'No orders yet',
     noOrdersDesc: 'When you place an order, it will show up here.',
