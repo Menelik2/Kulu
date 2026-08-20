@@ -1,5 +1,19 @@
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom'
-import { Search, ShoppingCart, Heart, User, Menu, X, Home, Store, Languages } from 'lucide-react'
+import {
+  Search,
+  ShoppingCart,
+  Heart,
+  User,
+  Menu,
+  X,
+  Home,
+  Store,
+  Languages,
+  Truck,
+  Shield,
+  Headphones,
+  MapPin,
+} from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useCart } from '@/features/cart/CartContext'
@@ -38,6 +52,13 @@ export function StoreLayout() {
     { to: '/wishlist', icon: Heart, label: t('wishlist'), match: '/wishlist' },
     { to: '/cart', icon: ShoppingCart, label: t('cart'), match: '/cart', badge: itemCount },
     { to: user ? '/account' : '/login', icon: User, label: t('account'), match: user ? '/account' : '/login' },
+  ]
+
+  const trustBadges = [
+    { icon: Truck, title: t('nationwideDelivery'), desc: t('allRegions') },
+    { icon: Shield, title: t('secureShopping'), desc: t('safeProtected') },
+    { icon: Headphones, title: t('customerSupport'), desc: t('hereToHelp') },
+    { icon: MapPin, title: t('cashOnDelivery'), desc: t('payWhenReceive') },
   ]
 
   return (
@@ -223,6 +244,25 @@ export function StoreLayout() {
 
       {/* Footer — visible on all screens; extra bottom padding on mobile for bottom nav */}
       <footer className="bg-charcoal-900 text-charcoal-300 mt-auto pb-20 md:pb-0">
+        {/* Trust badges */}
+        <div className="border-b border-charcoal-700">
+          <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+              {trustBadges.map((item) => (
+                <div key={item.title} className="flex items-start gap-2.5 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-charcoal-800 flex items-center justify-center shrink-0">
+                    <item.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary-400" />
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="font-semibold text-xs sm:text-sm text-white leading-snug">{item.title}</h3>
+                    <p className="text-[11px] sm:text-xs text-charcoal-400 mt-0.5 leading-snug">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         <div className="max-w-7xl mx-auto container-padding py-8 sm:py-12">
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
             <div className="col-span-2 sm:col-span-2 md:col-span-1">
