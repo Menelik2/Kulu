@@ -31,13 +31,12 @@ function ProductGridSkeleton({ count = 8 }: { count?: number }) {
 function CategorySkeleton() {
   return (
     <>
-      {/* Mobile: horizontal scroll skeleton */}
-      <div className="sm:hidden -mx-4 px-4 overflow-x-auto scrollbar-hide">
-        <div className="flex gap-3 pb-1 w-max">
+      <div className="sm:hidden -mx-4 px-4 snap-strip-scroller">
+        <div className="snap-strip">
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
-              className="w-[76px] shrink-0 bg-white rounded-xl border border-charcoal-100 p-2.5 text-center animate-pulse"
+              className="snap-strip-item w-[76px] bg-white rounded-xl border border-charcoal-100 p-2.5 text-center animate-pulse"
             >
               <div className="w-10 h-10 mx-auto rounded-xl bg-charcoal-100 mb-1.5" />
               <div className="h-2.5 bg-charcoal-100 rounded w-3/4 mx-auto" />
@@ -45,7 +44,6 @@ function CategorySkeleton() {
           ))}
         </div>
       </div>
-      {/* sm+: grid skeleton */}
       <div className="hidden sm:grid grid-cols-4 md:grid-cols-5 gap-4">
         {Array.from({ length: 10 }).map((_, i) => (
           <div
@@ -152,18 +150,18 @@ export default function HomePage() {
           <CategorySkeleton />
         ) : categories && categories.length > 0 ? (
           <>
-            {/* Mobile: single-row horizontal scroll */}
-            <div className="sm:hidden -mx-4 px-4 overflow-x-auto overscroll-x-contain scrollbar-hide snap-x snap-mandatory">
-              <div className="flex gap-3 pb-1 w-max">
+            {/* Mobile: smooth horizontal snap scroll */}
+            <div className="sm:hidden -mx-4 px-4 snap-strip-scroller">
+              <div className="snap-strip">
                 {categories.map((cat) => {
                   const Icon = getCategoryIcon(cat.slug || cat.name)
                   return (
                     <Link
                       key={cat.id}
                       to={`/shop?category=${cat.id}`}
-                      className="group w-[76px] shrink-0 snap-start bg-white rounded-xl border border-charcoal-100 p-2.5 text-center active:scale-[0.97] transition-all"
+                      className="snap-strip-item group w-[76px] bg-white rounded-xl border border-charcoal-100 p-2.5 text-center active:scale-[0.97] transition-transform duration-150"
                     >
-                      <div className="w-10 h-10 mx-auto rounded-xl bg-primary-50 flex items-center justify-center mb-1.5 group-active:bg-primary-100">
+                      <div className="w-10 h-10 mx-auto rounded-xl bg-primary-50 flex items-center justify-center mb-1.5 group-active:bg-primary-100 transition-colors">
                         <Icon className="h-5 w-5 text-primary-600" strokeWidth={1.75} />
                       </div>
                       <h3 className="font-medium text-[10px] text-charcoal-800 line-clamp-2 leading-tight">
