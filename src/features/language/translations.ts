@@ -240,6 +240,9 @@ export const translations = {
     dismiss: 'ዝጋ',
     installIosHint: 'በ Safari ውስጥ ኩሉን ወደ መነሻ ስክሪን ያክሉ።',
     installIosSteps: 'Share → Add to Home Screen ይጫኑ',
+    installManualHint: 'ኩሉን ከአሳሹ ምናሌ ወደ መነሻ ስክሪን ያክሉ።',
+    installManualSteps:
+      'ምናሌ (⋮ ወይም ⋯) ይክፈቱ → “Install app” ወይም “Add to Home Screen” ይምረጡ።',
     deleteAccount: 'መለያ ሰርዝ',
     deleteAccountDesc: 'መለያዎን እና የግል ውሂብዎን በቋሚነት ያስወግዱ',
     deleteAccountTitle: 'መለያ በቋሚነት ሰርዝ',
@@ -494,6 +497,9 @@ export const translations = {
     dismiss: 'Dismiss',
     installIosHint: 'Add Kulu to your Home Screen from Safari.',
     installIosSteps: 'Tap Share, then Add to Home Screen',
+    installManualHint: 'Add Kulu to your home screen from the browser menu.',
+    installManualSteps:
+      'Open the menu (⋮ or ⋯) → choose “Install app” or “Add to Home Screen”.',
     deleteAccount: 'Delete account',
     deleteAccountDesc: 'Permanently remove your account and personal data',
     deleteAccountTitle: 'Permanently delete account',
