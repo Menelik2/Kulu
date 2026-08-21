@@ -27,13 +27,24 @@ export function formatPhone(phone: string): string {
   return phone
 }
 
+/**
+ * URL slug that keeps Unicode letters (e.g. Amharic).
+ * Previous ASCII-only version turned Amharic names into empty slugs and broke unique constraints.
+ */
 export function slugify(text: string): string {
-  return text
+  const base = text
+    .normalize('NFC')
     .toLowerCase()
     .trim()
-    .replace(/[^\w\s-]/g, '')
-    .replace(/[\s_-]+/g, '-')
+    .replace(/\s+/g, '-')
+    // Letters, marks (Ethiopic), numbers, hyphens
+    .replace(/[^\p{L}\p{N}\p{M}-]+/gu, '')
+    .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
+    .slice(0, 80)
+
+  if (base.length > 0) return base
+  return `item-${Date.now().toString(36)}`
 }
 
 export function calculateDiscountPercent(price: number, discountPrice: number | null): number | null {

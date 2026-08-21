@@ -3,26 +3,45 @@ import type { Product, Category, Order, Profile, Review, DeliveryConfig, Invento
 import { slugify } from '@/lib/utils'
 import { deleteAllProductImages } from '@/services/productImages'
 
-const PRODUCT_SELECT =
+const PRODUCT_SELECT_WITH_SUPPLIER =
   '*, category:categories(*), supplier:suppliers(*), images:product_images(*)'
+const PRODUCT_SELECT_BASIC =
+  '*, category:categories(*), images:product_images(*)'
+
+async function selectProducts(orderCreatedDesc: boolean) {
+  let q = supabase.from('products').select(PRODUCT_SELECT_WITH_SUPPLIER)
+  if (orderCreatedDesc) q = q.order('created_at', { ascending: false })
+  const { data, error } = await q
+  if (!error) return (data || []) as Product[]
+
+  // suppliers table / embed may be missing until migration runs
+  console.warn('products+supplier select failed, falling back:', error.message)
+  let q2 = supabase.from('products').select(PRODUCT_SELECT_BASIC)
+  if (orderCreatedDesc) q2 = q2.order('created_at', { ascending: false })
+  const { data: data2, error: error2 } = await q2
+  if (error2) throw error2
+  return (data2 || []) as Product[]
+}
 
 export async function adminGetProducts() {
-  const { data, error } = await supabase
-    .from('products')
-    .select(PRODUCT_SELECT)
-    .order('created_at', { ascending: false })
-  if (error) throw error
-  return (data || []) as Product[]
+  return selectProducts(true)
 }
 
 export async function adminGetProduct(id: string) {
   const { data, error } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(PRODUCT_SELECT_WITH_SUPPLIER)
     .eq('id', id)
     .single()
-  if (error) throw error
-  return data as Product
+  if (!error && data) return data as Product
+
+  const { data: data2, error: error2 } = await supabase
+    .from('products')
+    .select(PRODUCT_SELECT_BASIC)
+    .eq('id', id)
+    .single()
+  if (error2) throw error2
+  return data2 as Product
 }
 
 export async function adminCreateProduct(payload: {
@@ -39,6 +58,8 @@ export async function adminCreateProduct(payload: {
       slug,
       discount_price: payload.discount_price || null,
       supplier_id: payload.supplier_id || null,
+      is_active: payload.is_active ?? true,
+      is_featured: payload.is_featured ?? false,
     })
     .select()
     .single()
@@ -71,7 +92,6 @@ export async function adminDeleteProduct(id: string) {
   if (error) throw error
 }
 
-/** Adjust stock and write inventory_transactions audit row */
 export async function adminAdjustStock(params: {
   productId: string
   quantityChange: number
@@ -142,7 +162,16 @@ export async function adminGetCategories() {
 
 export async function adminCreateCategory(payload: { name: string; description?: string; is_active?: boolean }) {
   const slug = slugify(payload.name)
-  const { data, error } = await supabase.from('categories').insert({ ...payload, slug }).select().single()
+  const { data, error } = await supabase
+    .from('categories')
+    .insert({
+      name: payload.name.trim(),
+      description: payload.description || null,
+      slug,
+      is_active: payload.is_active ?? true,
+    })
+    .select()
+    .single()
   if (error) throw error
   return data as Category
 }
@@ -150,6 +179,7 @@ export async function adminCreateCategory(payload: { name: string; description?:
 export async function adminUpdateCategory(id: string, payload: Partial<{ name: string; description: string; is_active: boolean; sort_order: number }>) {
   const updates: Record<string, unknown> = { ...payload }
   if (payload.name) updates.slug = slugify(payload.name)
+  if ('is_active' in payload) updates.is_active = !!payload.is_active
   const { data, error } = await supabase.from('categories').update(updates).eq('id', id).select().single()
   if (error) throw error
   return data as Category
@@ -186,20 +216,21 @@ export async function adminUpdateOrderStatus(id: string, status: string) {
     cancelled: 'cancelled',
   }
   const label = statusLabels[status]
-  if (label && data) {
-    await supabase.from('notifications').insert({
+  // Skip notification when order has no linked user (deleted accounts → user_id null)
+  if (label && data?.user_id) {
+    const { error: nErr } = await supabase.from('notifications').insert({
       user_id: data.user_id,
       title: `Order ${label}`,
       message: `Your order ${data.order_number} has been ${label}.`,
       type: 'order',
       link: `/orders/${data.id}`,
     })
+    if (nErr) console.warn('order status notification failed:', nErr.message)
   }
 
   return data as Order
 }
 
-/** Permanently delete an order (order_items cascade). Admin RLS required. */
 export async function adminDeleteOrder(id: string) {
   const { error } = await supabase.from('orders').delete().eq('id', id)
   if (error) throw error

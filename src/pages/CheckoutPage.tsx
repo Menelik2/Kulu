@@ -86,9 +86,21 @@ export default function CheckoutPage() {
       return
     }
 
+    if (!items.length) {
+      toast.error(t('cartEmpty'))
+      return
+    }
+
+    // Drop cart lines without a product snapshot (corrupt localStorage)
+    const validItems = items.filter((i) => i.product_id && i.quantity > 0)
+    if (!validItems.length) {
+      toast.error(t('orderFailed'))
+      return
+    }
+
     setLoading(true)
     try {
-      const orderItems = items.map((i) => ({
+      const orderItems = validItems.map((i) => ({
         product_id: i.product_id,
         quantity: i.quantity,
       }))
@@ -111,6 +123,11 @@ export default function CheckoutPage() {
 
       if (error) {
         toast.error(error.message || t('orderFailed'))
+        return
+      }
+
+      if (!orderId) {
+        toast.error(t('orderFailed'))
         return
       }
 
