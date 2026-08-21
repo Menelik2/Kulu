@@ -49,6 +49,44 @@ export function storagePathFromUrl(url: string): string | null {
   return null
 }
 
+/** List every object under products/{productId}/ in the bucket */
+async function listStoragePathsForProduct(productId: string): Promise<string[]> {
+  const folder = `products/${productId}`
+  const paths: string[] = []
+
+  const { data, error } = await supabase.storage.from(BUCKET).list(folder, {
+    limit: 200,
+    offset: 0,
+  })
+  if (error) {
+    console.warn('list storage folder failed:', error.message)
+    return paths
+  }
+
+  for (const item of data || []) {
+    if (!item.name) continue
+    // Skip folder placeholders
+    if (item.id === null && !item.metadata) continue
+    paths.push(`${folder}/${item.name}`)
+  }
+  return paths
+}
+
+async function removeStoragePaths(paths: string[]): Promise<void> {
+  const unique = [...new Set(paths.filter(Boolean))]
+  if (!unique.length) return
+
+  // Storage API accepts batches; chunk to be safe
+  const chunkSize = 50
+  for (let i = 0; i < unique.length; i += chunkSize) {
+    const chunk = unique.slice(i, i + chunkSize)
+    const { error } = await supabase.storage.from(BUCKET).remove(chunk)
+    if (error) {
+      console.warn('Storage remove failed:', error.message, chunk)
+    }
+  }
+}
+
 export async function uploadProductImage(
   productId: string,
   file: File,
@@ -117,17 +155,21 @@ export async function uploadProductImage(
 }
 
 /**
- * Fully remove an image:
- * 1) Delete row from product_images (database)
+ * Fully remove one image:
+ * 1) Delete row from product_images (database) — required success
  * 2) Delete file from Storage bucket
  * 3) If it was primary, promote another image
  */
 export async function deleteProductImage(image: ProductImage): Promise<void> {
   const productId = image.product_id
   const wasPrimary = image.is_primary
+  const imageId = image.id
 
   // 1. Database row — must succeed
-  const { error: dbError } = await supabase.from('product_images').delete().eq('id', image.id)
+  const { error: dbError, count } = await supabase
+    .from('product_images')
+    .delete({ count: 'exact' })
+    .eq('id', imageId)
 
   if (dbError) {
     throw new Error(
@@ -137,13 +179,26 @@ export async function deleteProductImage(image: ProductImage): Promise<void> {
     )
   }
 
-  // 2. Storage file — best effort (row is already gone)
+  if (count === 0) {
+    // Row already gone — still try storage cleanup
+    console.warn('product_images row already absent:', imageId)
+  }
+
+  // Confirm no row remains
+  const { data: stillThere } = await supabase
+    .from('product_images')
+    .select('id')
+    .eq('id', imageId)
+    .maybeSingle()
+
+  if (stillThere) {
+    throw new Error('Image row still in database — delete blocked (check admin RLS)')
+  }
+
+  // 2. Storage file
   const path = storagePathFromUrl(image.url)
   if (path) {
-    const { error: storageError } = await supabase.storage.from(BUCKET).remove([path])
-    if (storageError) {
-      console.warn('Storage file delete failed (DB row already removed):', storageError.message)
-    }
+    await removeStoragePaths([path])
   }
 
   // 3. Promote another image if we removed the primary
@@ -164,35 +219,63 @@ export async function deleteProductImage(image: ProductImage): Promise<void> {
   }
 }
 
-/** Delete every image for a product (DB + storage). Used when product is deleted. */
+/**
+ * Delete every image for a product from the database and storage.
+ * Used when admin deletes a product or clears all images.
+ */
 export async function deleteAllProductImages(productId: string): Promise<void> {
+  if (!productId) return
+
   const { data: images, error } = await supabase
     .from('product_images')
     .select('*')
     .eq('product_id', productId)
 
   if (error) throw new Error(error.message)
-  if (!images?.length) return
 
-  const paths: string[] = []
-  for (const img of images as ProductImage[]) {
+  const pathsFromDb: string[] = []
+  for (const img of (images || []) as ProductImage[]) {
     const p = storagePathFromUrl(img.url)
-    if (p) paths.push(p)
+    if (p) pathsFromDb.push(p)
   }
 
-  // DB rows (CASCADE may also handle this if product is deleted first)
-  const { error: delErr } = await supabase
+  // Also list storage folder in case of orphaned files
+  const pathsFromFolder = await listStoragePathsForProduct(productId)
+  const allPaths = [...new Set([...pathsFromDb, ...pathsFromFolder])]
+
+  // 1) Hard-delete all DB rows for this product
+  const { error: delErr, count } = await supabase
     .from('product_images')
-    .delete()
+    .delete({ count: 'exact' })
     .eq('product_id', productId)
 
   if (delErr) {
-    throw new Error(delErr.message || 'Failed to delete image records')
+    throw new Error(
+      delErr.message.includes('row-level security')
+        ? 'Cannot delete product images (RLS). Sign in as admin.'
+        : delErr.message || 'Failed to delete image records from database'
+    )
   }
 
-  if (paths.length) {
-    await supabase.storage.from(BUCKET).remove(paths)
+  // 2) Verify database is empty for this product
+  const { count: left } = await supabase
+    .from('product_images')
+    .select('id', { count: 'exact', head: true })
+    .eq('product_id', productId)
+
+  if ((left ?? 0) > 0) {
+    throw new Error(
+      `Failed to fully delete image records (${left} still in database). Check admin RLS on product_images.`
+    )
   }
+
+  // 3) Wipe storage objects
+  if (allPaths.length) {
+    await removeStoragePaths(allPaths)
+  }
+
+  // count is informational (may be null depending on PostgREST)
+  void count
 }
 
 export async function setPrimaryProductImage(
