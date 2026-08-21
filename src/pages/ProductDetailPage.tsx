@@ -13,7 +13,6 @@ import {
   Shield,
   MapPin,
   Star,
-  Heart,
 } from 'lucide-react'
 import { getProductBySlug, getRelatedProducts } from '@/services/products'
 import { ProductCard } from '@/components/products/ProductCard'
@@ -117,10 +116,8 @@ export default function ProductDetailPage() {
       </Link>
 
       <div className="grid md:grid-cols-2 gap-6 lg:gap-12 xl:gap-16">
-        {/* Gallery */}
         <div className="md:sticky md:top-28 md:self-start">
           <div className="flex gap-3 md:gap-4">
-            {/* Desktop vertical thumbs */}
             {images.length > 1 && (
               <div className="hidden md:flex flex-col gap-2.5 shrink-0 max-h-[520px] overflow-y-auto scrollbar-hide">
                 {images.map((img, i) => (
@@ -162,7 +159,6 @@ export default function ProductDetailPage() {
             </button>
           </div>
 
-          {/* Mobile horizontal thumbs */}
           {images.length > 1 && (
             <div className="flex md:hidden gap-2 mt-3 overflow-x-auto pb-1">
               {images.map((img, i) => (
@@ -182,7 +178,6 @@ export default function ProductDetailPage() {
           )}
         </div>
 
-        {/* Buy box */}
         <div className="md:sticky md:top-28 md:self-start">
           {product.category && (
             <Link
@@ -240,7 +235,6 @@ export default function ProductDetailPage() {
             </div>
           )}
 
-          {/* Desktop trust row */}
           <div className="hidden md:grid grid-cols-3 gap-3 mt-8 pt-6 border-t border-charcoal-100">
             <div className="flex items-start gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
