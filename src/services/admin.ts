@@ -80,21 +80,62 @@ export async function adminUpdateProduct(id: string, payload: Partial<{
   return data as Product
 }
 
-/** Delete product + all product_images rows + storage files */
+/**
+ * Permanently delete a product and all related app data:
+ * - product_images (DB + storage files)
+ * - wishlist_items
+ * - reviews
+ * - inventory_transactions
+ * - order_items.product_id set null (order history kept with name/sku snapshot)
+ * - products row
+ */
 export async function adminDeleteProduct(id: string) {
-  // Prefer explicit image cleanup (DB rows + storage folder) before product row
+  // 1) Images: DB rows + storage folder
   try {
     await deleteAllProductImages(id)
   } catch (e) {
     console.warn('Image cleanup before product delete:', e)
-    // Product delete still cascades product_images rows in DB
   }
 
-  const { error } = await supabase.from('products').delete().eq('id', id)
-  if (error) throw error
+  // 2) Explicit related rows (works even if CASCADE misconfigured)
+  const relatedDeletes = await Promise.all([
+    supabase.from('wishlist_items').delete().eq('product_id', id),
+    supabase.from('reviews').delete().eq('product_id', id),
+    supabase.from('inventory_transactions').delete().eq('product_id', id),
+    supabase.from('product_images').delete().eq('product_id', id),
+    // Detach from past orders (requires migration 008 — nullable product_id)
+    supabase.from('order_items').update({ product_id: null }).eq('product_id', id),
+  ])
 
-  // Safety: remove any leftover image rows (should be 0 after CASCADE)
-  await supabase.from('product_images').delete().eq('product_id', id)
+  for (const r of relatedDeletes) {
+    if (r.error) {
+      const msg = r.error.message || ''
+      // Ignore "null into NOT NULL" until migration 008 is applied
+      if (/null value|not-null|violates not-null/i.test(msg)) {
+        throw new Error(
+          'Cannot delete product that appears in past orders. Run migration 008_product_delete_cascade.sql in Supabase, then try again.'
+        )
+      }
+      if (/foreign key|violates foreign key/i.test(msg)) {
+        throw new Error(
+          'Cannot delete product: still linked to other records. ' + msg
+        )
+      }
+      console.warn('Related cleanup warning:', msg)
+    }
+  }
+
+  // 3) Product row
+  const { error } = await supabase.from('products').delete().eq('id', id)
+  if (error) {
+    const msg = error.message || ''
+    if (/foreign key|violates foreign key/i.test(msg)) {
+      throw new Error(
+        'Product is still referenced (often past orders). Run migration 008_product_delete_cascade.sql in Supabase SQL Editor, then delete again.'
+      )
+    }
+    throw error
+  }
 }
 
 export async function adminAdjustStock(params: {
