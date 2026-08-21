@@ -1,22 +1,27 @@
 {
   "rewrites": [
     {
-      "source": "/((?!assets/|\.well-known/).*)",
+      "source": "/.well-known/assetlinks.json",
+      "destination": "/well-known/assetlinks.json"
+    },
+    {
+      "source": "/((?!assets/|well-known/).*)",
       "destination": "/index.html"
     }
   ],
   "headers": [
     {
+      "source": "/well-known/assetlinks.json",
+      "headers": [
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Cache-Control", "value": "public, max-age=300" }
+      ]
+    },
+    {
       "source": "/.well-known/assetlinks.json",
       "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/json"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        }
+        { "key": "Content-Type", "value": "application/json" },
+        { "key": "Cache-Control", "value": "public, max-age=300" }
       ]
     }
   ]
