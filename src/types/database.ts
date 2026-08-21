@@ -16,6 +16,21 @@ export interface Profile {
   updated_at: string
 }
 
+export interface Supplier {
+  id: string
+  name: string
+  contact_person: string | null
+  email: string | null
+  phone: string | null
+  address: string | null
+  city: string | null
+  region: string | null
+  notes: string | null
+  is_active: boolean
+  created_at: string
+  updated_at: string
+}
+
 export interface Category {
   id: string
   name: string
@@ -38,6 +53,7 @@ export interface Product {
   sku: string
   stock_quantity: number
   category_id: string | null
+  supplier_id?: string | null
   brand: string | null
   specifications: Record<string, string> | null
   is_active: boolean
@@ -47,6 +63,7 @@ export interface Product {
   created_at: string
   updated_at: string
   category?: Category | null
+  supplier?: Supplier | null
   images?: ProductImage[]
   average_rating?: number
   review_count?: number
