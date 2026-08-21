@@ -14,10 +14,19 @@ export default function AdminProducts() {
   const { data: products, isLoading } = useQuery({ queryKey: ['admin', 'products'], queryFn: adminGetProducts })
   const del = useMutation({
     mutationFn: adminDeleteProduct,
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'products'] }); toast.success('Product deleted') },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin', 'products'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'supplier_product_counts'] })
+      toast.success('Product deleted')
+    },
     onError: (e: Error) => toast.error(e.message),
   })
-  const filtered = products?.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()) || p.sku.toLowerCase().includes(search.toLowerCase()))
+  const filtered = products?.filter(
+    (p) =>
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.sku.toLowerCase().includes(search.toLowerCase()) ||
+      (p.supplier?.name || '').toLowerCase().includes(search.toLowerCase())
+  )
 
   return (
     <div className="p-4 sm:p-6 space-y-4">
@@ -27,7 +36,7 @@ export default function AdminProducts() {
       </div>
       <div className="relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal-400" />
-        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name or SKU..." className="pl-10" />
+        <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search name, SKU, or supplier..." className="pl-10" />
       </div>
       {isLoading ? (
         <div className="animate-pulse space-y-2">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-14 bg-charcoal-100 rounded-lg" />)}</div>
@@ -39,6 +48,7 @@ export default function AdminProducts() {
                 <tr>
                   <th className="px-4 py-3 font-medium text-charcoal-600">Product</th>
                   <th className="px-4 py-3 font-medium text-charcoal-600">SKU</th>
+                  <th className="px-4 py-3 font-medium text-charcoal-600">Supplier</th>
                   <th className="px-4 py-3 font-medium text-charcoal-600">Price</th>
                   <th className="px-4 py-3 font-medium text-charcoal-600">Stock</th>
                   <th className="px-4 py-3 font-medium text-charcoal-600">Status</th>
@@ -48,8 +58,18 @@ export default function AdminProducts() {
               <tbody className="divide-y divide-charcoal-100">
                 {filtered?.map((p) => (
                   <tr key={p.id} className="hover:bg-charcoal-50">
-                    <td className="px-4 py-3"><div className="font-medium text-charcoal-900">{p.name}</div><div className="text-xs text-charcoal-500">{p.category?.name}</div></td>
+                    <td className="px-4 py-3">
+                      <div className="font-medium text-charcoal-900">{p.name}</div>
+                      <div className="text-xs text-charcoal-500">{p.category?.name}</div>
+                    </td>
                     <td className="px-4 py-3 font-mono text-xs">{p.sku}</td>
+                    <td className="px-4 py-3 text-charcoal-700">
+                      {p.supplier?.name ? (
+                        <span className="text-sm">{p.supplier.name}</span>
+                      ) : (
+                        <span className="text-xs text-charcoal-400">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3">{formatETB(getEffectivePrice(p.price, p.discount_price))}</td>
                     <td className="px-4 py-3"><span className={p.stock_quantity < 10 ? 'text-red-600 font-medium' : ''}>{p.stock_quantity}</span></td>
                     <td className="px-4 py-3"><span className={`text-xs px-2 py-0.5 rounded-full ${p.is_active ? 'bg-green-100 text-green-700' : 'bg-charcoal-100 text-charcoal-600'}`}>{p.is_active ? 'Active' : 'Hidden'}</span></td>
@@ -61,7 +81,7 @@ export default function AdminProducts() {
                     </td>
                   </tr>
                 ))}
-                {filtered?.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-charcoal-500">No products found</td></tr>}
+                {filtered?.length === 0 && <tr><td colSpan={7} className="px-4 py-8 text-center text-charcoal-500">No products found</td></tr>}
               </tbody>
             </table>
           </div>

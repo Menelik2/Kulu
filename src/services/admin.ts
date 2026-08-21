@@ -3,10 +3,13 @@ import type { Product, Category, Order, Profile, Review, DeliveryConfig, Invento
 import { slugify } from '@/lib/utils'
 import { deleteAllProductImages } from '@/services/productImages'
 
+const PRODUCT_SELECT =
+  '*, category:categories(*), supplier:suppliers(*), images:product_images(*)'
+
 export async function adminGetProducts() {
   const { data, error } = await supabase
     .from('products')
-    .select('*, category:categories(*), images:product_images(*)')
+    .select(PRODUCT_SELECT)
     .order('created_at', { ascending: false })
   if (error) throw error
   return (data || []) as Product[]
@@ -15,7 +18,7 @@ export async function adminGetProducts() {
 export async function adminGetProduct(id: string) {
   const { data, error } = await supabase
     .from('products')
-    .select('*, category:categories(*), images:product_images(*)')
+    .select(PRODUCT_SELECT)
     .eq('id', id)
     .single()
   if (error) throw error
@@ -24,25 +27,34 @@ export async function adminGetProduct(id: string) {
 
 export async function adminCreateProduct(payload: {
   name: string; description?: string; price: number; discount_price?: number | null
-  sku: string; stock_quantity: number; category_id?: string | null; brand?: string
+  sku: string; stock_quantity: number; category_id?: string | null
+  supplier_id?: string | null; brand?: string
   is_active?: boolean; is_featured?: boolean
 }) {
   const slug = slugify(payload.name)
   const { data, error } = await supabase
     .from('products')
-    .insert({ ...payload, slug, discount_price: payload.discount_price || null })
-    .select().single()
+    .insert({
+      ...payload,
+      slug,
+      discount_price: payload.discount_price || null,
+      supplier_id: payload.supplier_id || null,
+    })
+    .select()
+    .single()
   if (error) throw error
   return data as Product
 }
 
 export async function adminUpdateProduct(id: string, payload: Partial<{
   name: string; description: string; price: number; discount_price: number | null
-  sku: string; stock_quantity: number; category_id: string | null; brand: string
+  sku: string; stock_quantity: number; category_id: string | null
+  supplier_id: string | null; brand: string
   is_active: boolean; is_featured: boolean
 }>) {
   const updates: Record<string, unknown> = { ...payload }
   if (payload.name) updates.slug = slugify(payload.name)
+  if ('supplier_id' in payload) updates.supplier_id = payload.supplier_id || null
   const { data, error } = await supabase.from('products').update(updates).eq('id', id).select().single()
   if (error) throw error
   return data as Product
@@ -105,7 +117,6 @@ export async function adminAdjustStock(params: {
     performed_by: performedBy,
   })
   if (txErr) {
-    // Roll forward is OK; log but surface soft failure
     console.warn('inventory_transactions insert failed:', txErr)
   }
 
