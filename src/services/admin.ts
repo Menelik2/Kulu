@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import type { Product, Category, Order, Profile, Review, DeliveryConfig } from '@/types/database'
+import type { Product, Category, Order, Profile, Review, DeliveryConfig, InventoryTransaction } from '@/types/database'
 import { slugify } from '@/lib/utils'
 import { deleteAllProductImages } from '@/services/productImages'
 
@@ -57,6 +57,71 @@ export async function adminDeleteProduct(id: string) {
 
   const { error } = await supabase.from('products').delete().eq('id', id)
   if (error) throw error
+}
+
+/** Adjust stock and write inventory_transactions audit row */
+export async function adminAdjustStock(params: {
+  productId: string
+  quantityChange: number
+  reason: string
+  performedBy?: string | null
+  /** When true, quantityChange is absolute new stock (delta computed server-side). */
+  setAbsolute?: boolean
+}) {
+  const { productId, reason, performedBy = null, setAbsolute = false } = params
+  let quantityChange = params.quantityChange
+
+  const { data: product, error: fetchErr } = await supabase
+    .from('products')
+    .select('id, stock_quantity, name')
+    .eq('id', productId)
+    .single()
+  if (fetchErr) throw fetchErr
+  if (!product) throw new Error('Product not found')
+
+  const current = Number(product.stock_quantity) || 0
+  if (setAbsolute) {
+    quantityChange = quantityChange - current
+  }
+  if (quantityChange === 0) {
+    return product as Product
+  }
+
+  const next = current + quantityChange
+  if (next < 0) throw new Error('Stock cannot go below zero')
+
+  const { data: updated, error: updErr } = await supabase
+    .from('products')
+    .update({ stock_quantity: next, updated_at: new Date().toISOString() })
+    .eq('id', productId)
+    .select()
+    .single()
+  if (updErr) throw updErr
+
+  const { error: txErr } = await supabase.from('inventory_transactions').insert({
+    product_id: productId,
+    quantity_change: quantityChange,
+    reason: reason || (quantityChange > 0 ? 'stock_in' : 'stock_out'),
+    performed_by: performedBy,
+  })
+  if (txErr) {
+    // Roll forward is OK; log but surface soft failure
+    console.warn('inventory_transactions insert failed:', txErr)
+  }
+
+  return updated as Product
+}
+
+export async function adminGetInventoryTransactions(limit = 40) {
+  const { data, error } = await supabase
+    .from('inventory_transactions')
+    .select('*, product:products(id, name, sku)')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+  return (data || []) as (InventoryTransaction & {
+    product?: { id: string; name: string; sku: string } | null
+  })[]
 }
 
 export async function adminGetCategories() {
