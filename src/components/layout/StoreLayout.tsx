@@ -16,7 +16,7 @@ import {
   ChevronDown,
   LayoutGrid,
 } from 'lucide-react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useCart } from '@/features/cart/CartContext'
@@ -37,6 +37,8 @@ export function StoreLayout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [megaOpen, setMegaOpen] = useState(false)
+  const [profileOpen, setProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null)
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -51,7 +53,27 @@ export function StoreLayout() {
   useEffect(() => {
     setMobileMenuOpen(false)
     setMegaOpen(false)
+    setProfileOpen(false)
   }, [location.pathname])
+
+  // Close profile menu on outside click
+  useEffect(() => {
+    if (!profileOpen) return
+    const onDown = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false)
+      }
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setProfileOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [profileOpen])
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
@@ -81,246 +103,289 @@ export function StoreLayout() {
     { icon: MapPin, title: t('cashOnDelivery'), desc: t('payWhenReceive') },
   ]
 
-  const DesktopHeader = () => (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top hidden md:block">
-      {/* Top utility strip */}
-      <div className="bg-charcoal-900 text-charcoal-300 text-xs">
-        <div className="max-w-7xl mx-auto container-padding h-8 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <Truck className="h-3.5 w-3.5 text-primary-400" />
-              {t('nationwideDelivery')}
-            </span>
-            <span className="hidden lg:flex items-center gap-1.5">
-              <MapPin className="h-3.5 w-3.5 text-gold-400" />
-              {t('cashOnDelivery')}
-            </span>
-          </div>
-          <div className="flex items-center gap-3">
-            <Link to="/about" className="hover:text-white transition-colors">{t('about')}</Link>
-            <Link to="/contact" className="hover:text-white transition-colors">{t('contact')}</Link>
-            <button
-              type="button"
-              onClick={() => setLocale(locale === 'am' ? 'en' : 'am')}
-              className="flex items-center gap-1 hover:text-white transition-colors"
-            >
-              <Languages className="h-3.5 w-3.5" />
-              {locale === 'am' ? 'EN' : 'አማ'}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main bar */}
-      <div className="max-w-7xl mx-auto container-padding">
-        <div className="flex items-center justify-between h-16 lg:h-[4.25rem] gap-4">
-          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-            <img
-              src={KULU_LOGO_SRC}
-              alt="KULU"
-              className="w-11 h-11 object-contain transition-transform group-hover:scale-105"
-            />
-            <div className="leading-tight">
-              <span className="font-bold text-xl lg:text-2xl text-[#1e3a8a] tracking-tight block">KULU</span>
-              <span className="text-[10px] text-charcoal-400 font-medium tracking-wide hidden lg:block">
-                {t('tagline')?.slice(0, 28) || 'Ethiopian Marketplace'}
-              </span>
-            </div>
-          </Link>
-
-          <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-2 lg:mx-6">
-            <div className="relative w-full group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-charcoal-400 group-focus-within:text-primary-600 transition-colors" />
-              <Input
-                type="search"
-                placeholder={t('searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-11 pr-28 h-11 lg:h-12 rounded-full border-charcoal-200 bg-charcoal-50/80 focus-visible:bg-white focus-visible:ring-primary-500/30 focus-visible:border-primary-400 text-[15px] shadow-sm"
-              />
-              <Button
-                type="submit"
-                size="sm"
-                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 lg:h-9 rounded-full px-5 text-sm font-semibold"
-              >
-                {t('search')}
-              </Button>
-            </div>
-          </form>
-
-          <nav className="flex items-center gap-0.5 lg:gap-1 shrink-0">
-            <Link to="/shop">
-              <Button
-                variant="ghost"
-                size="sm"
-                className={cn(
-                  'gap-1.5 font-medium',
-                  isActive('/shop') && 'text-primary-600 bg-primary-50'
-                )}
-              >
-                <Store className="h-4 w-4" />
-                <span className="hidden lg:inline">{t('shop')}</span>
-              </Button>
-            </Link>
-            <Link to="/wishlist">
-              <Button variant="ghost" size="icon" className="relative h-10 w-10">
-                <Heart className="h-5 w-5" />
-              </Button>
-            </Link>
-            <NotificationBell />
-            <Link to="/cart">
-              <Button variant="ghost" size="icon" className="relative h-10 w-10">
-                <ShoppingCart className="h-5 w-5" />
-                {itemCount > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 rounded-full bg-primary-600 text-white text-[11px] flex items-center justify-center font-bold shadow-sm">
-                    {itemCount > 99 ? '99+' : itemCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
-
-            <div className="w-px h-6 bg-charcoal-200 mx-1 lg:mx-2" />
-
-            {user ? (
-              <div className="relative group">
-                <Button variant="ghost" size="sm" className="gap-2 h-10 pl-2 pr-3">
-                  <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-sm">
-                    {(profile?.full_name || user.email || 'U').charAt(0).toUpperCase()}
-                  </div>
-                  <span className="max-w-[110px] truncate text-sm font-medium hidden xl:inline">
-                    {profile?.full_name || t('account')}
-                  </span>
-                  <ChevronDown className="h-3.5 w-3.5 text-charcoal-400" />
-                </Button>
-                <div className="absolute right-0 top-full mt-1.5 w-56 bg-white rounded-2xl shadow-xl border border-charcoal-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-50 elevation-3">
-                  <div className="px-4 py-2 border-b border-charcoal-100 mb-1">
-                    <p className="text-sm font-semibold text-charcoal-900 truncate">
-                      {profile?.full_name || t('account')}
-                    </p>
-                    <p className="text-xs text-charcoal-500 truncate">{user.email}</p>
-                  </div>
-                  <Link to="/account" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1">
-                    {t('myAccount')}
-                  </Link>
-                  <Link to="/orders" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1">
-                    {t('myOrders')}
-                  </Link>
-                  <Link to="/notifications" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1">
-                    {t('notifications')}
-                  </Link>
-                  <Link to="/wishlist" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1">
-                    {t('wishlist')}
-                  </Link>
-                  {isAdmin && (
-                    <Link
-                      to="/admin"
-                      className="block px-4 py-2.5 text-sm hover:bg-primary-50 text-primary-700 font-medium rounded-lg mx-1"
-                    >
-                      {t('adminDashboard')}
-                    </Link>
-                  )}
-                  <div className="border-t border-charcoal-100 mt-1 pt-1">
-                    <button
-                      onClick={() => signOut()}
-                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-red-50 text-red-600 rounded-lg mx-1"
-                    >
-                      {t('signOut')}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <Link to="/login">
-                <Button size="sm" className="rounded-full h-10 px-5 font-semibold shadow-sm">
-                  {t('signIn')}
-                </Button>
-              </Link>
-            )}
-          </nav>
-        </div>
-      </div>
-
-      {/* Categories mega bar */}
-      <div className="border-t border-charcoal-100 bg-white relative">
-        <div className="max-w-7xl mx-auto container-padding">
-          <div className="flex items-center gap-1 h-11 overflow-x-auto scrollbar-hide">
-            <button
-              type="button"
-              onClick={() => setMegaOpen((o) => !o)}
-              className={cn(
-                'flex items-center gap-1.5 px-3 h-8 rounded-full text-sm font-semibold shrink-0 transition-colors',
-                megaOpen
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-charcoal-900 text-white hover:bg-charcoal-800'
-              )}
-            >
-              <LayoutGrid className="h-3.5 w-3.5" />
-              {t('shopByCategory')}
-              <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', megaOpen && 'rotate-180')} />
-            </button>
-
-            <div className="w-px h-5 bg-charcoal-200 mx-1 shrink-0" />
-
-            {categories?.slice(0, 8).map((cat) => {
-              const Icon = getCategoryIcon(cat.slug || cat.name)
-              return (
-                <Link
-                  key={cat.id}
-                  to={`/shop?category=${cat.id}`}
-                  className="flex items-center gap-1.5 px-3 h-8 rounded-full text-sm text-charcoal-700 hover:bg-primary-50 hover:text-primary-700 whitespace-nowrap shrink-0 transition-colors font-medium"
-                >
-                  <Icon className="h-3.5 w-3.5 opacity-70" strokeWidth={1.75} />
-                  {cat.name}
-                </Link>
-              )
-            })}
-
-            <Link
-              to="/shop"
-              className="flex items-center gap-1 px-3 h-8 rounded-full text-sm text-primary-600 hover:bg-primary-50 whitespace-nowrap shrink-0 font-semibold ml-auto"
-            >
-              {t('viewAll')}
-            </Link>
-          </div>
-        </div>
-
-        {/* Mega dropdown panel */}
-        {megaOpen && categories && categories.length > 0 && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setMegaOpen(false)} />
-            <div className="absolute left-0 right-0 top-full z-50 bg-white border-b border-charcoal-100 shadow-xl">
-              <div className="max-w-7xl mx-auto container-padding py-6">
-                <div className="grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
-                  {categories.map((cat) => {
-                    const Icon = getCategoryIcon(cat.slug || cat.name)
-                    return (
-                      <Link
-                        key={cat.id}
-                        to={`/shop?category=${cat.id}`}
-                        onClick={() => setMegaOpen(false)}
-                        className="group flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent hover:border-primary-200 hover:bg-primary-50/50 transition-all"
-                      >
-                        <div className="w-12 h-12 rounded-2xl bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
-                          <Icon className="h-6 w-6 text-primary-600" strokeWidth={1.75} />
-                        </div>
-                        <span className="text-xs font-medium text-charcoal-800 text-center line-clamp-2 group-hover:text-primary-700">
-                          {cat.name}
-                        </span>
-                      </Link>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-      </div>
-    </header>
-  )
-
   return (
     <div className="min-h-screen flex flex-col bg-charcoal-50">
-      <DesktopHeader />
+      {/* Desktop header */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top hidden md:block">
+        <div className="bg-charcoal-900 text-charcoal-300 text-xs">
+          <div className="max-w-7xl mx-auto container-padding h-8 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span className="flex items-center gap-1.5">
+                <Truck className="h-3.5 w-3.5 text-primary-400" />
+                {t('nationwideDelivery')}
+              </span>
+              <span className="hidden lg:flex items-center gap-1.5">
+                <MapPin className="h-3.5 w-3.5 text-gold-400" />
+                {t('cashOnDelivery')}
+              </span>
+            </div>
+            <div className="flex items-center gap-3">
+              <Link to="/about" className="hover:text-white transition-colors">{t('about')}</Link>
+              <Link to="/contact" className="hover:text-white transition-colors">{t('contact')}</Link>
+              <button
+                type="button"
+                onClick={() => setLocale(locale === 'am' ? 'en' : 'am')}
+                className="flex items-center gap-1 hover:text-white transition-colors"
+              >
+                <Languages className="h-3.5 w-3.5" />
+                {locale === 'am' ? 'EN' : 'አማ'}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto container-padding">
+          <div className="flex items-center justify-between h-16 lg:h-[4.25rem] gap-4">
+            <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+              <img
+                src={KULU_LOGO_SRC}
+                alt="KULU"
+                className="w-11 h-11 object-contain transition-transform group-hover:scale-105"
+              />
+              <div className="leading-tight">
+                <span className="font-bold text-xl lg:text-2xl text-[#1e3a8a] tracking-tight block">KULU</span>
+                <span className="text-[10px] text-charcoal-400 font-medium tracking-wide hidden lg:block">
+                  {t('tagline')?.slice(0, 28) || 'Ethiopian Marketplace'}
+                </span>
+              </div>
+            </Link>
+
+            <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-2 lg:mx-6">
+              <div className="relative w-full group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-charcoal-400 group-focus-within:text-primary-600 transition-colors" />
+                <Input
+                  type="search"
+                  placeholder={t('searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-11 pr-28 h-11 lg:h-12 rounded-full border-charcoal-200 bg-charcoal-50/80 focus-visible:bg-white focus-visible:ring-primary-500/30 focus-visible:border-primary-400 text-[15px] shadow-sm"
+                />
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 lg:h-9 rounded-full px-5 text-sm font-semibold"
+                >
+                  {t('search')}
+                </Button>
+              </div>
+            </form>
+
+            <nav className="flex items-center gap-0.5 lg:gap-1 shrink-0">
+              <Link to="/shop">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    'gap-1.5 font-medium',
+                    isActive('/shop') && 'text-primary-600 bg-primary-50'
+                  )}
+                >
+                  <Store className="h-4 w-4" />
+                  <span className="hidden lg:inline">{t('shop')}</span>
+                </Button>
+              </Link>
+              <Link to="/wishlist">
+                <Button variant="ghost" size="icon" className="relative h-10 w-10">
+                  <Heart className="h-5 w-5" />
+                </Button>
+              </Link>
+              <NotificationBell />
+              <Link to="/cart">
+                <Button variant="ghost" size="icon" className="relative h-10 w-10">
+                  <ShoppingCart className="h-5 w-5" />
+                  {itemCount > 0 && (
+                    <span className="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 rounded-full bg-primary-600 text-white text-[11px] flex items-center justify-center font-bold shadow-sm">
+                      {itemCount > 99 ? '99+' : itemCount}
+                    </span>
+                  )}
+                </Button>
+              </Link>
+
+              <div className="w-px h-6 bg-charcoal-200 mx-1 lg:mx-2" />
+
+              {user ? (
+                <div className="relative" ref={profileRef}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className={cn(
+                      'gap-2 h-10 pl-2 pr-3',
+                      profileOpen && 'bg-charcoal-50'
+                    )}
+                    onClick={() => setProfileOpen((o) => !o)}
+                    aria-expanded={profileOpen}
+                    aria-haspopup="menu"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-sm">
+                      {(profile?.full_name || user.email || 'U').charAt(0).toUpperCase()}
+                    </div>
+                    <span className="max-w-[110px] truncate text-sm font-medium hidden xl:inline">
+                      {profile?.full_name || t('account')}
+                    </span>
+                    <ChevronDown
+                      className={cn(
+                        'h-3.5 w-3.5 text-charcoal-400 transition-transform',
+                        profileOpen && 'rotate-180'
+                      )}
+                    />
+                  </Button>
+
+                  {profileOpen && (
+                    <div
+                      role="menu"
+                      className="absolute right-0 top-full mt-1.5 w-56 bg-white rounded-2xl shadow-xl border border-charcoal-100 py-2 z-[60] elevation-3"
+                    >
+                      <div className="px-4 py-2 border-b border-charcoal-100 mb-1">
+                        <p className="text-sm font-semibold text-charcoal-900 truncate">
+                          {profile?.full_name || t('account')}
+                        </p>
+                        <p className="text-xs text-charcoal-500 truncate">{user.email}</p>
+                      </div>
+                      <Link
+                        to="/account"
+                        role="menuitem"
+                        onClick={() => setProfileOpen(false)}
+                        className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1"
+                      >
+                        {t('myAccount')}
+                      </Link>
+                      <Link
+                        to="/orders"
+                        role="menuitem"
+                        onClick={() => setProfileOpen(false)}
+                        className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1"
+                      >
+                        {t('myOrders')}
+                      </Link>
+                      <Link
+                        to="/notifications"
+                        role="menuitem"
+                        onClick={() => setProfileOpen(false)}
+                        className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1"
+                      >
+                        {t('notifications')}
+                      </Link>
+                      <Link
+                        to="/wishlist"
+                        role="menuitem"
+                        onClick={() => setProfileOpen(false)}
+                        className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1"
+                      >
+                        {t('wishlist')}
+                      </Link>
+                      {isAdmin && (
+                        <Link
+                          to="/admin"
+                          role="menuitem"
+                          onClick={() => setProfileOpen(false)}
+                          className="block px-4 py-2.5 text-sm hover:bg-primary-50 text-primary-700 font-medium rounded-lg mx-1"
+                        >
+                          {t('adminDashboard')}
+                        </Link>
+                      )}
+                      <div className="border-t border-charcoal-100 mt-1 pt-1">
+                        <button
+                          type="button"
+                          role="menuitem"
+                          onClick={() => {
+                            setProfileOpen(false)
+                            signOut()
+                          }}
+                          className="w-full text-left px-4 py-2.5 text-sm hover:bg-red-50 text-red-600 rounded-lg mx-1"
+                        >
+                          {t('signOut')}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link to="/login">
+                  <Button size="sm" className="rounded-full h-10 px-5 font-semibold shadow-sm">
+                    {t('signIn')}
+                  </Button>
+                </Link>
+              )}
+            </nav>
+          </div>
+        </div>
+
+        {/* Categories mega bar */}
+        <div className="border-t border-charcoal-100 bg-white relative">
+          <div className="max-w-7xl mx-auto container-padding">
+            <div className="flex items-center gap-1 h-11 overflow-x-auto scrollbar-hide">
+              <button
+                type="button"
+                onClick={() => setMegaOpen((o) => !o)}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 h-8 rounded-full text-sm font-semibold shrink-0 transition-colors',
+                  megaOpen
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-charcoal-900 text-white hover:bg-charcoal-800'
+                )}
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+                {t('shopByCategory')}
+                <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', megaOpen && 'rotate-180')} />
+              </button>
+
+              <div className="w-px h-5 bg-charcoal-200 mx-1 shrink-0" />
+
+              {categories?.slice(0, 8).map((cat) => {
+                const Icon = getCategoryIcon(cat.slug || cat.name)
+                return (
+                  <Link
+                    key={cat.id}
+                    to={`/shop?category=${cat.id}`}
+                    className="flex items-center gap-1.5 px-3 h-8 rounded-full text-sm text-charcoal-700 hover:bg-primary-50 hover:text-primary-700 whitespace-nowrap shrink-0 transition-colors font-medium"
+                  >
+                    <Icon className="h-3.5 w-3.5 opacity-70" strokeWidth={1.75} />
+                    {cat.name}
+                  </Link>
+                )
+              })}
+
+              <Link
+                to="/shop"
+                className="flex items-center gap-1 px-3 h-8 rounded-full text-sm text-primary-600 hover:bg-primary-50 whitespace-nowrap shrink-0 font-semibold ml-auto"
+              >
+                {t('viewAll')}
+              </Link>
+            </div>
+          </div>
+
+          {megaOpen && categories && categories.length > 0 && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setMegaOpen(false)} />
+              <div className="absolute left-0 right-0 top-full z-50 bg-white border-b border-charcoal-100 shadow-xl">
+                <div className="max-w-7xl mx-auto container-padding py-6">
+                  <div className="grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+                    {categories.map((cat) => {
+                      const Icon = getCategoryIcon(cat.slug || cat.name)
+                      return (
+                        <Link
+                          key={cat.id}
+                          to={`/shop?category=${cat.id}`}
+                          onClick={() => setMegaOpen(false)}
+                          className="group flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent hover:border-primary-200 hover:bg-primary-50/50 transition-all"
+                        >
+                          <div className="w-12 h-12 rounded-2xl bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
+                            <Icon className="h-6 w-6 text-primary-600" strokeWidth={1.75} />
+                          </div>
+                          <span className="text-xs font-medium text-charcoal-800 text-center line-clamp-2 group-hover:text-primary-700">
+                            {cat.name}
+                          </span>
+                        </Link>
+                      )
+                    })}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      </header>
 
       {isHome && (
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top md:hidden">
