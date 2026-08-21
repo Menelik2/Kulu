@@ -33,6 +33,7 @@ import AdminOrderDetail from '@/pages/admin/OrderDetail'
 import AdminCustomers from '@/pages/admin/Customers'
 import AdminReviews from '@/pages/admin/Reviews'
 import AdminInventory from '@/pages/admin/Inventory'
+import AdminSuppliers from '@/pages/admin/Suppliers'
 import AdminSettings from '@/pages/admin/Settings'
 
 const SPLASH_KEY = 'kulu_splash_shown'
@@ -92,6 +93,7 @@ export default function App() {
               <Route path="products/new" element={<AdminProductForm />} />
               <Route path="products/:id/edit" element={<AdminProductForm />} />
               <Route path="categories" element={<AdminCategories />} />
+              <Route path="suppliers" element={<AdminSuppliers />} />
               <Route path="orders" element={<AdminOrders />} />
               <Route path="orders/:id" element={<AdminOrderDetail />} />
               <Route path="customers" element={<AdminCustomers />} />
