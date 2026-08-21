@@ -86,6 +86,14 @@ export default function AccountPage() {
     }
   }, [loading, profile, needsPhone, section])
 
+  // Admins must never land on the delete account screen
+  useEffect(() => {
+    if (isAdmin && section === 'delete') {
+      setSection('menu')
+      setDeleteConfirm('')
+    }
+  }, [isAdmin, section])
+
   const onSaveProfile = async (data: ProfileForm) => {
     setSavingProfile(true)
     try {
@@ -274,7 +282,8 @@ export default function AccountPage() {
     )
   }
 
-  if (section === 'delete') {
+  // Delete account UI — customers only (never shown for admins)
+  if (section === 'delete' && !isAdmin) {
     return (
       <div className="max-w-lg mx-auto container-padding py-8 sm:py-12">
         <button
@@ -294,35 +303,29 @@ export default function AccountPage() {
           <p className="leading-relaxed">{t('deleteAccountWarning')}</p>
         </div>
 
-        {isAdmin ? (
-          <div className="bg-white rounded-2xl border border-charcoal-100 p-5 elevation-1 text-sm text-charcoal-600">
-            {t('deleteAccountAdminBlocked')}
+        <div className="bg-white rounded-2xl border border-charcoal-100 p-5 sm:p-6 space-y-4 elevation-1">
+          <div className="space-y-2">
+            <Label htmlFor="deleteConfirm">{t('deleteAccountConfirmHint')}</Label>
+            <Input
+              id="deleteConfirm"
+              value={deleteConfirm}
+              onChange={(e) => setDeleteConfirm(e.target.value)}
+              placeholder={confirmWord}
+              className="h-12 rounded-xl font-mono tracking-wide"
+              autoComplete="off"
+            />
           </div>
-        ) : (
-          <div className="bg-white rounded-2xl border border-charcoal-100 p-5 sm:p-6 space-y-4 elevation-1">
-            <div className="space-y-2">
-              <Label htmlFor="deleteConfirm">{t('deleteAccountConfirmHint')}</Label>
-              <Input
-                id="deleteConfirm"
-                value={deleteConfirm}
-                onChange={(e) => setDeleteConfirm(e.target.value)}
-                placeholder={confirmWord}
-                className="h-12 rounded-xl font-mono tracking-wide"
-                autoComplete="off"
-              />
-            </div>
-            <Button
-              type="button"
-              className="w-full h-12 rounded-full bg-red-600 hover:bg-red-700 text-white"
-              disabled={!canDelete || deleting}
-              loading={deleting}
-              onClick={onDeleteAccount}
-            >
-              <Trash2 className="h-4 w-4" />
-              {t('deleteAccountBtn')}
-            </Button>
-          </div>
-        )}
+          <Button
+            type="button"
+            className="w-full h-12 rounded-full bg-red-600 hover:bg-red-700 text-white"
+            disabled={!canDelete || deleting}
+            loading={deleting}
+            onClick={onDeleteAccount}
+          >
+            <Trash2 className="h-4 w-4" />
+            {t('deleteAccountBtn')}
+          </Button>
+        </div>
       </div>
     )
   }
@@ -416,7 +419,7 @@ export default function AccountPage() {
           className="w-full flex items-center gap-4 bg-white rounded-2xl p-4 elevation-1 active:scale-[0.98] transition-transform text-left"
         >
           <div className="w-11 h-11 rounded-xl bg-primary-50 flex items-center justify-center">
-            <Lock className="h-5 w-5 text-primary-600" />
+            <User className="h-5 w-5 text-primary-600" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-charcoal-900">{t('changePassword')}</p>
@@ -455,23 +458,25 @@ export default function AccountPage() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => {
-            setDeleteConfirm('')
-            setSection('delete')
-          }}
-          className="w-full flex items-center gap-4 bg-white rounded-2xl p-4 elevation-1 active:scale-[0.98] transition-transform text-left"
-        >
-          <div className="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center">
-            <Trash2 className="h-5 w-5 text-red-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-red-600">{t('deleteAccount')}</p>
-            <p className="text-xs text-charcoal-500">{t('deleteAccountDesc')}</p>
-          </div>
-          <ChevronRight className="h-5 w-5 text-charcoal-300" />
-        </button>
+        {!isAdmin && (
+          <button
+            type="button"
+            onClick={() => {
+              setDeleteConfirm('')
+              setSection('delete')
+            }}
+            className="w-full flex items-center gap-4 bg-white rounded-2xl p-4 elevation-1 active:scale-[0.98] transition-transform text-left"
+          >
+            <div className="w-11 h-11 rounded-xl bg-red-50 flex items-center justify-center">
+              <Trash2 className="h-5 w-5 text-red-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-medium text-red-600">{t('deleteAccount')}</p>
+              <p className="text-xs text-charcoal-500">{t('deleteAccountDesc')}</p>
+            </div>
+            <ChevronRight className="h-5 w-5 text-charcoal-300" />
+          </button>
+        )}
       </div>
 
       <Button
