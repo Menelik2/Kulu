@@ -77,7 +77,6 @@ export async function adminAdjustStock(params: {
   quantityChange: number
   reason: string
   performedBy?: string | null
-  /** When true, quantityChange is absolute new stock (delta computed server-side). */
   setAbsolute?: boolean
 }) {
   const { productId, reason, performedBy = null, setAbsolute = false } = params
@@ -200,6 +199,12 @@ export async function adminUpdateOrderStatus(id: string, status: string) {
   return data as Order
 }
 
+/** Permanently delete an order (order_items cascade). Admin RLS required. */
+export async function adminDeleteOrder(id: string) {
+  const { error } = await supabase.from('orders').delete().eq('id', id)
+  if (error) throw error
+}
+
 export async function adminGetCustomers() {
   const { data, error } = await supabase.from('profiles').select('*').eq('role', 'customer').order('created_at', { ascending: false })
   if (error) throw error
@@ -290,7 +295,6 @@ export async function adminEnsureDefaultDeliveryConfigs() {
   return (data || []) as DeliveryConfig[]
 }
 
-/** Public storefront: active delivery configs (falls back to defaults if table empty). */
 export async function getDeliveryConfigs() {
   const { data, error } = await supabase
     .from('delivery_configs')
