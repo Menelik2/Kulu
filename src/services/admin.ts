@@ -80,52 +80,36 @@ export async function adminUpdateProduct(id: string, payload: Partial<{
   return data as Product
 }
 
-/**
- * Permanently delete a product and all related app data:
- * - product_images (DB + storage files)
- * - wishlist_items
- * - reviews
- * - inventory_transactions
- * - order_items.product_id set null (order history kept with name/sku snapshot)
- * - products row
- */
 export async function adminDeleteProduct(id: string) {
-  // 1) Images: DB rows + storage folder
   try {
     await deleteAllProductImages(id)
   } catch (e) {
     console.warn('Image cleanup before product delete:', e)
   }
 
-  // 2) Explicit related rows (works even if CASCADE misconfigured)
   const relatedDeletes = await Promise.all([
     supabase.from('wishlist_items').delete().eq('product_id', id),
     supabase.from('reviews').delete().eq('product_id', id),
     supabase.from('inventory_transactions').delete().eq('product_id', id),
     supabase.from('product_images').delete().eq('product_id', id),
-    // Detach from past orders (requires migration 008 — nullable product_id)
     supabase.from('order_items').update({ product_id: null }).eq('product_id', id),
   ])
 
   for (const r of relatedDeletes) {
     if (r.error) {
       const msg = r.error.message || ''
-      // Ignore "null into NOT NULL" until migration 008 is applied
       if (/null value|not-null|violates not-null/i.test(msg)) {
         throw new Error(
           'Cannot delete product that appears in past orders. Run migration 008_product_delete_cascade.sql in Supabase, then try again.'
         )
       }
       if (/foreign key|violates foreign key/i.test(msg)) {
-        throw new Error(
-          'Cannot delete product: still linked to other records. ' + msg
-        )
+        throw new Error('Cannot delete product: still linked to other records. ' + msg)
       }
       console.warn('Related cleanup warning:', msg)
     }
   }
 
-  // 3) Product row
   const { error } = await supabase.from('products').delete().eq('id', id)
   if (error) {
     const msg = error.message || ''
@@ -396,33 +380,56 @@ export function feeForRegion(configs: DeliveryConfig[], region: string, fallback
 }
 
 export async function adminGetDashboardStats() {
-  const [products, orders, customers, lowStock] = await Promise.all([
+  const [productsCount, productValues, orders, customers, lowStock] = await Promise.all([
     supabase.from('products').select('id', { count: 'exact', head: true }),
-    supabase.from('orders').select('id, total, status, created_at'),
+    supabase.from('products').select('price, discount_price, stock_quantity'),
+    supabase.from('orders').select('id, total, status, created_at, order_number'),
     supabase.from('profiles').select('id', { count: 'exact', head: true }).eq('role', 'customer'),
-    supabase.from('products').select('id, name, stock_quantity').lt('stock_quantity', 10).eq('is_active', true),
+    supabase
+      .from('products')
+      .select('id, name, stock_quantity')
+      .lt('stock_quantity', 10)
+      .eq('is_active', true),
   ])
+
+  // Total inventory value = sum( sell_price × stock ) for all products
+  const inventoryValue = (productValues.data || []).reduce((sum, p) => {
+    const price = Number(p.price) || 0
+    const disc = p.discount_price != null ? Number(p.discount_price) : null
+    const unit =
+      disc != null && !Number.isNaN(disc) && disc > 0 && disc < price ? disc : price
+    const stock = Number(p.stock_quantity) || 0
+    return sum + unit * stock
+  }, 0)
+
   const allOrders = orders.data || []
   const totalSales = allOrders.reduce((s, o) => s + Number(o.total || 0), 0)
   const today = new Date().toISOString().slice(0, 10)
-  const todaySales = allOrders.filter((o) => o.created_at?.startsWith(today)).reduce((s, o) => s + Number(o.total || 0), 0)
+  const todaySales = allOrders
+    .filter((o) => o.created_at?.startsWith(today))
+    .reduce((s, o) => s + Number(o.total || 0), 0)
   const pending = allOrders.filter((o) => o.status === 'pending').length
   const delivered = allOrders.filter((o) => o.status === 'delivered').length
   const salesByDay: Record<string, number> = {}
   for (let i = 13; i >= 0; i--) {
-    const d = new Date(); d.setDate(d.getDate() - i)
+    const d = new Date()
+    d.setDate(d.getDate() - i)
     salesByDay[d.toISOString().slice(0, 10)] = 0
   }
   allOrders.forEach((o) => {
     const day = o.created_at?.slice(0, 10)
     if (day && day in salesByDay) salesByDay[day] += Number(o.total || 0)
   })
+
   return {
-    totalProducts: products.count || 0,
+    totalProducts: productsCount.count || 0,
+    inventoryValue,
     totalOrders: allOrders.length,
     totalCustomers: customers.count || 0,
-    totalSales, todaySales,
-    pendingOrders: pending, deliveredOrders: delivered,
+    totalSales,
+    todaySales,
+    pendingOrders: pending,
+    deliveredOrders: delivered,
     lowStock: lowStock.data || [],
     salesByDay: Object.entries(salesByDay).map(([date, total]) => ({ date, total })),
     recentOrders: allOrders.slice(0, 5) as Order[],
@@ -430,13 +437,21 @@ export async function adminGetDashboardStats() {
 }
 
 export async function getMyOrders(userId: string) {
-  const { data, error } = await supabase.from('orders').select('*, items:order_items(*)').eq('user_id', userId).order('created_at', { ascending: false })
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, items:order_items(*)')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
   if (error) throw error
   return (data || []) as Order[]
 }
 
 export async function getMyOrder(orderId: string) {
-  const { data, error } = await supabase.from('orders').select('*, items:order_items(*)').eq('id', orderId).single()
+  const { data, error } = await supabase
+    .from('orders')
+    .select('*, items:order_items(*)')
+    .eq('id', orderId)
+    .single()
   if (error) throw error
   return data as Order
 }
