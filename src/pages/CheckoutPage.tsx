@@ -70,8 +70,8 @@ export default function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-7xl mx-auto container-padding py-16 text-center">
-        <p className="text-charcoal-500">{t('cartEmpty')}</p>
+      <div className="max-w-7xl mx-auto container-padding py-16 md:py-24 text-center">
+        <p className="text-charcoal-500 text-lg">{t('cartEmpty')}</p>
         <Link to="/shop">
           <Button className="mt-4 rounded-full">{t('goShopping')}</Button>
         </Link>
@@ -91,7 +91,6 @@ export default function CheckoutPage() {
       return
     }
 
-    // Drop cart lines without a product snapshot (corrupt localStorage)
     const validItems = items.filter((i) => i.product_id && i.quantity > 0)
     if (!validItems.length) {
       toast.error(t('orderFailed'))
@@ -143,14 +142,16 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8 pb-28 md:pb-8">
-      <h1 className="text-xl sm:text-3xl font-bold text-charcoal-900 mb-6 sm:mb-8">{t('checkout')}</h1>
+    <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8 md:py-10 pb-28 md:pb-12">
+      <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-charcoal-900 mb-6 sm:mb-8 md:mb-10 tracking-tight">
+        {t('checkout')}
+      </h1>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid lg:grid-cols-3 gap-6 lg:gap-8">
-        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-          <section className="bg-white rounded-2xl border border-charcoal-100 p-5 sm:p-6 elevation-1">
-            <h2 className="font-semibold text-base sm:text-lg mb-4">{t('customerInfo')}</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="grid lg:grid-cols-3 gap-6 lg:gap-10">
+        <div className="lg:col-span-2 space-y-4 sm:space-y-5 md:space-y-6">
+          <section className="bg-white rounded-2xl md:rounded-3xl border border-charcoal-100 p-5 sm:p-6 md:p-7 elevation-1 shadow-sm">
+            <h2 className="font-semibold text-base sm:text-lg md:text-xl mb-4 md:mb-5">{t('customerInfo')}</h2>
+            <div className="grid sm:grid-cols-2 gap-4 md:gap-5">
               <div className="space-y-2 sm:col-span-2">
                 <Label htmlFor="fullName">{t('fullName')} *</Label>
                 <Input id="fullName" className="h-12 rounded-xl" {...register('fullName')} />
@@ -169,9 +170,9 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-2xl border border-charcoal-100 p-5 sm:p-6 elevation-1">
-            <h2 className="font-semibold text-base sm:text-lg mb-4">{t('deliveryAddress')}</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
+          <section className="bg-white rounded-2xl md:rounded-3xl border border-charcoal-100 p-5 sm:p-6 md:p-7 elevation-1 shadow-sm">
+            <h2 className="font-semibold text-base sm:text-lg md:text-xl mb-4 md:mb-5">{t('deliveryAddress')}</h2>
+            <div className="grid sm:grid-cols-2 gap-4 md:gap-5">
               <div className="space-y-2">
                 <Label htmlFor="region">{t('region')} *</Label>
                 <select
@@ -213,9 +214,9 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          <section className="bg-white rounded-2xl border border-charcoal-100 p-5 sm:p-6 elevation-1">
-            <h2 className="font-semibold text-base sm:text-lg mb-4">{t('paymentMethod')}</h2>
-            <div className="flex items-center gap-3 p-4 border-2 border-primary-600 rounded-2xl bg-primary-50">
+          <section className="bg-white rounded-2xl md:rounded-3xl border border-charcoal-100 p-5 sm:p-6 md:p-7 elevation-1 shadow-sm">
+            <h2 className="font-semibold text-base sm:text-lg md:text-xl mb-4 md:mb-5">{t('paymentMethod')}</h2>
+            <div className="flex items-center gap-3 p-4 md:p-5 border-2 border-primary-600 rounded-2xl bg-primary-50">
               <div className="w-5 h-5 rounded-full border-2 border-primary-600 flex items-center justify-center shrink-0">
                 <div className="w-2.5 h-2.5 rounded-full bg-primary-600" />
               </div>
@@ -228,37 +229,48 @@ export default function CheckoutPage() {
         </div>
 
         <div className="hidden lg:block lg:col-span-1">
-          <div className="bg-white rounded-2xl border border-charcoal-100 p-6 sticky top-24 elevation-1">
-            <h2 className="font-semibold text-lg mb-4">{t('orderSummary')}</h2>
-            <ul className="space-y-3 mb-4 max-h-48 overflow-y-auto">
+          <div className="bg-white rounded-2xl md:rounded-3xl border border-charcoal-100 p-6 md:p-7 sticky top-28 elevation-1 shadow-sm">
+            <h2 className="font-semibold text-lg md:text-xl mb-5">{t('orderSummary')}</h2>
+            <ul className="space-y-3 mb-5 max-h-52 overflow-y-auto scrollbar-hide">
               {items.map((item) => {
                 if (!item.product) return null
                 const price = getEffectivePrice(item.product.price, item.product.discount_price)
+                const img = item.product.images?.find((i) => i.is_primary) || item.product.images?.[0]
                 return (
-                  <li key={item.product_id} className="flex justify-between text-sm">
-                    <span className="text-charcoal-600 truncate mr-2">
-                      {item.product.name} × {item.quantity}
-                    </span>
-                    <span className="font-medium shrink-0">{formatETB(price * item.quantity)}</span>
+                  <li key={item.product_id} className="flex gap-3 items-start">
+                    <div className="w-12 h-12 rounded-lg bg-charcoal-50 overflow-hidden shrink-0">
+                      {img ? (
+                        <img src={img.url} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-xs font-bold text-charcoal-300">
+                          {item.product.name.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-charcoal-800 line-clamp-2 leading-snug">{item.product.name}</p>
+                      <p className="text-xs text-charcoal-500 mt-0.5">× {item.quantity}</p>
+                    </div>
+                    <span className="font-medium text-sm shrink-0">{formatETB(price * item.quantity)}</span>
                   </li>
                 )
               })}
             </ul>
-            <div className="border-t border-charcoal-100 pt-4 space-y-2 text-sm">
+            <div className="border-t border-charcoal-100 pt-4 space-y-2.5 text-sm md:text-[15px]">
               <div className="flex justify-between">
                 <span className="text-charcoal-500">{t('subtotal')}</span>
-                <span>{formatETB(subtotal)}</span>
+                <span className="font-medium">{formatETB(subtotal)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-charcoal-500">{t('delivery')} ({region})</span>
-                <span>{formatETB(fee)}</span>
+                <span className="font-medium">{formatETB(fee)}</span>
               </div>
-              <div className="flex justify-between font-bold text-base pt-2 border-t border-charcoal-100">
+              <div className="flex justify-between font-bold text-base md:text-lg pt-3 border-t border-charcoal-100 items-baseline">
                 <span>{t('total')}</span>
-                <span className="text-primary-600">{formatETB(total)}</span>
+                <span className="text-primary-600 text-xl">{formatETB(total)}</span>
               </div>
             </div>
-            <Button type="submit" className="w-full mt-6 rounded-full" size="lg" loading={loading}>
+            <Button type="submit" className="w-full mt-6 rounded-full h-12 font-semibold shadow-md hover:shadow-lg transition-shadow" size="lg" loading={loading}>
               {t('placeOrder')}
             </Button>
           </div>
