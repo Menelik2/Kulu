@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/features/language/LanguageContext'
 import { getCategoryIcon } from '@/lib/categoryIcons'
 import { cn } from '@/lib/utils'
-import type { Category } from '@/types'
+import type { Category } from '@/types/database'
 
 function ProductGridSkeleton({ count = 8 }: { count?: number }) {
   return (
@@ -81,7 +81,6 @@ function CategoryStrip({ categories }: { categories: Category[] }) {
     el.scrollBy({ left: dir * amount, behavior: 'smooth' })
   }
 
-  // Desktop: shift vertical wheel to horizontal when hovering the strip
   useEffect(() => {
     const el = scrollerRef.current
     if (!el) return
@@ -97,7 +96,6 @@ function CategoryStrip({ categories }: { categories: Category[] }) {
 
   return (
     <div className="relative group/strip">
-      {/* Desktop arrow controls */}
       <button
         type="button"
         aria-label="Scroll left"
@@ -178,7 +176,6 @@ export default function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
       <section className="relative bg-gradient-to-br from-primary-800 via-primary-700 to-primary-600 text-white overflow-hidden">
         <div className="absolute inset-0 opacity-15 pointer-events-none">
           <div className="absolute top-8 left-4 w-32 h-32 sm:w-72 sm:h-72 bg-gold-400 rounded-full blur-3xl" />
@@ -283,7 +280,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories */}
       <section className="max-w-7xl mx-auto container-padding py-5 sm:py-10 md:py-12">
         <div className="flex items-center justify-between mb-3 sm:mb-5 md:mb-6">
           <h2 className="text-base sm:text-2xl md:text-3xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
@@ -301,7 +297,6 @@ export default function HomePage() {
         ) : null}
       </section>
 
-      {/* Featured */}
       <section className="max-w-7xl mx-auto container-padding py-6 sm:py-10 md:py-14">
         <div className="flex items-center justify-between mb-3 sm:mb-6 md:mb-8">
           <div>
@@ -326,7 +321,6 @@ export default function HomePage() {
         ) : null}
       </section>
 
-      {/* New arrivals */}
       <section className="bg-white py-6 sm:py-10 md:py-14">
         <div className="max-w-7xl mx-auto container-padding">
           <div className="flex items-center justify-between mb-3 sm:mb-6 md:mb-8">
@@ -350,7 +344,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="max-w-7xl mx-auto container-padding py-8 sm:py-12 md:py-16">
         <div className="relative bg-gradient-to-r from-primary-700 via-primary-600 to-primary-700 rounded-2xl sm:rounded-3xl p-5 sm:p-10 md:p-14 text-center text-white overflow-hidden">
           <div className="absolute inset-0 opacity-20 pointer-events-none">
