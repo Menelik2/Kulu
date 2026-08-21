@@ -14,7 +14,6 @@ async function selectProducts(orderCreatedDesc: boolean) {
   const { data, error } = await q
   if (!error) return (data || []) as Product[]
 
-  // suppliers table / embed may be missing until migration runs
   console.warn('products+supplier select failed, falling back:', error.message)
   let q2 = supabase.from('products').select(PRODUCT_SELECT_BASIC)
   if (orderCreatedDesc) q2 = q2.order('created_at', { ascending: false })
@@ -81,15 +80,21 @@ export async function adminUpdateProduct(id: string, payload: Partial<{
   return data as Product
 }
 
+/** Delete product + all product_images rows + storage files */
 export async function adminDeleteProduct(id: string) {
+  // Prefer explicit image cleanup (DB rows + storage folder) before product row
   try {
     await deleteAllProductImages(id)
   } catch (e) {
     console.warn('Image cleanup before product delete:', e)
+    // Product delete still cascades product_images rows in DB
   }
 
   const { error } = await supabase.from('products').delete().eq('id', id)
   if (error) throw error
+
+  // Safety: remove any leftover image rows (should be 0 after CASCADE)
+  await supabase.from('product_images').delete().eq('product_id', id)
 }
 
 export async function adminAdjustStock(params: {
@@ -216,7 +221,6 @@ export async function adminUpdateOrderStatus(id: string, status: string) {
     cancelled: 'cancelled',
   }
   const label = statusLabels[status]
-  // Skip notification when order has no linked user (deleted accounts → user_id null)
   if (label && data?.user_id) {
     const { error: nErr } = await supabase.from('notifications').insert({
       user_id: data.user_id,
