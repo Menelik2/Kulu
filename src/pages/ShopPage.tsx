@@ -123,82 +123,89 @@ export default function ShopPage() {
   )
 
   return (
-    <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
+    <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8 md:py-10">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-6 sm:mb-8 md:mb-10">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-charcoal-900">{t('shop')}</h1>
-          <p className="text-charcoal-500 mt-0.5 text-sm">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-charcoal-900 tracking-tight">{t('shop')}</h1>
+          <p className="text-charcoal-500 mt-1 text-sm md:text-base">
             {data
               ? `${data.total} ${data.total === 1 ? t('product') : t('products')}`
               : t('loading')}
           </p>
         </div>
         <form onSubmit={handleSearch} className="flex gap-2 w-full sm:w-auto">
-          <div className="relative flex-1 sm:w-72">
+          <div className="relative flex-1 sm:w-72 md:w-80">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal-400" />
             <Input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={t('searchPlaceholder')}
-              className="pl-10 rounded-full h-11"
+              className="pl-10 rounded-full h-11 md:h-12 bg-white shadow-sm"
             />
           </div>
-          <Button type="submit" className="rounded-full h-11 px-5">
+          <Button type="submit" className="rounded-full h-11 md:h-12 px-5 md:px-6 font-semibold">
             {t('search')}
           </Button>
         </form>
       </div>
 
-      <div className="flex gap-8">
-        <aside className="hidden lg:block w-56 shrink-0 space-y-6">
-          <div>
-            <h3 className="font-semibold text-sm text-charcoal-900 mb-3">{t('categories')}</h3>
-            <ul className="space-y-1">
-              <li>
-                <button
-                  onClick={() => updateParam('category', '')}
-                  className={cn(
-                    'w-full text-left px-3 py-2 rounded-xl text-sm',
-                    !category ? 'bg-primary-50 text-primary-700 font-medium' : 'hover:bg-charcoal-50'
-                  )}
-                >
-                  {t('all')}
-                </button>
-              </li>
-              {categories?.map((c) => (
-                <li key={c.id}>
+      <div className="flex gap-8 lg:gap-10">
+        {/* Desktop sticky sidebar */}
+        <aside className="hidden lg:block w-60 xl:w-64 shrink-0">
+          <div className="sticky top-28 space-y-7">
+            <div className="bg-white rounded-2xl border border-charcoal-100 p-5 shadow-sm">
+              <h3 className="font-semibold text-sm text-charcoal-900 mb-3">{t('categories')}</h3>
+              <ul className="space-y-0.5 max-h-[320px] overflow-y-auto scrollbar-hide">
+                <li>
                   <button
-                    onClick={() => updateParam('category', c.id)}
+                    onClick={() => updateParam('category', '')}
                     className={cn(
-                      'w-full text-left px-3 py-2 rounded-xl text-sm',
-                      category === c.id ? 'bg-primary-50 text-primary-700 font-medium' : 'hover:bg-charcoal-50'
+                      'w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors',
+                      !category ? 'bg-primary-50 text-primary-700 font-semibold' : 'hover:bg-charcoal-50 text-charcoal-700'
                     )}
                   >
-                    {c.name}
+                    {t('all')}
                   </button>
                 </li>
-              ))}
-            </ul>
-          </div>
+                {categories?.map((c) => (
+                  <li key={c.id}>
+                    <button
+                      onClick={() => updateParam('category', c.id)}
+                      className={cn(
+                        'w-full text-left px-3 py-2.5 rounded-xl text-sm transition-colors',
+                        category === c.id
+                          ? 'bg-primary-50 text-primary-700 font-semibold'
+                          : 'hover:bg-charcoal-50 text-charcoal-700'
+                      )}
+                    >
+                      {c.name}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <PriceFields />
+            <div className="bg-white rounded-2xl border border-charcoal-100 p-5 shadow-sm space-y-5">
+              <PriceFields />
 
-          <div>
-            <h3 className="font-semibold text-sm text-charcoal-900 mb-3">{t('availability')}</h3>
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                type="checkbox"
-                checked={inStock}
-                onChange={(e) => updateParam('inStock', e.target.checked ? '1' : '')}
-                className="rounded border-charcoal-300 text-primary-600 focus:ring-primary-600"
-              />
-              {t('inStockOnly')}
-            </label>
+              <div>
+                <h3 className="font-semibold text-sm text-charcoal-900 mb-3">{t('availability')}</h3>
+                <label className="flex items-center gap-2.5 text-sm cursor-pointer hover:text-primary-700 transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={inStock}
+                    onChange={(e) => updateParam('inStock', e.target.checked ? '1' : '')}
+                    className="rounded border-charcoal-300 text-primary-600 focus:ring-primary-600 h-4 w-4"
+                  />
+                  {t('inStockOnly')}
+                </label>
+              </div>
+            </div>
           </div>
         </aside>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-3 mb-5">
+          <div className="flex items-center justify-between gap-3 mb-5 md:mb-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-charcoal-100 px-3 py-2.5 md:px-4 md:py-3 shadow-sm">
             <Button
               variant="outline"
               size="sm"
@@ -212,10 +219,13 @@ export default function ShopPage() {
                 </span>
               )}
             </Button>
+            <p className="hidden lg:block text-sm text-charcoal-500">
+              {data ? `${data.total} ${t('products')}` : ''}
+            </p>
             <select
               value={sort}
               onChange={(e) => updateParam('sort', e.target.value)}
-              className="h-9 rounded-full border border-charcoal-200 bg-white px-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary-600"
+              className="h-9 md:h-10 rounded-full border border-charcoal-200 bg-white px-3 md:px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary-600 font-medium"
             >
               {SORT_OPTIONS.map((o) => (
                 <option key={o.value} value={o.value}>
@@ -226,7 +236,7 @@ export default function ShopPage() {
           </div>
 
           {isLoading && !data && (
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5">
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6">
               {Array.from({ length: 8 }).map((_, i) => (
                 <div key={i} className="bg-white rounded-2xl border border-charcoal-100 overflow-hidden animate-pulse">
                   <div className="aspect-square bg-charcoal-100" />
@@ -246,8 +256,8 @@ export default function ShopPage() {
           )}
 
           {data && data.products.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-charcoal-500 text-lg">{t('noProducts')}</p>
+            <div className="text-center py-16 md:py-24">
+              <p className="text-charcoal-500 text-lg md:text-xl">{t('noProducts')}</p>
               <Button variant="outline" className="mt-4 rounded-full" onClick={() => setSearchParams({})}>
                 {t('clearFilters')}
               </Button>
@@ -256,29 +266,34 @@ export default function ShopPage() {
 
           {data && data.products.length > 0 && (
             <>
-              <div className={cn('grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5', isFetching && 'opacity-70 transition-opacity')}>
+              <div
+                className={cn(
+                  'grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5 md:gap-6',
+                  isFetching && 'opacity-70 transition-opacity'
+                )}
+              >
                 {data.products.map((p) => (
                   <ProductCard key={p.id} product={p} />
                 ))}
               </div>
               {data.totalPages > 1 && (
-                <div className="flex justify-center gap-2 mt-8 sm:mt-10">
+                <div className="flex justify-center gap-2 mt-8 sm:mt-10 md:mt-12">
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full"
+                    className="rounded-full md:h-10 md:px-5"
                     disabled={page <= 1}
                     onClick={() => updateParam('page', String(page - 1))}
                   >
                     {t('previous')}
                   </Button>
-                  <span className="flex items-center px-3 text-sm text-charcoal-600">
+                  <span className="flex items-center px-3 text-sm text-charcoal-600 font-medium">
                     {t('pageOf', { page, total: data.totalPages })}
                   </span>
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-full"
+                    className="rounded-full md:h-10 md:px-5"
                     disabled={page >= data.totalPages}
                     onClick={() => updateParam('page', String(page + 1))}
                   >
