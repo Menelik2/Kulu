@@ -419,7 +419,7 @@ export default function AccountPage() {
           className="w-full flex items-center gap-4 bg-white rounded-2xl p-4 elevation-1 active:scale-[0.98] transition-transform text-left"
         >
           <div className="w-11 h-11 rounded-xl bg-primary-50 flex items-center justify-center">
-            <User className="h-5 w-5 text-primary-600" />
+            <Lock className="h-5 w-5 text-primary-600" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-medium text-charcoal-900">{t('changePassword')}</p>
