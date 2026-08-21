@@ -155,7 +155,8 @@ function StockAdjustRow({
           />
           <Button
             type="button"
-            size="sm"\zeta className="h-9 sm:h-8 text-xs"
+            size="sm"
+            className="h-9 sm:h-8 text-xs"
             disabled={adjust.isPending}
             onClick={() => {
               const abs = Math.max(0, Math.floor(Number(value) || 0))
@@ -318,7 +319,6 @@ export default function AdminInventory() {
         <div className="animate-pulse h-48 bg-charcoal-100 rounded-xl" />
       ) : (
         <>
-          {/* Mobile cards */}
           <div className="md:hidden space-y-2">
             {filtered.map((p) => (
               <div
@@ -360,7 +360,6 @@ export default function AdminInventory() {
             )}
           </div>
 
-          {/* Desktop table */}
           <div className="hidden md:block bg-white rounded-xl border border-charcoal-100 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm min-w-[720px]">
