@@ -13,6 +13,7 @@ import {
   Shield,
   Headphones,
   MapPin,
+  ChevronDown,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -68,94 +69,183 @@ export function StoreLayout() {
     { icon: MapPin, title: t('cashOnDelivery'), desc: t('payWhenReceive') },
   ]
 
+  const DesktopHeader = () => (
+    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top hidden md:block">
+      {/* Top utility strip */}
+      <div className="bg-charcoal-900 text-charcoal-300 text-xs">
+        <div className="max-w-7xl mx-auto container-padding h-8 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1.5">
+              <Truck className="h-3.5 w-3.5 text-primary-400" />
+              {t('nationwideDelivery')}
+            </span>
+            <span className="hidden lg:flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5 text-gold-400" />
+              {t('cashOnDelivery')}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <Link to="/about" className="hover:text-white transition-colors">{t('about')}</Link>
+            <Link to="/contact" className="hover:text-white transition-colors">{t('contact')}</Link>
+            <button
+              type="button"
+              onClick={() => setLocale(locale === 'am' ? 'en' : 'am')}
+              className="flex items-center gap-1 hover:text-white transition-colors"
+            >
+              <Languages className="h-3.5 w-3.5" />
+              {locale === 'am' ? 'EN' : 'አማ'}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main bar */}
+      <div className="max-w-7xl mx-auto container-padding">
+        <div className="flex items-center justify-between h-16 lg:h-[4.25rem] gap-4">
+          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
+            <img
+              src={KULU_LOGO_SRC}
+              alt="KULU"
+              className="w-11 h-11 object-contain transition-transform group-hover:scale-105"
+            />
+            <div className="leading-tight">
+              <span className="font-bold text-xl lg:text-2xl text-[#1e3a8a] tracking-tight block">KULU</span>
+              <span className="text-[10px] text-charcoal-400 font-medium tracking-wide hidden lg:block">
+                {t('tagline')?.slice(0, 28) || 'Ethiopian Marketplace'}
+              </span>
+            </div>
+          </Link>
+
+          <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-2 lg:mx-6">
+            <div className="relative w-full group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4.5 w-4.5 text-charcoal-400 group-focus-within:text-primary-600 transition-colors" />
+              <Input
+                type="search"
+                placeholder={t('searchPlaceholder')}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-11 pr-28 h-11 lg:h-12 rounded-full border-charcoal-200 bg-charcoal-50/80 focus-visible:bg-white focus-visible:ring-primary-500/30 focus-visible:border-primary-400 text-[15px] shadow-sm"
+              />
+              <Button
+                type="submit"
+                size="sm"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 h-8 lg:h-9 rounded-full px-5 text-sm font-semibold"
+              >
+                {t('search')}
+              </Button>
+            </div>
+          </form>
+
+          <nav className="flex items-center gap-0.5 lg:gap-1 shrink-0">
+            <Link to="/shop">
+              <Button
+                variant="ghost"
+                size="sm"
+                className={cn(
+                  'gap-1.5 font-medium',
+                  isActive('/shop') && 'text-primary-600 bg-primary-50'
+                )}
+              >
+                <Store className="h-4 w-4" />
+                <span className="hidden lg:inline">{t('shop')}</span>
+              </Button>
+            </Link>
+            <Link to="/wishlist">
+              <Button variant="ghost" size="icon" className="relative h-10 w-10">
+                <Heart className="h-5 w-5" />
+              </Button>
+            </Link>
+            <NotificationBell />
+            <Link to="/cart">
+              <Button variant="ghost" size="icon" className="relative h-10 w-10">
+                <ShoppingCart className="h-5 w-5" />
+                {itemCount > 0 && (
+                  <span className="absolute -top-0.5 -right-0.5 min-w-[1.25rem] h-5 px-1 rounded-full bg-primary-600 text-white text-[11px] flex items-center justify-center font-bold shadow-sm">
+                    {itemCount > 99 ? '99+' : itemCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+
+            <div className="w-px h-6 bg-charcoal-200 mx-1 lg:mx-2" />
+
+            {user ? (
+              <div className="relative group">
+                <Button variant="ghost" size="sm" className="gap-2 h-10 pl-2 pr-3">
+                  <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-semibold text-sm">
+                    {(profile?.full_name || user.email || 'U').charAt(0).toUpperCase()}
+                  </div>
+                  <span className="max-w-[110px] truncate text-sm font-medium hidden xl:inline">
+                    {profile?.full_name || t('account')}
+                  </span>
+                  <ChevronDown className="h-3.5 w-3.5 text-charcoal-400" />
+                </Button>
+                <div className="absolute right-0 top-full mt-1.5 w-56 bg-white rounded-2xl shadow-xl border border-charcoal-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-2 z-50 elevation-3">
+                  <div className="px-4 py-2 border-b border-charcoal-100 mb-1">
+                    <p className="text-sm font-semibold text-charcoal-900 truncate">
+                      {profile?.full_name || t('account')}
+                    </p>
+                    <p className="text-xs text-charcoal-500 truncate">{user.email}</p>
+                  </div>
+                  <Link to="/account" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1">
+                    {t('myAccount')}
+                  </Link>
+                  <Link to="/orders" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1">
+                    {t('myOrders')}
+                  </Link>
+                  <Link to="/notifications" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1">
+                    {t('notifications')}
+                  </Link>
+                  <Link to="/wishlist" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 rounded-lg mx-1">
+                    {t('wishlist')}
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className="block px-4 py-2.5 text-sm hover:bg-primary-50 text-primary-700 font-medium rounded-lg mx-1"
+                    >
+                      {t('adminDashboard')}
+                    </Link>
+                  )}
+                  <div className="border-t border-charcoal-100 mt-1 pt-1">
+                    <button
+                      onClick={() => signOut()}
+                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-red-50 text-red-600 rounded-lg mx-1"
+                    >
+                      {t('signOut')}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <Link to="/login">
+                <Button size="sm" className="rounded-full h-10 px-5 font-semibold shadow-sm">
+                  {t('signIn')}
+                </Button>
+              </Link>
+            )}
+          </nav>
+        </div>
+      </div>
+    </header>
+  )
+
   return (
     <div className="min-h-screen flex flex-col bg-charcoal-50">
+      {/* Desktop header — always present */}
+      <DesktopHeader />
+
+      {/* Mobile header — home only (existing app-like pattern) */}
       {isHome && (
-        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top">
+        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top md:hidden">
           <div className="max-w-7xl mx-auto container-padding">
-            <div className="flex items-center justify-between h-14 md:h-16 gap-3">
+            <div className="flex items-center justify-between h-14 gap-3">
               <Link to="/" className="flex items-center gap-2 shrink-0">
                 <img src={KULU_LOGO_SRC} alt="KULU" className="w-10 h-10 object-contain" />
-                <div className="hidden sm:block">
-                  <span className="font-bold text-xl text-[#1e3a8a] tracking-tight">KULU</span>
-                </div>
+                <span className="font-bold text-xl text-[#1e3a8a] tracking-tight sm:inline hidden">KULU</span>
               </Link>
 
-              <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-xl mx-4">
-                <div className="relative w-full">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal-400" />
-                  <Input
-                    type="search"
-                    placeholder={t('searchPlaceholder')}
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 rounded-full"
-                  />
-                </div>
-              </form>
-
-              <nav className="hidden md:flex items-center gap-1">
-                <Link to="/shop">
-                  <Button variant="ghost" size="sm">{t('shop')}</Button>
-                </Link>
-                <Link to="/wishlist">
-                  <Button variant="ghost" size="icon">
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                </Link>
-                <NotificationBell />
-                <Link to="/cart">
-                  <Button variant="ghost" size="icon" className="relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary-600 text-white text-xs flex items-center justify-center font-medium">
-                        {itemCount > 99 ? '99+' : itemCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-1.5"
-                  onClick={() => setLocale(locale === 'am' ? 'en' : 'am')}
-                  title={t('language')}
-                >
-                  <Languages className="h-4 w-4" />
-                  <span className="text-xs font-medium">{locale === 'am' ? 'EN' : 'አማ'}</span>
-                </Button>
-                {user ? (
-                  <div className="relative group">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <User className="h-4 w-4" />
-                      <span className="max-w-[100px] truncate">{profile?.full_name || t('account')}</span>
-                    </Button>
-                    <div className="absolute right-0 top-full mt-1 w-52 bg-white rounded-xl shadow-lg border border-charcoal-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all py-1.5 z-50">
-                      <Link to="/account" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50">{t('myAccount')}</Link>
-                      <Link to="/orders" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50">{t('myOrders')}</Link>
-                      <Link to="/notifications" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50">{t('notifications')}</Link>
-                      <Link to="/wishlist" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50">{t('wishlist')}</Link>
-                      {isAdmin && (
-                        <Link to="/admin" className="block px-4 py-2.5 text-sm hover:bg-charcoal-50 text-primary-600 font-medium">
-                          {t('adminDashboard')}
-                        </Link>
-                      )}
-                      <button
-                        onClick={() => signOut()}
-                        className="w-full text-left px-4 py-2.5 text-sm hover:bg-charcoal-50 text-red-600"
-                      >
-                        {t('signOut')}
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <Link to="/login">
-                    <Button size="sm">{t('signIn')}</Button>
-                  </Link>
-                )}
-              </nav>
-
-              <div className="flex items-center gap-1 md:hidden">
+              <div className="flex items-center gap-1">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -175,7 +265,7 @@ export function StoreLayout() {
               </div>
             </div>
 
-            <form onSubmit={handleSearch} className="md:hidden pb-3">
+            <form onSubmit={handleSearch} className="pb-3">
               <div className="relative">
                 <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-charcoal-400" />
                 <Input
@@ -190,7 +280,7 @@ export function StoreLayout() {
           </div>
 
           {mobileMenuOpen && (
-            <div className="md:hidden border-t border-charcoal-100 bg-white">
+            <div className="border-t border-charcoal-100 bg-white">
               <nav className="flex flex-col p-3 gap-0.5">
                 <Link to="/" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('home')}</Link>
                 <Link to="/shop" className="px-4 py-3 rounded-xl hover:bg-charcoal-50 text-[15px]">{t('shop')}</Link>
@@ -222,77 +312,22 @@ export function StoreLayout() {
         </header>
       )}
 
-      {!isHome && (
-        <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top hidden md:block">
-          <div className="max-w-7xl mx-auto container-padding">
-            <div className="flex items-center justify-between h-14 md:h-16 gap-3">
-              <Link to="/" className="flex items-center gap-2 shrink-0">
-                <img src={KULU_LOGO_SRC} alt="KULU" className="w-10 h-10 object-contain" />
-                <span className="font-bold text-xl text-[#1e3a8a] tracking-tight">KULU</span>
-              </Link>
-              <nav className="flex items-center gap-1">
-                <Link to="/shop">
-                  <Button variant="ghost" size="sm">{t('shop')}</Button>
-                </Link>
-                <Link to="/wishlist">
-                  <Button variant="ghost" size="icon">
-                    <Heart className="h-5 w-5" />
-                  </Button>
-                </Link>
-                <NotificationBell />
-                <Link to="/cart">
-                  <Button variant="ghost" size="icon" className="relative">
-                    <ShoppingCart className="h-5 w-5" />
-                    {itemCount > 0 && (
-                      <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary-600 text-white text-xs flex items-center justify-center font-medium">
-                        {itemCount > 99 ? '99+' : itemCount}
-                      </span>
-                    )}
-                  </Button>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="gap-1.5"
-                  onClick={() => setLocale(locale === 'am' ? 'en' : 'am')}
-                >
-                  <Languages className="h-4 w-4" />
-                  <span className="text-xs font-medium">{locale === 'am' ? 'EN' : 'አማ'}</span>
-                </Button>
-                {user ? (
-                  <Link to="/account">
-                    <Button variant="ghost" size="sm" className="gap-2">
-                      <User className="h-4 w-4" />
-                      <span className="max-w-[100px] truncate">{profile?.full_name || t('account')}</span>
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link to="/login">
-                    <Button size="sm">{t('signIn')}</Button>
-                  </Link>
-                )}
-              </nav>
-            </div>
-          </div>
-        </header>
-      )}
-
       <main className="flex-1 pb-safe">
         <Outlet />
       </main>
 
       <footer className="bg-charcoal-900 text-charcoal-300 mt-auto pb-20 md:pb-0">
         <div className="border-b border-charcoal-700">
-          <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="max-w-7xl mx-auto container-padding py-6 sm:py-8 md:py-10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
               {trustBadges.map((item) => (
-                <div key={item.title} className="flex items-start gap-2.5 sm:gap-3">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-charcoal-800 flex items-center justify-center shrink-0">
-                    <item.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary-400" />
+                <div key={item.title} className="flex items-start gap-2.5 sm:gap-3 md:gap-4">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-charcoal-800 flex items-center justify-center shrink-0">
+                    <item.icon className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-primary-400" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="font-semibold text-xs sm:text-sm text-white leading-snug">{item.title}</h3>
-                    <p className="text-[11px] sm:text-xs text-charcoal-400 mt-0.5 leading-snug">{item.desc}</p>
+                    <h3 className="font-semibold text-xs sm:text-sm md:text-base text-white leading-snug">{item.title}</h3>
+                    <p className="text-[11px] sm:text-xs md:text-sm text-charcoal-400 mt-0.5 leading-snug">{item.desc}</p>
                   </div>
                 </div>
               ))}
@@ -300,71 +335,49 @@ export function StoreLayout() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto container-padding py-8 sm:py-12">
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
+        <div className="max-w-7xl mx-auto container-padding py-8 sm:py-12 md:py-14">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
             <div className="col-span-2 sm:col-span-2 md:col-span-1">
               <div className="flex items-center gap-2 mb-3 sm:mb-4">
-                <img src={KULU_LOGO_SRC} alt="KULU" className="w-9 h-9 object-contain brightness-0 invert" />
-                <span className="font-bold text-xl text-white">KULU</span>
+                <img src={KULU_LOGO_SRC} alt="KULU" className="w-9 h-9 md:w-11 md:h-11 object-contain brightness-0 invert" />
+                <span className="font-bold text-xl md:text-2xl text-white">KULU</span>
               </div>
-              <p className="text-sm leading-relaxed">{t('tagline')}</p>
+              <p className="text-sm md:text-[15px] leading-relaxed">{t('tagline')}</p>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('shop')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link to="/shop" className="hover:text-white">{t('allProducts')}</Link>
-                </li>
-                <li>
-                  <Link to="/shop?sort=newest" className="hover:text-white">{t('newArrivals')}</Link>
-                </li>
-                <li>
-                  <Link to="/shop?sort=popular" className="hover:text-white">{t('bestSellers')}</Link>
-                </li>
+              <ul className="space-y-2 text-sm md:text-[15px]">
+                <li><Link to="/shop" className="hover:text-white transition-colors">{t('allProducts')}</Link></li>
+                <li><Link to="/shop?sort=newest" className="hover:text-white transition-colors">{t('newArrivals')}</Link></li>
+                <li><Link to="/shop?sort=popular" className="hover:text-white transition-colors">{t('bestSellers')}</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('customer')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link to="/account" className="hover:text-white">{t('myAccount')}</Link>
-                </li>
-                <li>
-                  <Link to="/orders" className="hover:text-white">{t('trackOrder')}</Link>
-                </li>
-                <li>
-                  <Link to="/wishlist" className="hover:text-white">{t('wishlist')}</Link>
-                </li>
+              <ul className="space-y-2 text-sm md:text-[15px]">
+                <li><Link to="/account" className="hover:text-white transition-colors">{t('myAccount')}</Link></li>
+                <li><Link to="/orders" className="hover:text-white transition-colors">{t('trackOrder')}</Link></li>
+                <li><Link to="/wishlist" className="hover:text-white transition-colors">{t('wishlist')}</Link></li>
               </ul>
             </div>
             <div>
               <h4 className="font-semibold text-white mb-3 text-sm sm:text-base">{t('company')}</h4>
-              <ul className="space-y-2 text-sm">
-                <li>
-                  <Link to="/about" className="hover:text-white">{t('about')}</Link>
-                </li>
-                <li>
-                  <Link to="/contact" className="hover:text-white">{t('contact')}</Link>
-                </li>
-                <li>
-                  <Link to="/privacy" className="hover:text-white">{t('privacy')}</Link>
-                </li>
-                <li>
-                  <Link to="/legal" className="hover:text-white">{t('legal')}</Link>
-                </li>
+              <ul className="space-y-2 text-sm md:text-[15px]">
+                <li><Link to="/about" className="hover:text-white transition-colors">{t('about')}</Link></li>
+                <li><Link to="/contact" className="hover:text-white transition-colors">{t('contact')}</Link></li>
+                <li><Link to="/privacy" className="hover:text-white transition-colors">{t('privacy')}</Link></li>
+                <li><Link to="/legal" className="hover:text-white transition-colors">{t('legal')}</Link></li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-charcoal-700 mt-6 sm:mt-8 pt-6 sm:pt-8 text-center text-sm space-y-3">
+          <div className="border-t border-charcoal-700 mt-6 sm:mt-8 md:mt-10 pt-6 sm:pt-8 text-center text-sm space-y-3">
             <p className="text-[11px] sm:text-xs text-charcoal-400 max-w-3xl mx-auto leading-relaxed">
               {t('legalDisclaimerShort')}{' '}
               <Link to="/legal" className="text-charcoal-200 underline hover:text-white">
                 {t('legalReadMore')}
               </Link>
             </p>
-            <p>
-              &copy; {new Date().getFullYear()} KULU. {t('allRights')}
-            </p>
+            <p>&copy; {new Date().getFullYear()} KULU. {t('allRights')}</p>
           </div>
         </div>
       </footer>
