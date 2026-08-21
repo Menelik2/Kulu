@@ -1,11 +1,14 @@
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, Sparkles, Package, Truck } from 'lucide-react'
+import { ArrowRight, Sparkles, Package, Truck, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getFeaturedProducts, getCategories, getProducts } from '@/services/products'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/features/language/LanguageContext'
 import { getCategoryIcon } from '@/lib/categoryIcons'
+import { cn } from '@/lib/utils'
+import type { Category } from '@/types'
 
 function ProductGridSkeleton({ count = 8 }: { count?: number }) {
   return (
@@ -30,17 +33,126 @@ function ProductGridSkeleton({ count = 8 }: { count?: number }) {
 
 function CategorySkeleton() {
   return (
-    <div className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-hide">
-      <div className="flex gap-3 sm:gap-4 w-max pb-1">
+    <div className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 snap-strip-scroller">
+      <div className="snap-strip gap-3 sm:gap-4 md:gap-5">
         {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="w-[76px] sm:w-[110px] md:w-[120px] bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2.5 sm:p-4 text-center animate-pulse shrink-0"
+            className="snap-strip-item w-[76px] sm:w-[110px] md:w-[128px] bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2.5 sm:p-4 text-center animate-pulse"
           >
             <div className="w-10 h-10 sm:w-14 sm:h-14 mx-auto rounded-xl sm:rounded-2xl bg-charcoal-100 mb-1.5 sm:mb-3" />
             <div className="h-2.5 sm:h-3 bg-charcoal-100 rounded w-3/4 mx-auto" />
           </div>
         ))}
+      </div>
+    </div>
+  )
+}
+
+function CategoryStrip({ categories }: { categories: Category[] }) {
+  const scrollerRef = useRef<HTMLDivElement>(null)
+  const [canLeft, setCanLeft] = useState(false)
+  const [canRight, setCanRight] = useState(false)
+
+  const updateArrows = useCallback(() => {
+    const el = scrollerRef.current
+    if (!el) return
+    const { scrollLeft, scrollWidth, clientWidth } = el
+    setCanLeft(scrollLeft > 4)
+    setCanRight(scrollLeft + clientWidth < scrollWidth - 4)
+  }, [])
+
+  useEffect(() => {
+    const el = scrollerRef.current
+    if (!el) return
+    updateArrows()
+    el.addEventListener('scroll', updateArrows, { passive: true })
+    window.addEventListener('resize', updateArrows)
+    return () => {
+      el.removeEventListener('scroll', updateArrows)
+      window.removeEventListener('resize', updateArrows)
+    }
+  }, [updateArrows, categories])
+
+  const scrollByAmount = (dir: -1 | 1) => {
+    const el = scrollerRef.current
+    if (!el) return
+    const amount = Math.min(el.clientWidth * 0.7, 360)
+    el.scrollBy({ left: dir * amount, behavior: 'smooth' })
+  }
+
+  // Desktop: shift vertical wheel to horizontal when hovering the strip
+  useEffect(() => {
+    const el = scrollerRef.current
+    if (!el) return
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return
+      if (el.scrollWidth <= el.clientWidth) return
+      e.preventDefault()
+      el.scrollBy({ left: e.deltaY, behavior: 'smooth' })
+    }
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [categories])
+
+  return (
+    <div className="relative group/strip">
+      {/* Desktop arrow controls */}
+      <button
+        type="button"
+        aria-label="Scroll left"
+        onClick={() => scrollByAmount(-1)}
+        disabled={!canLeft}
+        className={cn(
+          'hidden md:flex absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white border border-charcoal-100 shadow-md items-center justify-center transition-all',
+          canLeft
+            ? 'opacity-0 group-hover/strip:opacity-100 hover:bg-primary-50 hover:border-primary-200 text-charcoal-700'
+            : 'opacity-0 pointer-events-none'
+        )}
+      >
+        <ChevronLeft className="h-5 w-5" />
+      </button>
+      <button
+        type="button"
+        aria-label="Scroll right"
+        onClick={() => scrollByAmount(1)}
+        disabled={!canRight}
+        className={cn(
+          'hidden md:flex absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white border border-charcoal-100 shadow-md items-center justify-center transition-all',
+          canRight
+            ? 'opacity-0 group-hover/strip:opacity-100 hover:bg-primary-50 hover:border-primary-200 text-charcoal-700'
+            : 'opacity-0 pointer-events-none'
+        )}
+      >
+        <ChevronRight className="h-5 w-5" />
+      </button>
+
+      <div
+        ref={scrollerRef}
+        className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 snap-strip-scroller"
+      >
+        <div className="snap-strip gap-3 sm:gap-4 md:gap-5">
+          {categories.map((cat) => {
+            const Icon = getCategoryIcon(cat.slug || cat.name)
+            return (
+              <Link
+                key={cat.id}
+                to={`/shop?category=${cat.id}`}
+                className="snap-strip-item group w-[76px] sm:w-[110px] md:w-[128px] bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2.5 sm:p-4 md:p-5 text-center shadow-sm hover:shadow-md hover:border-primary-200 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
+              >
+                <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto rounded-xl sm:rounded-2xl bg-primary-50 flex items-center justify-center mb-1.5 sm:mb-3 group-hover:bg-primary-100 group-hover:scale-105 transition-all duration-200">
+                  <Icon
+                    className="h-5 w-5 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary-600"
+                    strokeWidth={1.75}
+                  />
+                </div>
+                <h3 className="font-medium text-[10px] sm:text-xs md:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2 leading-tight transition-colors">
+                  {cat.name}
+                </h3>
+              </Link>
+            )
+          })}
+        </div>
       </div>
     </div>
   )
@@ -171,7 +283,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories — horizontal strip on all breakpoints (pro style on desktop) */}
+      {/* Categories */}
       <section className="max-w-7xl mx-auto container-padding py-5 sm:py-10 md:py-12">
         <div className="flex items-center justify-between mb-3 sm:mb-5 md:mb-6">
           <h2 className="text-base sm:text-2xl md:text-3xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
@@ -185,30 +297,7 @@ export default function HomePage() {
         {categoriesLoading ? (
           <CategorySkeleton />
         ) : categories && categories.length > 0 ? (
-          <div className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-hide scroll-smooth">
-            <div className="flex gap-3 sm:gap-4 md:gap-5 w-max pb-1">
-              {categories.map((cat) => {
-                const Icon = getCategoryIcon(cat.slug || cat.name)
-                return (
-                  <Link
-                    key={cat.id}
-                    to={`/shop?category=${cat.id}`}
-                    className="group shrink-0 w-[76px] sm:w-[110px] md:w-[128px] bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2.5 sm:p-4 md:p-5 text-center shadow-sm hover:shadow-md hover:border-primary-200 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
-                  >
-                    <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto rounded-xl sm:rounded-2xl bg-primary-50 flex items-center justify-center mb-1.5 sm:mb-3 group-hover:bg-primary-100 group-hover:scale-105 transition-all duration-200">
-                      <Icon
-                        className="h-5 w-5 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary-600"
-                        strokeWidth={1.75}
-                      />
-                    </div>
-                    <h3 className="font-medium text-[10px] sm:text-xs md:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2 leading-tight transition-colors">
-                      {cat.name}
-                    </h3>
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
+          <CategoryStrip categories={categories} />
         ) : null}
       </section>
 
