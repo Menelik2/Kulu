@@ -30,32 +30,19 @@ function ProductGridSkeleton({ count = 8 }: { count?: number }) {
 
 function CategorySkeleton() {
   return (
-    <>
-      <div className="sm:hidden -mx-4 px-4 snap-strip-scroller">
-        <div className="snap-strip">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="snap-strip-item w-[76px] bg-white rounded-xl border border-charcoal-100 p-2.5 text-center animate-pulse"
-            >
-              <div className="w-10 h-10 mx-auto rounded-xl bg-charcoal-100 mb-1.5" />
-              <div className="h-2.5 bg-charcoal-100 rounded w-3/4 mx-auto" />
-            </div>
-          ))}
-        </div>
-      </div>
-      <div className="hidden sm:grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-5">
-        {Array.from({ length: 10 }).map((_, i) => (
+    <div className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-hide">
+      <div className="flex gap-3 sm:gap-4 w-max pb-1">
+        {Array.from({ length: 8 }).map((_, i) => (
           <div
             key={i}
-            className="bg-white rounded-2xl border border-charcoal-100 p-4 text-center animate-pulse"
+            className="w-[76px] sm:w-[110px] md:w-[120px] bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2.5 sm:p-4 text-center animate-pulse shrink-0"
           >
-            <div className="w-12 h-12 md:w-14 md:h-14 mx-auto rounded-2xl bg-charcoal-100 mb-3" />
-            <div className="h-3 bg-charcoal-100 rounded w-2/3 mx-auto" />
+            <div className="w-10 h-10 sm:w-14 sm:h-14 mx-auto rounded-xl sm:rounded-2xl bg-charcoal-100 mb-1.5 sm:mb-3" />
+            <div className="h-2.5 sm:h-3 bg-charcoal-100 rounded w-3/4 mx-auto" />
           </div>
         ))}
       </div>
-    </>
+    </div>
   )
 }
 
@@ -89,7 +76,6 @@ export default function HomePage() {
 
         <div className="relative max-w-7xl mx-auto container-padding py-6 sm:py-14 lg:py-20 xl:py-24">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            {/* Copy */}
             <div className="max-w-xl lg:max-w-none">
               <div className="hidden md:inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 border border-white/15 text-sm text-primary-100 mb-5 backdrop-blur-sm">
                 <Sparkles className="h-3.5 w-3.5 text-gold-400" />
@@ -124,7 +110,6 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* Desktop trust mini-row */}
               <div className="hidden md:flex items-center gap-6 mt-10 pt-8 border-t border-white/15">
                 <div className="flex items-center gap-2.5">
                   <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center">
@@ -147,7 +132,6 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Desktop visual panel */}
             <div className="hidden lg:block relative">
               <div className="relative aspect-[4/3] max-w-lg ml-auto">
                 <div className="absolute inset-0 rounded-3xl bg-white/10 backdrop-blur-sm border border-white/20 shadow-2xl overflow-hidden">
@@ -172,7 +156,6 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-                {/* Floating badge */}
                 <div className="absolute -bottom-4 -left-4 px-4 py-3 rounded-2xl bg-white shadow-xl text-charcoal-900 flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-primary-100 flex items-center justify-center">
                     <Sparkles className="h-5 w-5 text-primary-600" />
@@ -188,9 +171,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Categories */}
-      <section className="max-w-7xl mx-auto container-padding py-5 sm:py-10 md:py-14">
-        <div className="flex items-center justify-between mb-3 sm:mb-6 md:mb-8">
+      {/* Categories — horizontal strip on all breakpoints (pro style on desktop) */}
+      <section className="max-w-7xl mx-auto container-padding py-5 sm:py-10 md:py-12">
+        <div className="flex items-center justify-between mb-3 sm:mb-5 md:mb-6">
           <h2 className="text-base sm:text-2xl md:text-3xl font-bold text-charcoal-900">{t('shopByCategory')}</h2>
           <Link
             to="/shop"
@@ -202,51 +185,30 @@ export default function HomePage() {
         {categoriesLoading ? (
           <CategorySkeleton />
         ) : categories && categories.length > 0 ? (
-          <>
-            {/* Mobile: snap strip */}
-            <div className="sm:hidden -mx-4 px-4 snap-strip-scroller">
-              <div className="snap-strip">
-                {categories.map((cat) => {
-                  const Icon = getCategoryIcon(cat.slug || cat.name)
-                  return (
-                    <Link
-                      key={cat.id}
-                      to={`/shop?category=${cat.id}`}
-                      className="snap-strip-item group w-[76px] bg-white rounded-xl border border-charcoal-100 p-2.5 text-center active:scale-[0.97] transition-transform duration-150"
-                    >
-                      <div className="w-10 h-10 mx-auto rounded-xl bg-primary-50 flex items-center justify-center mb-1.5 group-active:bg-primary-100 transition-colors">
-                        <Icon className="h-5 w-5 text-primary-600" strokeWidth={1.75} />
-                      </div>
-                      <h3 className="font-medium text-[10px] text-charcoal-800 line-clamp-2 leading-tight">
-                        {cat.name}
-                      </h3>
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* Desktop / tablet grid */}
-            <div className="hidden sm:grid grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-5">
-              {categories.slice(0, 16).map((cat) => {
+          <div className="-mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 overflow-x-auto scrollbar-hide scroll-smooth">
+            <div className="flex gap-3 sm:gap-4 md:gap-5 w-max pb-1">
+              {categories.map((cat) => {
                 const Icon = getCategoryIcon(cat.slug || cat.name)
                 return (
                   <Link
                     key={cat.id}
                     to={`/shop?category=${cat.id}`}
-                    className="group bg-white rounded-2xl border border-charcoal-100 p-4 md:p-5 text-center hover:border-primary-300 hover:shadow-lg hover:-translate-y-1 active:scale-[0.98] transition-all duration-200"
+                    className="group shrink-0 w-[76px] sm:w-[110px] md:w-[128px] bg-white rounded-xl sm:rounded-2xl border border-charcoal-100 p-2.5 sm:p-4 md:p-5 text-center shadow-sm hover:shadow-md hover:border-primary-200 hover:-translate-y-0.5 active:scale-[0.97] transition-all duration-200"
                   >
-                    <div className="w-12 h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 mx-auto rounded-2xl bg-primary-50 flex items-center justify-center mb-3 group-hover:bg-primary-100 group-hover:scale-110 transition-all duration-200">
-                      <Icon className="h-6 w-6 md:h-7 md:w-7 lg:h-8 lg:w-8 text-primary-600" strokeWidth={1.75} />
+                    <div className="w-10 h-10 sm:w-14 sm:h-14 md:w-16 md:h-16 mx-auto rounded-xl sm:rounded-2xl bg-primary-50 flex items-center justify-center mb-1.5 sm:mb-3 group-hover:bg-primary-100 group-hover:scale-105 transition-all duration-200">
+                      <Icon
+                        className="h-5 w-5 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary-600"
+                        strokeWidth={1.75}
+                      />
                     </div>
-                    <h3 className="font-medium text-xs md:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2 leading-tight transition-colors">
+                    <h3 className="font-medium text-[10px] sm:text-xs md:text-sm text-charcoal-800 group-hover:text-primary-600 line-clamp-2 leading-tight transition-colors">
                       {cat.name}
                     </h3>
                   </Link>
                 )
               })}
             </div>
-          </>
+          </div>
         ) : null}
       </section>
 
