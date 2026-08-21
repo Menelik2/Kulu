@@ -12,6 +12,7 @@ import {
   adminUpdateProduct,
   adminGetCategories,
 } from '@/services/admin'
+import { adminGetSuppliers } from '@/services/suppliers'
 import {
   uploadProductImage,
   deleteProductImage,
@@ -31,6 +32,7 @@ const schema = z.object({
   sku: z.string().min(1, 'SKU required'),
   stock_quantity: z.coerce.number().int().min(0),
   category_id: z.string().optional().nullable(),
+  supplier_id: z.string().optional().nullable(),
   brand: z.string().optional(),
   is_active: z.boolean(),
   is_featured: z.boolean(),
@@ -53,6 +55,12 @@ export default function AdminProductForm() {
     queryKey: ['admin', 'categories'],
     queryFn: adminGetCategories,
   })
+
+  const { data: suppliers } = useQuery({
+    queryKey: ['admin', 'suppliers'],
+    queryFn: adminGetSuppliers,
+  })
+
   const { data: product, isLoading: productLoading } = useQuery({
     queryKey: ['admin', 'product', id],
     queryFn: () => adminGetProduct(id!),
@@ -74,6 +82,7 @@ export default function AdminProductForm() {
       sku: '',
       stock_quantity: 0,
       category_id: '',
+      supplier_id: '',
       brand: '',
       is_active: true,
       is_featured: false,
@@ -90,6 +99,7 @@ export default function AdminProductForm() {
         sku: product.sku,
         stock_quantity: product.stock_quantity,
         category_id: product.category_id || '',
+        supplier_id: product.supplier_id || '',
         brand: product.brand || '',
         is_active: product.is_active,
         is_featured: product.is_featured,
@@ -107,6 +117,7 @@ export default function AdminProductForm() {
       const payload = {
         ...data,
         category_id: data.category_id || null,
+        supplier_id: data.supplier_id || null,
         discount_price: data.discount_price || null,
       }
       if (isEdit) return adminUpdateProduct(id!, payload)
@@ -114,6 +125,7 @@ export default function AdminProductForm() {
     },
     onSuccess: (created) => {
       qc.invalidateQueries({ queryKey: ['admin', 'products'] })
+      qc.invalidateQueries({ queryKey: ['admin', 'supplier_product_counts'] })
       toast.success(isEdit ? 'Product updated' : 'Product created')
       if (!isEdit && created?.id) {
         navigate(`/admin/products/${created.id}/edit`, { replace: true })
@@ -186,7 +198,6 @@ export default function AdminProductForm() {
       await deleteProductImage(img)
       setImages((prev) => {
         const next = prev.filter((i) => i.id !== img.id)
-        // Reflect primary promotion in UI if needed
         if (img.is_primary && next.length > 0 && !next.some((i) => i.is_primary)) {
           next[0] = { ...next[0], is_primary: true }
         }
@@ -220,6 +231,16 @@ export default function AdminProductForm() {
       </div>
     )
   }
+
+  const activeSuppliers = (suppliers || []).filter((s) => s.is_active)
+  // Keep currently linked inactive supplier visible when editing
+  const supplierOptions =
+    isEdit && product?.supplier_id && !activeSuppliers.some((s) => s.id === product.supplier_id)
+      ? [
+          ...(suppliers || []).filter((s) => s.id === product.supplier_id),
+          ...activeSuppliers,
+        ]
+      : activeSuppliers
 
   return (
     <div className="p-4 sm:p-6 max-w-2xl">
@@ -283,9 +304,30 @@ export default function AdminProductForm() {
             </select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="brand">Brand</Label>
-            <Input id="brand" {...register('brand')} />
+            <Label htmlFor="supplier_id">Supplier</Label>
+            <select
+              id="supplier_id"
+              {...register('supplier_id')}
+              className="flex h-10 w-full rounded-lg border border-charcoal-200 bg-white px-3 text-sm"
+            >
+              <option value="">None</option>
+              {supplierOptions.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.name}{!s.is_active ? ' (inactive)' : ''}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-charcoal-400">
+              Manage list in{' '}
+              <Link to="/admin/suppliers" className="text-primary-600 hover:underline">
+                Suppliers
+              </Link>
+            </p>
           </div>
+        </div>
+        <div className="space-y-2">
+          <Label htmlFor="brand">Brand</Label>
+          <Input id="brand" {...register('brand')} />
         </div>
         <div className="flex gap-6">
           <label className="flex items-center gap-2 text-sm">
