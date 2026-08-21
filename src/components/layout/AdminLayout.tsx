@@ -1,7 +1,18 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom'
 import {
-  LayoutDashboard, Package, FolderTree, ShoppingBag, Users,
-  Star, Warehouse, Settings, LogOut, Menu, X, ChevronLeft, Truck
+  LayoutDashboard,
+  Package,
+  FolderTree,
+  ShoppingBag,
+  Users,
+  Star,
+  Warehouse,
+  Settings,
+  LogOut,
+  Menu,
+  X,
+  Store,
+  Truck,
 } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '@/features/auth/AuthContext'
@@ -59,31 +70,44 @@ export function AdminLayout() {
             </Link>
           ))}
         </nav>
-        <div className="p-3 border-t border-charcoal-700">
+        <div className="p-3 border-t border-charcoal-700 space-y-1">
           <div className="px-3 py-2 text-sm text-charcoal-400 truncate">
             {profile?.full_name || profile?.email}
           </div>
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-white bg-primary-600/90 hover:bg-primary-600"
+          >
+            <Store className="h-4 w-4" />
+            Back to Store
+          </Link>
           <Button
             variant="ghost"
             size="sm"
             className="w-full justify-start text-charcoal-300 hover:text-white hover:bg-charcoal-800"
-            onClick={() => { signOut(); navigate('/') }}
+            onClick={() => {
+              signOut()
+              navigate('/')
+            }}
           >
             <LogOut className="h-4 w-4 mr-2" />
             Sign Out
           </Button>
-          <Link to="/" className="flex items-center gap-2 px-3 py-2 text-sm text-charcoal-400 hover:text-white mt-1">
-            <ChevronLeft className="h-4 w-4" />
-            Back to Store
-          </Link>
         </div>
       </aside>
 
       <div className="lg:hidden fixed top-0 left-0 right-0 z-40 bg-charcoal-900 text-white h-14 flex items-center px-4 gap-3">
-        <button onClick={() => setSidebarOpen(true)} aria-label="Open menu">
+        <button type="button" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
           <Menu className="h-6 w-6" />
         </button>
-        <span className="font-bold">KULU Admin</span>
+        <span className="font-bold flex-1">KULU Admin</span>
+        <Link
+          to="/"
+          className="text-xs font-medium px-2.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 flex items-center gap-1"
+        >
+          <Store className="h-3.5 w-3.5" />
+          Store
+        </Link>
       </div>
 
       {sidebarOpen && (
@@ -92,9 +116,11 @@ export function AdminLayout() {
           <aside className="relative w-64 bg-charcoal-900 text-white flex flex-col">
             <div className="p-4 border-b border-charcoal-700 flex items-center justify-between">
               <span className="font-bold text-lg">KULU Admin</span>
-              <button onClick={() => setSidebarOpen(false)}><X className="h-5 w-5" /></button>
+              <button type="button" onClick={() => setSidebarOpen(false)}>
+                <X className="h-5 w-5" />
+              </button>
             </div>
-            <nav className="flex-1 p-3 space-y-1">
+            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
               {navItems.map((item) => (
                 <Link
                   key={item.to}
@@ -102,7 +128,9 @@ export function AdminLayout() {
                   onClick={() => setSidebarOpen(false)}
                   className={cn(
                     'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium',
-                    isActive(item.to, item.end) ? 'bg-primary-600' : 'text-charcoal-300 hover:bg-charcoal-800'
+                    isActive(item.to, item.end)
+                      ? 'bg-primary-600'
+                      : 'text-charcoal-300 hover:bg-charcoal-800'
                   )}
                 >
                   <item.icon className="h-5 w-5" />
@@ -110,6 +138,29 @@ export function AdminLayout() {
                 </Link>
               ))}
             </nav>
+            <div className="p-3 border-t border-charcoal-700 space-y-1">
+              <Link
+                to="/"
+                onClick={() => setSidebarOpen(false)}
+                className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium text-white bg-primary-600"
+              >
+                <Store className="h-4 w-4" />
+                Back to Store
+              </Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full justify-start text-charcoal-300 hover:text-white hover:bg-charcoal-800"
+                onClick={() => {
+                  setSidebarOpen(false)
+                  signOut()
+                  navigate('/')
+                }}
+              >
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
           </aside>
         </div>
       )}
