@@ -1,13 +1,11 @@
-import { useRef, useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, Sparkles, Package, Truck, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowRight, Sparkles, Package, Truck } from 'lucide-react'
 import { getFeaturedProducts, getCategories, getProducts } from '@/services/products'
 import { ProductCard } from '@/components/products/ProductCard'
 import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/features/language/LanguageContext'
 import { getCategoryIcon } from '@/lib/categoryIcons'
-import { cn } from '@/lib/utils'
 import type { Category } from '@/types/database'
 
 function ProductGridSkeleton({ count = 8 }: { count?: number }) {
@@ -50,13 +48,8 @@ function CategorySkeleton() {
 }
 
 function CategoryStrip({ categories }: { categories: Category[] }) {
-  const scrollerRef = useRef<HTMLDivElement>(null)
-
   return (
-    <div
-      ref={scrollerRef}
-      className="-mx-4 px-4 snap-strip-scroller"
-    >
+    <div className="-mx-4 px-4 snap-strip-scroller">
       <div className="snap-strip gap-3">
         {categories.map((cat) => {
           const Icon = getCategoryIcon(cat.slug || cat.name)
