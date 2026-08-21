@@ -9,6 +9,8 @@ interface BeforeInstallPromptEvent extends Event {
 const DISMISS_KEY = 'kulu_pwa_install_dismissed'
 const DISMISS_DAYS = 14
 
+export type InstallMode = 'native' | 'ios' | 'manual'
+
 function wasDismissedRecently(): boolean {
   try {
     const raw = localStorage.getItem(DISMISS_KEY)
@@ -26,6 +28,7 @@ function isStandalone(): boolean {
   const nav = window.navigator as Navigator & { standalone?: boolean }
   return (
     window.matchMedia('(display-mode: standalone)').matches ||
+    window.matchMedia('(display-mode: minimal-ui)').matches ||
     nav.standalone === true ||
     document.referrer.includes('android-app://')
   )
@@ -33,18 +36,23 @@ function isStandalone(): boolean {
 
 function isIos(): boolean {
   if (typeof navigator === 'undefined') return false
-  return /iphone|ipad|ipod/i.test(navigator.userAgent)
+  const ua = navigator.userAgent
+  // iPadOS 13+ may report as Mac — check touch points
+  const iPadOs =
+    navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1
+  return /iphone|ipad|ipod/i.test(ua) || iPadOs
 }
 
-function isMobile(): boolean {
-  if (typeof navigator === 'undefined') return false
-  return /android|iphone|ipad|ipod|mobile/i.test(navigator.userAgent) || window.innerWidth < 768
-}
-
+/**
+ * Show install CTA on every browser that is not already running as an installed app.
+ * - Chromium (Chrome, Edge, Samsung, Opera, Brave): native beforeinstallprompt when available
+ * - iOS Safari: Share → Add to Home Screen instructions
+ * - Firefox / others: manual install tip (menu → Install / Add to Home Screen)
+ */
 export function usePwaInstall() {
   const [deferred, setDeferred] = useState<BeforeInstallPromptEvent | null>(null)
-  const [visible, setVisible] = useState(false)
-  const [iosHint, setIosHint] = useState(false)
+  const [showBanner, setShowBanner] = useState(false)
+  const [mode, setMode] = useState<InstallMode>('manual')
   const [installing, setInstalling] = useState(false)
 
   useEffect(() => {
@@ -54,29 +62,34 @@ export function usePwaInstall() {
     const onBip = (e: Event) => {
       e.preventDefault()
       setDeferred(e as BeforeInstallPromptEvent)
-      if (isMobile()) setVisible(true)
+      setMode('native')
+      setShowBanner(true)
     }
 
     const onInstalled = () => {
       setDeferred(null)
-      setVisible(false)
-      setIosHint(false)
+      setShowBanner(false)
     }
 
     window.addEventListener('beforeinstallprompt', onBip)
     window.addEventListener('appinstalled', onInstalled)
 
-    // iOS Safari has no beforeinstallprompt — show soft tip after short delay
-    if (isIos() && isMobile() && !isStandalone()) {
-      const t = window.setTimeout(() => setIosHint(true), 2500)
-      return () => {
-        window.clearTimeout(t)
-        window.removeEventListener('beforeinstallprompt', onBip)
-        window.removeEventListener('appinstalled', onInstalled)
-      }
-    }
+    // Always surface a banner after a short delay so non-Chromium browsers still see install help
+    const delay = window.setTimeout(() => {
+      if (isStandalone() || wasDismissedRecently()) return
+      setShowBanner((already) => {
+        if (already) return true
+        if (isIos()) {
+          setMode('ios')
+        } else {
+          setMode((m) => (m === 'native' ? 'native' : 'manual'))
+        }
+        return true
+      })
+    }, 1800)
 
     return () => {
+      window.clearTimeout(delay)
       window.removeEventListener('beforeinstallprompt', onBip)
       window.removeEventListener('appinstalled', onInstalled)
     }
@@ -88,8 +101,7 @@ export function usePwaInstall() {
     } catch {
       /* ignore */
     }
-    setVisible(false)
-    setIosHint(false)
+    setShowBanner(false)
   }, [])
 
   const promptInstall = useCallback(async () => {
@@ -99,7 +111,9 @@ export function usePwaInstall() {
       await deferred.prompt()
       const { outcome } = await deferred.userChoice
       setDeferred(null)
-      setVisible(false)
+      if (outcome === 'accepted') {
+        setShowBanner(false)
+      }
       return outcome === 'accepted'
     } catch {
       return false
@@ -109,9 +123,9 @@ export function usePwaInstall() {
   }, [deferred])
 
   return {
-    canInstall: !!deferred && visible,
-    showBanner: (visible && !!deferred) || iosHint,
-    isIosHint: iosHint && !deferred,
+    showBanner,
+    mode,
+    canNativeInstall: mode === 'native' && !!deferred,
     installing,
     promptInstall,
     dismiss,
