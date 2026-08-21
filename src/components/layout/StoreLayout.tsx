@@ -14,8 +14,10 @@ import {
   Headphones,
   MapPin,
   ChevronDown,
+  LayoutGrid,
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useAuth } from '@/features/auth/AuthContext'
 import { useCart } from '@/features/cart/CartContext'
 import { useLanguage } from '@/features/language/LanguageContext'
@@ -25,6 +27,8 @@ import { PwaInstallBanner } from '@/components/PwaInstallBanner'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 import { KULU_LOGO_SRC } from '@/lib/logoSrc'
+import { getCategories } from '@/services/products'
+import { getCategoryIcon } from '@/lib/categoryIcons'
 
 export function StoreLayout() {
   const { user, profile, signOut, isAdmin } = useAuth()
@@ -32,13 +36,21 @@ export function StoreLayout() {
   const { t, locale, setLocale } = useLanguage()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [megaOpen, setMegaOpen] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
 
   const isHome = location.pathname === '/'
 
+  const { data: categories } = useQuery({
+    queryKey: ['categories'],
+    queryFn: getCategories,
+    staleTime: 1000 * 60 * 10,
+  })
+
   useEffect(() => {
     setMobileMenuOpen(false)
+    setMegaOpen(false)
   }, [location.pathname])
 
   const handleSearch = (e: React.FormEvent) => {
@@ -227,15 +239,89 @@ export function StoreLayout() {
           </nav>
         </div>
       </div>
+
+      {/* Categories mega bar */}
+      <div className="border-t border-charcoal-100 bg-white relative">
+        <div className="max-w-7xl mx-auto container-padding">
+          <div className="flex items-center gap-1 h-11 overflow-x-auto scrollbar-hide">
+            <button
+              type="button"
+              onClick={() => setMegaOpen((o) => !o)}
+              className={cn(
+                'flex items-center gap-1.5 px-3 h-8 rounded-full text-sm font-semibold shrink-0 transition-colors',
+                megaOpen
+                  ? 'bg-primary-600 text-white'
+                  : 'bg-charcoal-900 text-white hover:bg-charcoal-800'
+              )}
+            >
+              <LayoutGrid className="h-3.5 w-3.5" />
+              {t('shopByCategory')}
+              <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', megaOpen && 'rotate-180')} />
+            </button>
+
+            <div className="w-px h-5 bg-charcoal-200 mx-1 shrink-0" />
+
+            {categories?.slice(0, 8).map((cat) => {
+              const Icon = getCategoryIcon(cat.slug || cat.name)
+              return (
+                <Link
+                  key={cat.id}
+                  to={`/shop?category=${cat.id}`}
+                  className="flex items-center gap-1.5 px-3 h-8 rounded-full text-sm text-charcoal-700 hover:bg-primary-50 hover:text-primary-700 whitespace-nowrap shrink-0 transition-colors font-medium"
+                >
+                  <Icon className="h-3.5 w-3.5 opacity-70" strokeWidth={1.75} />
+                  {cat.name}
+                </Link>
+              )
+            })}
+
+            <Link
+              to="/shop"
+              className="flex items-center gap-1 px-3 h-8 rounded-full text-sm text-primary-600 hover:bg-primary-50 whitespace-nowrap shrink-0 font-semibold ml-auto"
+            >
+              {t('viewAll')}
+            </Link>
+          </div>
+        </div>
+
+        {/* Mega dropdown panel */}
+        {megaOpen && categories && categories.length > 0 && (
+          <>
+            <div className="fixed inset-0 z-40" onClick={() => setMegaOpen(false)} />
+            <div className="absolute left-0 right-0 top-full z-50 bg-white border-b border-charcoal-100 shadow-xl">
+              <div className="max-w-7xl mx-auto container-padding py-6">
+                <div className="grid grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-3">
+                  {categories.map((cat) => {
+                    const Icon = getCategoryIcon(cat.slug || cat.name)
+                    return (
+                      <Link
+                        key={cat.id}
+                        to={`/shop?category=${cat.id}`}
+                        onClick={() => setMegaOpen(false)}
+                        className="group flex flex-col items-center gap-2 p-4 rounded-2xl border border-transparent hover:border-primary-200 hover:bg-primary-50/50 transition-all"
+                      >
+                        <div className="w-12 h-12 rounded-2xl bg-primary-50 group-hover:bg-primary-100 flex items-center justify-center transition-colors">
+                          <Icon className="h-6 w-6 text-primary-600" strokeWidth={1.75} />
+                        </div>
+                        <span className="text-xs font-medium text-charcoal-800 text-center line-clamp-2 group-hover:text-primary-700">
+                          {cat.name}
+                        </span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
     </header>
   )
 
   return (
     <div className="min-h-screen flex flex-col bg-charcoal-50">
-      {/* Desktop header — always present */}
       <DesktopHeader />
 
-      {/* Mobile header — home only (existing app-like pattern) */}
       {isHome && (
         <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-charcoal-100 shadow-sm safe-top md:hidden">
           <div className="max-w-7xl mx-auto container-padding">
